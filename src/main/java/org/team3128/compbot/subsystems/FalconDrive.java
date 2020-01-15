@@ -1,7 +1,7 @@
 /** 
  * @author Adham Elarabawy 
  */
-package org.team3128.athos.subsystems;
+package org.team3128.compbot.subsystems;
 
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.generics.Threaded;
@@ -19,31 +19,27 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import com.revrobotics.*;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import org.team3128.common.hardware.motor.LazyCANSparkMax;
+import org.team3128.common.hardware.motor.LazyTalonFX;
 import org.team3128.common.utility.RobotMath;
 
 import edu.wpi.first.wpilibj.Timer;
 
 import org.team3128.common.utility.Log;
 
-public class NEODrive extends Threaded {
+public class FalconDrive extends Threaded {
 
 	public enum DriveState {
 		TELEOP, RAMSETECONTROL, TURN, DONE
 	}
 
-	private static final NEODrive instance = new NEODrive();
+	private static final FalconDrive instance = new FalconDrive();
 
-	public static NEODrive getInstance() {
+	public static FalconDrive getInstance() {
 		return instance;
 	}
 
@@ -65,35 +61,26 @@ public class NEODrive extends Threaded {
 	double prevPositionL = 0;
 	double prevPositionR = 0;
 
-	public LazyCANSparkMax leftSpark, rightSpark, leftSparkSlave, rightSparkSlave, leftSparkSlave2, rightSparkSlave2;
-	private CANPIDController leftSparkPID, rightSparkPID;
-	private CANEncoder leftSparkEncoder, rightSparkEncoder;
+	public LazyTalonFX leftTalon, rightTalon, leftTalonSlave, rightTalonSlave, leftTalonSlave2, rightTalonSlave2;
 
-	private NEODrive() {
+	private FalconDrive() {
 
 		gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 
-		leftSpark = new LazyCANSparkMax(Constants.LEFT_DRIVE_FRONT_ID, MotorType.kBrushless);
-		leftSparkSlave = new LazyCANSparkMax(Constants.LEFT_DRIVE_MIDDLE_ID, MotorType.kBrushless);
-		// leftSparkSlave2 = new LazyCANSparkMax(Constants.LEFT_DRIVE_BACK_ID,
-		// MotorType.kBrushless);
+		leftTalon = new LazyTalonFX(Constants.LEFT_DRIVE_FRONT_ID);
+		leftTalonSlave = new LazyTalonFX(Constants.LEFT_DRIVE_MIDDLE_ID);
+		// leftTalonSlave2 = new LazyTalonFX(Constants.LEFT_DRIVE_BACK_ID);
 
-		rightSpark = new LazyCANSparkMax(Constants.RIGHT_DRIVE_FRONT_ID, MotorType.kBrushless);
-		rightSparkSlave = new LazyCANSparkMax(Constants.RIGHT_DRIVE_MIDDLE_ID, MotorType.kBrushless);
-		// rightSparkSlave2 = new LazyCANSparkMax(Constants.RIGHT_DRIVE_BACK_ID,
-		// MotorType.kBrushless);
+		rightTalon = new LazyTalonFX(Constants.RIGHT_DRIVE_FRONT_ID);
+		rightTalonSlave = new LazyTalonFX(Constants.RIGHT_DRIVE_MIDDLE_ID);
+		// rightTalonSlave2 = new LazyTalonFX(Constants.RIGHT_DRIVE_BACK_ID);
 
-		leftSpark.setInverted(false);
-		rightSpark.setInverted(true);
-		leftSparkSlave.setInverted(false);
-		rightSparkSlave.setInverted(true);
-		// leftSparkSlave2.setInverted(false);
-		// rightSparkSlave2.setInverted(false);
-
-		leftSparkPID = leftSpark.getPIDController();
-		rightSparkPID = rightSpark.getPIDController();
-		leftSparkEncoder = leftSpark.getEncoder();
-		rightSparkEncoder = rightSpark.getEncoder();
+		leftTalon.setInverted(false);
+		rightTalon.setInverted(true);
+		leftTalonSlave.setInverted(false);
+		rightTalonSlave.setInverted(true);
+		// leftTalonSlave2.setInverted(false);
+		// rightTalonSlave2.setInverted(false);
 
 		configMotors();
 
@@ -127,16 +114,13 @@ public class NEODrive extends Threaded {
 	}
 
 	private void configAuto() {
-		rightSparkPID.setP(Constants.K_AUTO_RIGHT_P, 0);
-		rightSparkPID.setD(Constants.K_AUTO_RIGHT_D, 0);
-		rightSparkPID.setFF(Constants.K_AUTO_RIGHT_F, 0);
-		rightSparkPID.setOutputRange(-1, 1);
+		rightTalon.config_kP(0, Constants.K_AUTO_RIGHT_P);
+		rightTalon.config_kD(0, Constants.K_AUTO_RIGHT_D);
+		rightTalon.config_kF(0, Constants.K_AUTO_RIGHT_F);
 
-		leftSparkPID.setP(Constants.K_AUTO_LEFT_P, 0);
-		leftSparkPID.setD(Constants.K_AUTO_LEFT_D, 0);
-		leftSparkPID.setFF(Constants.K_AUTO_LEFT_F, 0);
-		leftSparkPID.setOutputRange(-1, 1);
-
+		leftTalon.config_kP(0, Constants.K_AUTO_LEFT_P);
+		leftTalon.config_kD(0, Constants.K_AUTO_LEFT_D);
+		leftTalon.config_kF(0, Constants.K_AUTO_LEFT_F);
 	}
 
 	private void configHigh() {
@@ -154,21 +138,21 @@ public class NEODrive extends Threaded {
 	}
 
 	public void printCurrent() {
-		System.out.println(leftSpark);
+		System.out.println(leftTalon);
 	}
 
 	private void configMotors() {
-		leftSparkSlave.follow(leftSpark);
-		// leftSparkSlave2.follow(leftSpark);
-		rightSparkSlave.follow(rightSpark);
-		// rightSparkSlave2.follow(rightSpark);
+		leftTalonSlave.follow(leftTalon);
+		// leftTalonSlave2.follow(leftTalon);
+		rightTalonSlave.follow(rightTalon);
+		// rightTalonSlave2.follow(rightTalon);
 
-		leftSpark.setIdleMode(Constants.DRIVE_IDLE_MODE);
-		rightSpark.setIdleMode(Constants.DRIVE_IDLE_MODE);
-		leftSparkSlave.setIdleMode(Constants.DRIVE_IDLE_MODE);
-		rightSparkSlave.setIdleMode(Constants.DRIVE_IDLE_MODE);
-		// leftSparkSlave2.setIdleMode(IdleMode.kCoast);
-		// rightSparkSlave2.setIdleMode(IdleMode.kCoast);
+		leftTalon.setNeutralMode(Constants.DRIVE_IDLE_MODE);
+		rightTalon.setNeutralMode(Constants.DRIVE_IDLE_MODE);
+		leftTalonSlave.setNeutralMode(Constants.DRIVE_IDLE_MODE);
+		rightTalonSlave.setNeutralMode(Constants.DRIVE_IDLE_MODE);
+		// leftTalonSlave2.setIdleMode(IdleMode.kCoast);
+		// rightTalonSlave2.setIdleMode(IdleMode.kCoast);
 		configAuto();
 	}
 
@@ -190,18 +174,11 @@ public class NEODrive extends Threaded {
 	}
 
 	public double getLeftDistance() {
-		/*
-		 * return leftTalon.getSelectedSensorPosition(0) /
-		 * Constants.EncoderTicksPerRotation * Constants.WheelDiameter Math.PI * 22d /
-		 * 62d / 3d;
-		 */
-		return leftSparkEncoder.getPosition() * Constants.WHEEL_DIAMETER * Math.PI
-				* Constants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION;
+		return leftTalon.getSelectedSensorPosition(0) * Constants.kDriveNuToInches;
 	}
 
 	public double getRightDistance() {
-		return rightSparkEncoder.getPosition() * Constants.WHEEL_DIAMETER * Math.PI
-				* Constants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION;
+		return rightTalon.getSelectedSensorPosition(0) * Constants.kDriveNuToInches;
 	}
 
 	public double getSpeed() {
@@ -209,11 +186,11 @@ public class NEODrive extends Threaded {
 	}
 
 	public double getLeftSpeed() {
-		return leftSparkEncoder.getVelocity() * Constants.kDriveInchesPerSecPerRPM;
+		return leftTalon.getSelectedSensorVelocity(0) * Constants.kDriveInchesPerSecPerNUp100ms;
 	}
 
 	public double getRightSpeed() {
-		return rightSparkEncoder.getVelocity() * Constants.kDriveInchesPerSecPerRPM;
+		return rightTalon.getSelectedSensorVelocity(0) * Constants.kDriveInchesPerSecPerNUp100ms;
 	}
 
 	public synchronized void setAutoTrajectory(Trajectory autoTraj, boolean isReversed) {
@@ -224,8 +201,8 @@ public class NEODrive extends Threaded {
 
 	public synchronized void startTrajectory() {
 		if (trajectory == null) {
-			Log.info("NEODrive", "FATAL // FAILED TRAJECTORY - NULL TRAJECTORY INPUTTED");
-			Log.info("NEODrive", "Returned to teleop control");
+			Log.info("FalconDrive", "FATAL // FAILED TRAJECTORY - NULL TRAJECTORY INPUTTED");
+			Log.info("FalconDrive", "Returned to teleop control");
 			driveState = DriveState.TELEOP;
 		} else {
 			configAuto();
@@ -241,9 +218,9 @@ public class NEODrive extends Threaded {
 		return 0;
 	}
 
-	private void setWheelPower(DriveSignal setVelocity) {
-		leftSpark.set(setVelocity.leftVelocity);
-		rightSpark.set(setVelocity.rightVelocity);
+	private void setWheelPower(DriveSignal signal) {
+		leftTalon.set(ControlMode.PercentOutput, signal.leftVelocity);
+		rightTalon.set(ControlMode.PercentOutput, signal.rightVelocity);
 	}
 
 	private void setWheelVelocity(DriveSignal setVelocity) {
@@ -253,14 +230,14 @@ public class NEODrive extends Threaded {
 			DriverStation.reportError("Velocity set over " + Constants.DRIVE_HIGH_SPEED + " !", false);
 			return;
 		}
-		// inches per sec to rotations per min
-		double leftSetpoint = (setVelocity.leftVelocity) * 1 / Constants.kDriveInchesPerSecPerRPM;
-		double rightSetpoint = (setVelocity.rightVelocity) * 1 / Constants.kDriveInchesPerSecPerRPM;
-		leftSparkPID.setReference(leftSetpoint, ControlType.kVelocity);
-		// Log.info("NEODrive", "setWheelVelocity: " + "leftSetpoint = " +
+		// inches per sec to nu/100ms
+		double leftSetpoint = (setVelocity.leftVelocity) * 1 / Constants.kDriveInchesPerSecPerNUp100ms;
+		double rightSetpoint = (setVelocity.rightVelocity) * 1 / Constants.kDriveInchesPerSecPerNUp100ms;
+		leftTalon.set(ControlMode.Velocity, leftSetpoint);
+		// Log.info("FalconDrive", "setWheelVelocity: " + "leftSetpoint = " +
 		// String.valueOf(leftSetpoint));
-		rightSparkPID.setReference(rightSetpoint, ControlType.kVelocity);
-		// Log.info("NEODrive", "setWheelVelocity: " + "rightSetpoint = " +
+		rightTalon.set(ControlMode.Velocity, rightSetpoint);
+		// Log.info("FalconDrive", "setWheelVelocity: " + "rightSetpoint = " +
 		// String.valueOf(rightSetpoint));
 	}
 
@@ -304,7 +281,7 @@ public class NEODrive extends Threaded {
 		spdR = Constants.DRIVE_HIGH_SPEED * pwrR;
 		String tempStr = "pwrL=" + String.valueOf(pwrL) + ", pwrR=" + String.valueOf(pwrR) + ", spdL="
 				+ String.valueOf(spdL) + ", spdR=" + String.valueOf(spdR);
-		Log.info("NEODrive", tempStr);
+		Log.info("FalconDrive", tempStr);
 		// setWheelPower(new DriveSignal(pwrL, pwrR));
 		setWheelVelocity(new DriveSignal(spdL, spdR));
 	}
@@ -344,15 +321,16 @@ public class NEODrive extends Threaded {
 	 * Set Velocity PID for both sides of the drivetrain (to the same constants)
 	 */
 	public void setDualVelocityPID(double kP, double kD, double kF) {
-		leftSparkPID.setP(kP);
-		leftSparkPID.setD(kD);
-		leftSparkPID.setFF(kF);
+		leftTalon.config_kP(0, kP);
+		leftTalon.config_kD(0, kD);
+		leftTalon.config_kF(0, kF);
 
-		rightSparkPID.setP(kP);
-		rightSparkPID.setD(kD);
-		rightSparkPID.setFF(kF);
-		Log.info("[NEODrive]", "Updated Velocity PID values for both sides of the drivetrain to: kP = " + kP + ", kD = "
-				+ kD + ", kF = " + kF);
+		rightTalon.config_kP(0, kP);
+		rightTalon.config_kD(0, kD);
+		rightTalon.config_kF(0, kF);
+
+		Log.info("[ArcadeDrive]", "Updated Velocity PID values for both sides of the drivetrain to: kP = " + kP
+				+ ", kD = " + kD + ", kF = " + kF);
 	}
 
 	private void updateTurn() {
@@ -390,7 +368,7 @@ public class NEODrive extends Threaded {
 				currentTrajectoryState);
 		if ((currentTime - startTime) == totalTime) {
 			synchronized (this) {
-				Log.info("NEODrive", "Finished Trajectory Pursuit with RamseteController successfully.");
+				Log.info("FalconDrive", "Finished Trajectory Pursuit with RamseteController successfully.");
 				driveState = DriveState.TELEOP;
 			}
 			configHigh();
@@ -410,10 +388,8 @@ public class NEODrive extends Threaded {
 	}
 
 	synchronized public void stopMovement() {
-		leftSpark.set(0);
-		rightSpark.set(0);
-		leftSparkPID.setReference(0, ControlType.kDutyCycle);
-		rightSparkPID.setReference(0, ControlType.kDutyCycle);
+		leftTalon.set(ControlMode.PercentOutput, 0);
+		rightTalon.set(ControlMode.PercentOutput, 0);
 		setWheelVelocity(new DriveSignal(0, 0));
 
 		driveState = DriveState.TELEOP;

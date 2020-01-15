@@ -3,11 +3,11 @@
  */
 package org.team3128.common.control.motion;
 
-import org.team3128.athos.subsystems.NEODrive.AutoDriveSignal;
-import org.team3128.athos.subsystems.NEODrive.DriveSignal;
 import org.team3128.common.control.RateLimiter;
 import org.team3128.common.control.trajectory.Trajectory;
 import org.team3128.common.control.trajectory.Trajectory.State;
+import org.team3128.common.drive.AutoDriveSignal;
+import org.team3128.common.drive.DriveSignal;
 import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.math.Translation2D;
 import org.team3128.common.utility.math.Rotation2D;
@@ -72,7 +72,10 @@ public class RamseteController {
 		// in
 		// meters
 
-		RobotTracker.getInstance().trajOdometry = new Pose2D(new Translation2D(desiredXPosition / Constants.inchesToMeters, desiredYPosition / Constants.inchesToMeters), new Rotation2D());
+		RobotTracker.getInstance().trajOdometry = new Pose2D(
+				new Translation2D(desiredXPosition / Constants.inchesToMeters,
+						desiredYPosition / Constants.inchesToMeters),
+				new Rotation2D());
 		double desiredTheta = currentTrajectoryState.poseMeters.getRotation().getRadians(); // trajectory desired theta
 																							// in radians
 

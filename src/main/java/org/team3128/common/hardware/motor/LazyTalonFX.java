@@ -4,12 +4,12 @@
 package org.team3128.common.hardware.motor;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 /**
- * Sends only new commands to the TalonSRX to reduce CAN usage.
+ * Sends only new commands to the TalonFX to reduce CAN usage.
  */
-public class LazyTalonSRX extends TalonSRX {
+public class LazyTalonFX extends TalonFX {
 
 	private double prevValue = 0;
 	private ControlMode prevControlMode = ControlMode.Disabled;
@@ -18,7 +18,7 @@ public class LazyTalonSRX extends TalonSRX {
 	 * 
 	 * @param deviceNumber device id
 	 */
-	public LazyTalonSRX(int deviceNumber) {
+	public LazyTalonFX(int deviceNumber) {
 		super(deviceNumber);
 		enableVoltageCompensation(true);
 		configVoltageCompSaturation(12, 10);
