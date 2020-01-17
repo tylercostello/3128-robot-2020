@@ -2,6 +2,8 @@
 
 package org.team3128.aramis.main;
 
+import org.team3128.common.utility.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,6 +15,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import org.team3128.common.hardware.motor.*;
 
 import org.team3128.common.NarwhalRobot;
 import org.team3128.common.drive.DriveCommandRunning;
@@ -49,9 +53,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 
 public class MainAramis extends NarwhalRobot {
-    public TalonSRX rightDriveLeader;
+    public LazyTalonSRX rightDriveLeader;
     public VictorSPX rightDriveFollower;
-    public TalonSRX leftDriveLeader;
+    public LazyTalonSRX leftDriveLeader;
     public VictorSPX leftDriveFollower;
 
     public SRXTankDrive tankDrive;
@@ -91,6 +95,8 @@ public class MainAramis extends NarwhalRobot {
     File usbFile;
     String csvString = "";
 
+    public ErrorCatcherUtility errorCatcher = new ErrorCatcherUtility(Constants.CanChain);
+
     @Override
     protected void constructHardware() {
         try {
@@ -122,13 +128,15 @@ public class MainAramis extends NarwhalRobot {
             ioe.printStackTrace();
         }
 
+        
+
         limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
-        rightDriveLeader = new TalonSRX(10);
-        rightDriveFollower = new VictorSPX(11);
+        rightDriveLeader = new LazyTalonSRX(15);
+        rightDriveFollower = new VictorSPX(6);
 
-        leftDriveLeader = new TalonSRX(15);
-        leftDriveFollower = new VictorSPX(16);
+        leftDriveLeader = new LazyTalonSRX(13);
+        leftDriveFollower = new VictorSPX(5);
 
         rightDriveLeader.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0,
                 Constants.CAN_TIMEOUT);
@@ -143,8 +151,7 @@ public class MainAramis extends NarwhalRobot {
         double wheelBase = 32.3 * Length.in;
         int robotFreeSpeed = 3700;
 
-        // SRXTankDrive.initialize(leftDriveLeader, rightDriveLeader, wheelCirc,
-        // wheelBase, robotFreeSpeed);
+        SRXTankDrive.initialize(leftDriveLeader, rightDriveLeader, wheelCirc, wheelBase, robotFreeSpeed);
 
         leftDriveLeader.setInverted(false);
         leftDriveFollower.setInverted(false);
@@ -175,11 +182,13 @@ public class MainAramis extends NarwhalRobot {
         blindPID = new PIDConstants(0.1, 0, 0, 0);
         driveCmdRunning = new DriveCommandRunning();
 
+        Constants.setCanChain();
+        errorCatcher.ErrorCatcher();
         // DCU
         // DriveCalibrationUtility.initialize(gyro, visionPID);
         dcu = DriveCalibrationUtility.getInstance();
 
-        dcu.initNarwhalDashboard();
+        //dcu.initNarwhalDashboard();
     }
 
     @Override
