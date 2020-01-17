@@ -2,9 +2,11 @@ package org.team3128.aramis.subsystems;
 
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.utility.units.Angle;
-
+import java.lang.Math;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import org.team3128.common.utility.test_suite.*;
+
 
 import org.team3128.common.generics.RobotConstants;
 
@@ -107,5 +109,22 @@ public class Constants extends RobotConstants {
     public static final double BOTTOM_LIMELIGHT_HEIGHT = 6.15 * Length.in;
     public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
     public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 0 * Length.in;
+
+
+    public static CanDevices[] CanChain = new CanDevices[42];
+
+    public static CanDevices leftDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 13, "Left Drive Leader");
+    public static CanDevices leftDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 5, "Left Drive Follower");
+    public static CanDevices rightDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 15, "Right Drive Leader");
+    public static CanDevices rightDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 6, "Right Drive Follower");
+    public static CanDevices PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel");
+    
+    public static void setCanChain(){
+        CanChain[0] = leftDriveLeader;
+        CanChain[1] = leftDriveFollower;
+        CanChain[2] = rightDriveLeader;
+        CanChain[3] = rightDriveFollower;
+        CanChain[4] = PDP;
+    }
 
 }
