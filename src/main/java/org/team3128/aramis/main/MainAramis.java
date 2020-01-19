@@ -2,7 +2,9 @@
 
 package org.team3128.aramis.main;
 
+
 import org.team3128.common.utility.*;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -99,6 +101,7 @@ public class MainAramis extends NarwhalRobot {
     File usbFile;
     String csvString = "";
 
+
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
     public static void setCanChain(){
@@ -108,6 +111,7 @@ public class MainAramis extends NarwhalRobot {
         CanChain[3] = Constants.rightDriveFollower;
         CanChain[4] = Constants.PDP;
     }
+
 
     @Override
     protected void constructHardware() {
@@ -204,6 +208,7 @@ public class MainAramis extends NarwhalRobot {
         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, pdp);
         errorCatcher = new ErrorCatcherUtility(CanChain);
         setCanChain();
+
         errorCatcher.ErrorCatcher();
         // DCU
         // DriveCalibrationUtility.initialize(gyro, visionPID);

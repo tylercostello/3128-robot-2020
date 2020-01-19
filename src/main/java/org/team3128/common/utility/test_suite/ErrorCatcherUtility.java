@@ -47,6 +47,7 @@ public class ErrorCatcherUtility {
                 break;
             }
             if(device.type == CanDevices.DeviceType.TALON){
+
                 errorCode = device.talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
             }
             else if (device.type==CanDevices.DeviceType.VICTOR){

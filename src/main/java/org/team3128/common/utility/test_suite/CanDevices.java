@@ -7,6 +7,7 @@ import org.team3128.common.hardware.motor.LazyTalonSRX;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
+
 /**
  * This class is used to create CAN device objects.
  * 
@@ -38,6 +39,7 @@ public class CanDevices{
         this.talon = talon;
         this.victor = victor;
         this.pdp = pdp;
+
     }
 
    
