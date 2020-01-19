@@ -205,14 +205,14 @@ public class MainAramis extends NarwhalRobot {
         Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 5, "Left Drive Follower", null, leftDriveFollower, null);
         Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 15, "Right Drive Leader", rightDriveLeader, null, null);
         Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 6, "Right Drive Follower", null, rightDriveFollower, null);
-        Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, pdp);
+        //Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, pdp);
         errorCatcher = new ErrorCatcherUtility(CanChain);
         setCanChain();
 
         errorCatcher.ErrorCatcher();
         // DCU
         // DriveCalibrationUtility.initialize(gyro, visionPID);
-        dcu = DriveCalibrationUtility.getInstance();
+        //dcu = DriveCalibrationUtility.getInstance();
 
         //dcu.initNarwhalDashboard();
     }
@@ -375,7 +375,7 @@ public class MainAramis extends NarwhalRobot {
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
-        dcu.tickNarwhalDashboard();
+        //dcu.tickNarwhalDashboard();
 
         if (SmartDashboard.getBoolean("gettingData", false)) {
             csvString += (Long.toString(RobotController.getFPGATime()) + limelight.getValues(5).toString() + "\n");

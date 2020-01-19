@@ -54,13 +54,13 @@ public class ErrorCatcherUtility {
                 errorCode = device.victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
 
             }
-            else if (device.type==CanDevices.DeviceType.PDP){
+           /* else if (device.type==CanDevices.DeviceType.PDP){
 
                 pdpTemp=device.pdp.getTemperature();
                 if (pdpTemp < -30){
                     errorCode = ErrorCode.RxTimeout;
                 }
-            }
+            }*/
             //TODO:
             //Add functionality for other CAN devices
 
