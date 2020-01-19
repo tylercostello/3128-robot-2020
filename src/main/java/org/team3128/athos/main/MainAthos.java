@@ -16,6 +16,7 @@ import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.vision.CmdHorizontalOffsetFeedbackDrive;
+import org.team3128.athos.autonomous.deprecated.CmdAutoBall;
 import org.team3128.athos.subsystems.Constants;
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
@@ -35,6 +36,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -78,6 +80,10 @@ public class MainAthos extends NarwhalRobot {
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
 
+    public Command ballCommand;
+    public Limelight bottomLimelight;
+    private DriveCommandRunning driveCmdRunning;
+
     @Override
     protected void constructHardware() {
 
@@ -99,6 +105,10 @@ public class MainAthos extends NarwhalRobot {
         SmartDashboard.putNumber("P Gain", kP);
         SmartDashboard.putNumber("D Gain", kD);
         SmartDashboard.putNumber("F Gain", kF);
+
+        visionPID = new PIDConstants(0.57, 0.032, 0.0, 0.00003);
+		blindPID = new PIDConstants(0.23, 0, 0, 0);
+		driveCmdRunning = new DriveCommandRunning();
 
         // straight
         // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(180)));
@@ -142,12 +152,18 @@ public class MainAthos extends NarwhalRobot {
         lm.nameControl(new Button(6), "PrintCSV");
         lm.nameControl(new Button(3), "ClearTracker");
         lm.nameControl(new Button(4), "ClearCSV");
+        lm.nameControl(new Button(7), "PursueBall");
 
         lm.addMultiListener(() -> {
             drive.arcadeDrive(-0.7 * RobotMath.thresh(lm.getAxis("MoveTurn"), 0.1),
                     -1.0 * RobotMath.thresh(lm.getAxis("MoveForwards"), 0.1), -1.0 * lm.getAxis("Throttle"), true);
 
         }, "MoveTurn", "MoveForwards", "Throttle");
+
+        lm.addButtonDownListener("PursueBall", () -> {
+            ballCommand = new CmdAutoBall(gyro, bottomLimelight, driveCmdRunning, visionPID, blindPID);
+			ballCommand.start();
+        });
 
         lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignToTarget");
         lm.addButtonDownListener("AlignToTarget", () -> {
