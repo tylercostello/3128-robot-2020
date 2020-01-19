@@ -47,17 +47,16 @@ public class ErrorCatcherUtility {
                 break;
             }
             if(device.type == CanDevices.DeviceType.TALON){
-                talon=new TalonSRX(device.id);
-                errorCode = talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+
+                errorCode = device.talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
             }
             else if (device.type==CanDevices.DeviceType.VICTOR){
-                victor = new VictorSPX(device.id);
-                errorCode = victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+                errorCode = device.victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
 
             }
             else if (device.type==CanDevices.DeviceType.PDP){
-                pdp = new PowerDistributionPanel(device.id);
-                pdpTemp=pdp.getTemperature();
+
+                pdpTemp=device.pdp.getTemperature();
                 if (pdpTemp < -30){
                     errorCode = ErrorCode.RxTimeout;
                 }
