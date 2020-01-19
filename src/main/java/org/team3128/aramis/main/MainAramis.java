@@ -2,7 +2,7 @@
 
 package org.team3128.aramis.main;
 
-import org.team3128.common.utility.*;
+import org.team3128.common.utility.test_suite.*;
 
 import java.io.File;
 import java.io.FileInputStream;
