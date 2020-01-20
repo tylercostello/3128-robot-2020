@@ -87,10 +87,10 @@ public class MainAthos extends NarwhalRobot {
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
     public static void setCanChain(){
-        CanChain[0] = Constants.leftDriveLeader;
-        CanChain[1] = Constants.rightDriveLeader;
+        CanChain[0] = Constants.rightDriveLeader;
+        CanChain[1] = Constants.rightDriveFollower;
         CanChain[2] = Constants.leftDriveFollower;
-        CanChain[3] = Constants.rightDriveFollower;
+        CanChain[3] = Constants.leftDriveLeader;
         CanChain[4] = Constants.PDP;
     }
 

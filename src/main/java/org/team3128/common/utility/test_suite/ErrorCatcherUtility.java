@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
  */
 public class ErrorCatcherUtility {
     public CanDevices[] CanChain = new CanDevices[42];
-    public ErrorCode errorCode;
+    public static ErrorCode errorCode;
     public CanDevices lastDevice;
 
     public TalonSRX talon;
@@ -45,6 +45,7 @@ public class ErrorCatcherUtility {
     public void ErrorCatcher(){
 
         //Iterates over each CAN device in the chain, in order, and checks if it is good
+        errorCode=errorCode.OK;
         for(CanDevices device : CanChain){
             if (device == null){
                 break;
@@ -62,6 +63,8 @@ public class ErrorCatcherUtility {
                 Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
                 if (sparkTemp < 5){
                     errorCode = ErrorCode.RxTimeout;
+                } else{
+                    errorCode=ErrorCode.OK;
                 }
                
 
@@ -90,7 +93,7 @@ public class ErrorCatcherUtility {
                 }
                 break;
             } else{
-               NarwhalDashboard.put("ErrorCatcher", 1);
+               NarwhalDashboard.put("ErrorCatcher", "All good");
             }
 
             lastDevice = device; 
