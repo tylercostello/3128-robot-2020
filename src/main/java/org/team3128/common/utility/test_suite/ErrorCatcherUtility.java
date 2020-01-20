@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+
+import org.team3128.common.narwhaldashboard.NarwhalDashboard;
 import org.team3128.common.utility.Log;
 
 
@@ -17,10 +19,10 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 /**
- * This is the class that catches errors with wiring.
+ * Utility used to catch breaks in the CAN chain
  * 
  * @author Tyler Costello, Daniel Wang, Jude T. Lifset
- *
+ * 
  */
 public class ErrorCatcherUtility {
     public CanDevices[] CanChain = new CanDevices[42];
@@ -69,11 +71,16 @@ public class ErrorCatcherUtility {
             if(errorCode != ErrorCode.OK){
                 if(lastDevice == null){
                     Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                    NarwhalDashboard.put("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
                 }
                 else{
                     Log.info("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                    NarwhalDashboard.put("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
+
                 }
                 break;
+            } else{
+               NarwhalDashboard.put("ErrorCatcher", 1);
             }
 
             lastDevice = device; 

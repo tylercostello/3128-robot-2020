@@ -209,12 +209,16 @@ public class MainAramis extends NarwhalRobot {
         errorCatcher = new ErrorCatcherUtility(CanChain);
         setCanChain();
 
-        errorCatcher.ErrorCatcher();
         // DCU
         // DriveCalibrationUtility.initialize(gyro, visionPID);
         //dcu = DriveCalibrationUtility.getInstance();
 
         //dcu.initNarwhalDashboard();
+        NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
+            if (down) {
+                errorCatcher.ErrorCatcher();
+            }
+        });
     }
 
     @Override
