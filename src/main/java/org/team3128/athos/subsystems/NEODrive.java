@@ -65,7 +65,7 @@ public class NEODrive extends Threaded {
 	double prevPositionL = 0;
 	double prevPositionR = 0;
 
-	public LazyCANSparkMax leftSpark, rightSpark, leftSparkSlave, rightSparkSlave, leftSparkSlave2, rightSparkSlave2;
+	public static LazyCANSparkMax leftSpark, rightSpark, leftSparkSlave, rightSparkSlave, leftSparkSlave2, rightSparkSlave2;
 	private CANPIDController leftSparkPID, rightSparkPID;
 	private CANEncoder leftSparkEncoder, rightSparkEncoder;
 
@@ -83,10 +83,10 @@ public class NEODrive extends Threaded {
 		// rightSparkSlave2 = new LazyCANSparkMax(Constants.RIGHT_DRIVE_BACK_ID,
 		// MotorType.kBrushless);
 
-		leftSpark.setInverted(false);
-		rightSpark.setInverted(true);
-		leftSparkSlave.setInverted(false);
-		rightSparkSlave.setInverted(true);
+		leftSpark.setInverted(true);
+		rightSpark.setInverted(false);
+		leftSparkSlave.setInverted(true);
+		rightSparkSlave.setInverted(false);
 		// leftSparkSlave2.setInverted(false);
 		// rightSparkSlave2.setInverted(false);
 

@@ -48,7 +48,13 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+
 import org.team3128.common.generics.ThreadScheduler;
+
+import org.team3128.common.hardware.motor.LazyCANSparkMax;
+
+import org.team3128.common.utility.test_suite.*;
 
 public class MainAthos extends NarwhalRobot {
     NEODrive drive = NEODrive.getInstance();
@@ -72,11 +78,21 @@ public class MainAthos extends NarwhalRobot {
     public double kF = Constants.K_AUTO_LEFT_F;
 
     public double startTime = 0;
-
+    public PowerDistributionPanel pdp;
     public String trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
 
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
+
+    public ErrorCatcherUtility errorCatcher;
+    public static CanDevices[] CanChain = new CanDevices[42];
+    public static void setCanChain(){
+        CanChain[0] = Constants.leftDriveLeader;
+        CanChain[1] = Constants.rightDriveLeader;
+        CanChain[2] = Constants.leftDriveFollower;
+        CanChain[3] = Constants.rightDriveFollower;
+        CanChain[4] = Constants.PDP;
+    }
 
     @Override
     protected void constructHardware() {
@@ -127,6 +143,26 @@ public class MainAthos extends NarwhalRobot {
 
         trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
                 120 * Constants.inchesToMeters, 0.5, false);
+         //Error Catcher (Auto Test Suite)
+         pdp = new PowerDistributionPanel(0);
+         Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Left Drive Leader", null , null, NEODrive.leftSpark, null);
+         Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null);
+         Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Right Drive Leader", null , null, NEODrive.rightSpark, null);
+         Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Right Drive Follower", null, null , NEODrive.rightSparkSlave, null);
+         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, pdp);
+         errorCatcher = new ErrorCatcherUtility(CanChain);
+         setCanChain();
+ 
+         // DCU
+         // DriveCalibrationUtility.initialize(gyro, visionPID);
+         //dcu = DriveCalibrationUtility.getInstance();
+ 
+         //dcu.initNarwhalDashboard();
+         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
+             if (down) {
+                 errorCatcher.ErrorCatcher();
+             }
+         });
     }
 
     @Override

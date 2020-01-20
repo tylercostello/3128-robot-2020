@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import org.team3128.common.utility.test_suite.*;
 
+import org.team3128.common.hardware.motor.LazyCANSparkMax;
 
 import org.team3128.common.generics.RobotConstants;
 
@@ -134,6 +135,7 @@ public class Constants extends RobotConstants {
     public static CanDevices rightDriveLeader;
     public static CanDevices rightDriveFollower;
     public static CanDevices PDP;
+    
 
 
 }

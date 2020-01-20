@@ -33,6 +33,7 @@ public class ErrorCatcherUtility {
     public VictorSPX victor;
     public PowerDistributionPanel pdp;
     private double pdpTemp;
+    private double sparkTemp;
     
     //TODO:
     //public SparkMax and public Falcon
@@ -54,6 +55,15 @@ public class ErrorCatcherUtility {
             }
             else if (device.type==CanDevices.DeviceType.VICTOR){
                 errorCode = device.victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+
+            }
+            else if (device.type==CanDevices.DeviceType.VICTOR){
+                sparkTemp=device.spark.getMotorTemperature();
+                Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
+                if (sparkTemp < 5){
+                    errorCode = ErrorCode.RxTimeout;
+                }
+               
 
             }
             else if (device.type==CanDevices.DeviceType.PDP){

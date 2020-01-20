@@ -7,6 +7,7 @@ import org.team3128.common.hardware.motor.LazyTalonSRX;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
+import org.team3128.common.hardware.motor.LazyCANSparkMax;
 
 /**
  * This class is used to create CAN device objects.
@@ -20,7 +21,7 @@ public class CanDevices{
     { 
         VICTOR,
         TALON,
-        SPARKMAX,
+        SPARK,
         FALCON,
         PDP;
     } 
@@ -31,13 +32,15 @@ public class CanDevices{
     public LazyTalonSRX talon;
     public VictorSPX victor;
     public PowerDistributionPanel pdp;
+    public LazyCANSparkMax spark;
 
-    public CanDevices(DeviceType type, int id, String name, LazyTalonSRX talon, VictorSPX victor, PowerDistributionPanel pdp){
+    public CanDevices(DeviceType type, int id, String name, LazyTalonSRX talon, VictorSPX victor, LazyCANSparkMax spark, PowerDistributionPanel pdp){
         this.type = type;
         this.id = id;
         this.name = name;
         this.talon = talon;
         this.victor = victor;
+        this.spark = spark;
         this.pdp = pdp;
 
     }
