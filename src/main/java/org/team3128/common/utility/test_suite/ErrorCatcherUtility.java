@@ -57,7 +57,7 @@ public class ErrorCatcherUtility {
                 errorCode = device.victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
 
             }
-            else if (device.type==CanDevices.DeviceType.VICTOR){
+            else if (device.type==CanDevices.DeviceType.SPARK){
                 sparkTemp=device.spark.getMotorTemperature();
                 Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
                 if (sparkTemp < 5){

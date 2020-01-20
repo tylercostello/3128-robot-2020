@@ -150,8 +150,9 @@ public class MainAthos extends NarwhalRobot {
          Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Right Drive Leader", null , null, NEODrive.rightSpark, null);
          Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Right Drive Follower", null, null , NEODrive.rightSparkSlave, null);
          Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, pdp);
-         errorCatcher = new ErrorCatcherUtility(CanChain);
          setCanChain();
+         errorCatcher = new ErrorCatcherUtility(CanChain);
+         
  
          // DCU
          // DriveCalibrationUtility.initialize(gyro, visionPID);
