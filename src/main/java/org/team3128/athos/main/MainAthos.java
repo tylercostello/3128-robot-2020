@@ -161,6 +161,8 @@ public class MainAthos extends NarwhalRobot {
          //dcu.initNarwhalDashboard();
          NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
              if (down) {
+                 //Janky fix
+                 
                 errorCatcher.ErrorCatcher();
                 errorCatcher.ErrorCatcher();
              }
