@@ -101,6 +101,8 @@ public class MainAthos extends NarwhalRobot {
         lm = new ListenerManager(joystick);
         addListenerManager(lm);
 
+        bottomLimelight = new Limelight("limelight-c", 20 * Angle.DEGREES,  6.15 * Length.in, 11 * Length.in, 14.5 * Length.in);
+
         // display PID coefficients on SmartDashboard
         SmartDashboard.putNumber("P Gain", kP);
         SmartDashboard.putNumber("D Gain", kD);
@@ -163,6 +165,10 @@ public class MainAthos extends NarwhalRobot {
         lm.addButtonDownListener("PursueBall", () -> {
             ballCommand = new CmdAutoBall(gyro, bottomLimelight, driveCmdRunning, visionPID, blindPID);
 			ballCommand.start();
+        });
+        lm.addButtonUpListener("PursueBall", () -> {
+            ballCommand.cancel();
+            ballCommand = null;
         });
 
         lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignToTarget");

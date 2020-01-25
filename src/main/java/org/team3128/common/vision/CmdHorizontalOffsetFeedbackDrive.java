@@ -102,8 +102,8 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
         drive = NEODrive.getInstance();
         dcu = DriveCalibrationUtility.getInstance();
 
-        txLimelight.setLEDMode(LEDMode.ON);
-        distanceLimelight.setLEDMode(LEDMode.ON);
+        txLimelight.setLEDMode(LEDMode.OFF);
+        distanceLimelight.setLEDMode(LEDMode.OFF);
         if (isLowHatch) {
             distanceLimelight.setStreamMode(StreamMode.LIMELIGHT_CAMERA);
         }
