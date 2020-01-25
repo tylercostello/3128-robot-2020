@@ -106,7 +106,7 @@ public class ErrorCatcherUtility {
 
             //If the current CAN device is not good, log it
             if(errorCode != ErrorCode.OK){
-                if(lastDevice == null){
+                if(device == CanChain[0]){
                     Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
                     NarwhalDashboard.put("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
                 }
