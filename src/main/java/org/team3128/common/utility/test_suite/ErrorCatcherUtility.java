@@ -19,6 +19,7 @@ import com.revrobotics.CANSparkMax;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import org.team3128.common.hardware.motor.LazyTalonFX;
 
 /**
  * Utility used to catch breaks in the CAN chain
@@ -32,15 +33,14 @@ public class ErrorCatcherUtility {
     public static ErrorCode errorCode;
     public CanDevices lastDevice;
 
-    public TalonSRX talon;
+    /*public TalonSRX talon;
     public VictorSPX victor;
-    public PowerDistributionPanel pdp;
+    public PowerDistributionPanel pdp;*/
     private double pdpTemp;
     private double sparkTemp;
     public CANError canError;
     
-    //TODO:
-    //public SparkMax and public Falcon
+    
 
     public ErrorCatcherUtility(CanDevices[] CanChain){
       this.CanChain = CanChain;  
@@ -86,6 +86,12 @@ public class ErrorCatcherUtility {
                     errorCode=ErrorCode.OK;
                 }
             }
+
+            else if (device.type==CanDevices.DeviceType.FALCON){
+                errorCode = device.falcon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+
+            }
+
             else if (device.type==CanDevices.DeviceType.PDP){
 
                 pdpTemp=device.pdp.getTemperature();
@@ -94,8 +100,9 @@ public class ErrorCatcherUtility {
                     errorCode = ErrorCode.RxTimeout;
                 }
             }
-            //TODO:
-            //Add functionality for other CAN devices
+            
+
+
 
             //If the current CAN device is not good, log it
             if(errorCode != ErrorCode.OK){
