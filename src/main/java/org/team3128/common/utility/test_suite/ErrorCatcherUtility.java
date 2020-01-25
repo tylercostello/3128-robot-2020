@@ -11,8 +11,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import org.team3128.common.narwhaldashboard.NarwhalDashboard;
 import org.team3128.common.utility.Log;
 
-
 import org.team3128.common.utility.test_suite.CanDevices;
+
+import com.revrobotics.CANError;
+import com.revrobotics.CANSparkMax;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -20,8 +22,9 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 /**
  * Utility used to catch breaks in the CAN chain
+ * This code is clinically bald
  * 
- * @author Tyler Costello, Daniel Wang, Jude T. Lifset
+ * author Tyler Costello, Daniel Wang, Jude T. Lifset
  * 
  */
 public class ErrorCatcherUtility {
@@ -34,6 +37,7 @@ public class ErrorCatcherUtility {
     public PowerDistributionPanel pdp;
     private double pdpTemp;
     private double sparkTemp;
+    public CANError canError;
     
     //TODO:
     //public SparkMax and public Falcon
@@ -45,7 +49,8 @@ public class ErrorCatcherUtility {
     public void ErrorCatcher(){
 
         //Iterates over each CAN device in the chain, in order, and checks if it is good
-        errorCode=errorCode.OK;
+        errorCode=ErrorCode.OK;
+
         for(CanDevices device : CanChain){
             if (device == null){
                 break;
@@ -59,15 +64,27 @@ public class ErrorCatcherUtility {
 
             }
             else if (device.type==CanDevices.DeviceType.SPARK){
+                /*if (device.spark.setCANTimeout(10) != CANError.kOk){
+                    errorCode = ErrorCode.RxTimeout;
+                }*/
+
+              /*  canError=device.spark.setCANTimeout(10);
+                if (canError==CANError.kOk){
+                    Log.info("ErrorCatcher", "ok");
+                }
+                else
+                {
+                    Log.info("ErrorCatcher", ""+canError);
+                }*/
+
                 sparkTemp=device.spark.getMotorTemperature();
                 Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
-                if (sparkTemp < 5){
+
+                if (sparkTemp < 5 || sparkTemp>100){
                     errorCode = ErrorCode.RxTimeout;
                 } else{
                     errorCode=ErrorCode.OK;
                 }
-               
-
             }
             else if (device.type==CanDevices.DeviceType.PDP){
 
@@ -93,7 +110,7 @@ public class ErrorCatcherUtility {
                 }
                 break;
             } else{
-               NarwhalDashboard.put("ErrorCatcher", "All good");
+               NarwhalDashboard.put("ErrorCatcher", "No Errors");
             }
 
             lastDevice = device; 

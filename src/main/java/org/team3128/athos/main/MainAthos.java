@@ -145,10 +145,10 @@ public class MainAthos extends NarwhalRobot {
                 120 * Constants.inchesToMeters, 0.5, false);
          //Error Catcher (Auto Test Suite)
          pdp = new PowerDistributionPanel(0);
-         Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Left Drive Leader", null , null, NEODrive.leftSpark, null);
-         Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null);
-         Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Right Drive Leader", null , null, NEODrive.rightSpark, null);
-         Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Right Drive Follower", null, null , NEODrive.rightSparkSlave, null);
+         Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", null , null, NEODrive.rightSpark, null);
+         Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", null, null , NEODrive.rightSparkSlave, null);
+         Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", null , null, NEODrive.leftSpark, null);
+         Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null);
          Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, pdp);
          setCanChain();
          errorCatcher = new ErrorCatcherUtility(CanChain);
@@ -161,7 +161,8 @@ public class MainAthos extends NarwhalRobot {
          //dcu.initNarwhalDashboard();
          NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
              if (down) {
-                 errorCatcher.ErrorCatcher();
+                errorCatcher.ErrorCatcher();
+                errorCatcher.ErrorCatcher();
              }
          });
     }
