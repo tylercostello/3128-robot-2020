@@ -48,8 +48,6 @@ public class NEODrive extends Threaded {
 	}
 
 	private ADXRS450_Gyro gyroSensor;
-	// private LazyTalonSRX leftTalon, rightTalon, leftSlaveTalon, leftSlave2Talon,
-	// rightSlaveTalon, rightSlave2Talon;
 	private RamseteController autonomousDriver;
 	private Trajectory trajectory = null;
 	private AsynchronousPid turnPID;
