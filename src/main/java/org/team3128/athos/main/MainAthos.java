@@ -171,10 +171,10 @@ public class MainAthos extends NarwhalRobot {
                  //Janky fix
                  
                 errorCatcher.ErrorCatcher();
+                
                 errorCatcher.ErrorCatcher();
              }
          });
-         errorCatcher.ErrorCatcher();
     }
 
     @Override

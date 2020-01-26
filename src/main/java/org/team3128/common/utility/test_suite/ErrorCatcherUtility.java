@@ -55,7 +55,8 @@ public class ErrorCatcherUtility {
 
         //Iterates over each CAN device in the chain, in order, and checks if it is good
         errorCode=ErrorCode.OK;
-
+        //bridge checker
+        NarwhalDashboard.put("ErrorCatcherBridge", "Bridge is connected");
         for(CanDevices device : CanChain){
             if (device == null){
                 break;
@@ -69,6 +70,14 @@ public class ErrorCatcherUtility {
 
             }
             else if (device.type==CanDevices.DeviceType.SPARK){
+               // canError=device.spark.setCANTimeout(10);
+                canError=device.spark.setIdleMode(CANSparkMax.IdleMode.kCoast);
+                if (canError != CANError.kOk){
+                    Log.info("ErrorCatcher", "bad"); 
+                }
+                else{
+                    Log.info("ErrorCatcher", "ok");
+                }
                 /*if (device.spark.setCANTimeout(10) != CANError.kOk){
                     errorCode = ErrorCode.RxTimeout;
                 }*/
@@ -138,17 +147,22 @@ public class ErrorCatcherUtility {
 
         }
 
+        String limelightError = "";
+
         for(Limelight limelight : limelights){
             double tempLatency = limelight.getValue(LimelightKey.LATENCY, 5);
             Log.info("ErrorCatcher", "Limelight Latency: " + String.valueOf(tempLatency));
 
             if(tempLatency == 0){
                 Log.info("ErrorCatcher", limelight.hostname + " is disconnected.");
+                //limelightError += limelight.hostname + "is disconnected.\n";
                 NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is disconnected.");  
             } else{
                 Log.info("ErrorCatcher", limelight.hostname + " is connected.");
+                //limelightError += limelight.hostname + "is connected.\n";
                 NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is connected.");  
             }
         }
+        //NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
     }
 }
