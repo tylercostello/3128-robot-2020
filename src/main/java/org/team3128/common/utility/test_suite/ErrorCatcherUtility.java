@@ -23,7 +23,7 @@ import org.team3128.common.hardware.motor.LazyTalonFX;
 
 /**
  * Utility used to catch breaks in the CAN chain
- * This code is clinically bald
+ * 
  * 
  * author Tyler Costello, Daniel Wang, Jude T. Lifset
  * 
@@ -81,7 +81,7 @@ public class ErrorCatcherUtility {
                 Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
 
                 if (sparkTemp < 5 || sparkTemp>100){
-                    errorCode = ErrorCode.RxTimeout;
+                    errorCode = ErrorCode.CAN_MSG_NOT_FOUND;
                 } else{
                     errorCode=ErrorCode.OK;
                 }
@@ -97,7 +97,7 @@ public class ErrorCatcherUtility {
                 pdpTemp=device.pdp.getTemperature();
                 Log.info("ErrorCatcher", "PDP temp "+pdpTemp);
                 if (pdpTemp < 5){
-                    errorCode = ErrorCode.RxTimeout;
+                    errorCode = ErrorCode.CAN_MSG_NOT_FOUND;
                 }
             }
             
@@ -106,16 +106,24 @@ public class ErrorCatcherUtility {
 
             //If the current CAN device is not good, log it
             if(errorCode != ErrorCode.OK){
-                if(device == CanChain[0]){
-                    Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
-                    NarwhalDashboard.put("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                if (errorCode == ErrorCode.CAN_MSG_NOT_FOUND){
+                    if(device == CanChain[0]){
+                        Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                        NarwhalDashboard.put("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                    }
+                    else{
+                        Log.info("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                        NarwhalDashboard.put("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
+    
+                    }
+                    break;
                 }
-                else{
-                    Log.info("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
-                    NarwhalDashboard.put("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
-
+                
+                if (errorCode == ErrorCode.SensorNotPresent){
+                    Log.info("ErrorCatcher", device.name+ " " + device.id +" Encoder is disconnected");
+                    NarwhalDashboard.put("ErrorCatcher", device.name+ " " + device.id +" Encoder is disconnected");
                 }
-                break;
+                
             } else{
                NarwhalDashboard.put("ErrorCatcher", "No Errors");
             }
