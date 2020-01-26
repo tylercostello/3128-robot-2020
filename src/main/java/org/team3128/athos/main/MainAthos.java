@@ -54,6 +54,7 @@ import org.team3128.common.generics.ThreadScheduler;
 
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.hardware.motor.LazyTalonFX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import org.team3128.common.utility.test_suite.*;
 
@@ -64,6 +65,9 @@ public class MainAthos extends NarwhalRobot {
     ExecutorService executor = Executors.newFixedThreadPool(4);
     ThreadScheduler scheduler = new ThreadScheduler();
     Thread auto;
+    
+    Limelight limelight = new Limelight("limelight-c", 26.0, 0, 0, 30);
+    Limelight[] limelights = new Limelight[1];
 
     public Joystick joystick;
     public ListenerManager lm;
@@ -117,6 +121,8 @@ public class MainAthos extends NarwhalRobot {
         SmartDashboard.putNumber("D Gain", kD);
         SmartDashboard.putNumber("F Gain", kF);
 
+        limelights[0] = limelight;
+
         // straight
         // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(180)));
         // waypoints.add(new Pose2D(60 * Constants.inchesToMeters, 0 *
@@ -152,7 +158,7 @@ public class MainAthos extends NarwhalRobot {
          Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null, null);
          Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
          setCanChain();
-         errorCatcher = new ErrorCatcherUtility(CanChain);
+         errorCatcher = new ErrorCatcherUtility(CanChain,limelights);
          
  
          // DCU
@@ -168,6 +174,7 @@ public class MainAthos extends NarwhalRobot {
                 errorCatcher.ErrorCatcher();
              }
          });
+         errorCatcher.ErrorCatcher();
     }
 
     @Override

@@ -206,7 +206,7 @@ public class MainAramis extends NarwhalRobot {
         Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 15, "Right Drive Leader", rightDriveLeader, null, null, null, null);
         Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 6, "Right Drive Follower", null, rightDriveFollower, null, null, null);
         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
-        errorCatcher = new ErrorCatcherUtility(CanChain);
+        //errorCatcher = new ErrorCatcherUtility(CanChain);
         setCanChain();
 
         // DCU
@@ -216,7 +216,7 @@ public class MainAramis extends NarwhalRobot {
         //dcu.initNarwhalDashboard();
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
             if (down) {
-                errorCatcher.ErrorCatcher();
+                //errorCatcher.ErrorCatcher();
             }
         });
     }

@@ -19,6 +19,9 @@ import com.revrobotics.CANSparkMax;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+
+import org.team3128.common.hardware.limelight.Limelight;
+import org.team3128.common.hardware.limelight.LimelightKey;
 import org.team3128.common.hardware.motor.LazyTalonFX;
 
 /**
@@ -30,6 +33,7 @@ import org.team3128.common.hardware.motor.LazyTalonFX;
  */
 public class ErrorCatcherUtility {
     public CanDevices[] CanChain = new CanDevices[42];
+    public Limelight[] limelights = new Limelight[5];
     public static ErrorCode errorCode;
     public CanDevices lastDevice;
 
@@ -42,8 +46,9 @@ public class ErrorCatcherUtility {
     
     
 
-    public ErrorCatcherUtility(CanDevices[] CanChain){
+    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights){
       this.CanChain = CanChain;  
+      this.limelights = limelights;
     }
 
     public void ErrorCatcher(){
@@ -109,11 +114,11 @@ public class ErrorCatcherUtility {
                 if (errorCode == ErrorCode.CAN_MSG_NOT_FOUND){
                     if(device == CanChain[0]){
                         Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
-                        NarwhalDashboard.put("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                        NarwhalDashboard.put("ErrorCatcherCAN", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
                     }
                     else{
                         Log.info("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
-                        NarwhalDashboard.put("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                        NarwhalDashboard.put("ErrorCatcherCAN", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
     
                     }
                     break;
@@ -121,16 +126,29 @@ public class ErrorCatcherUtility {
                 
                 if (errorCode == ErrorCode.SensorNotPresent){
                     Log.info("ErrorCatcher", device.name+ " " + device.id +" Encoder is disconnected");
-                    NarwhalDashboard.put("ErrorCatcher", device.name+ " " + device.id +" Encoder is disconnected");
+                    NarwhalDashboard.put("ErrorCatcherEncoder", device.name+ " " + device.id +" Encoder is disconnected");
                 }
                 
             } else{
-               NarwhalDashboard.put("ErrorCatcher", "No Errors");
+               NarwhalDashboard.put("ErrorCatcherCAN", "No CAN Errors");
             }
 
             lastDevice = device; 
             //Used because we need the last CAN device in the chain to find which 2 CAN devices are connected by the bad chain
 
+        }
+
+        for(Limelight limelight : limelights){
+            double tempLatency = limelight.getValue(LimelightKey.LATENCY, 5);
+            Log.info("ErrorCatcher", "Limelight Latency: " + String.valueOf(tempLatency));
+
+            if(tempLatency == 0){
+                Log.info("ErrorCatcher", limelight.hostname + " is disconnected.");
+                NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is disconnected.");  
+            } else{
+                Log.info("ErrorCatcher", limelight.hostname + " is connected.");
+                NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is connected.");  
+            }
         }
     }
 }
