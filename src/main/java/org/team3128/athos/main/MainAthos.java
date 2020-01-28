@@ -31,6 +31,7 @@ import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.athos.subsystems.NEODrive;
 import org.team3128.athos.subsystems.RobotTracker;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -84,6 +85,8 @@ public class MainAthos extends NarwhalRobot {
     public Limelight bottomLimelight;
     private DriveCommandRunning driveCmdRunning;
 
+    public static DigitalInput limitSwitch;
+
     @Override
     protected void constructHardware() {
 
@@ -108,9 +111,11 @@ public class MainAthos extends NarwhalRobot {
         SmartDashboard.putNumber("D Gain", kD);
         SmartDashboard.putNumber("F Gain", kF);
 
-        visionPID = new PIDConstants(0.57, 0.032, 0.0, 0.00003);
+        visionPID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
 		blindPID = new PIDConstants(0.23, 0, 0, 0);
-		driveCmdRunning = new DriveCommandRunning();
+        driveCmdRunning = new DriveCommandRunning();
+    
+        limitSwitch = new DigitalInput(0);
 
         // straight
         // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(180)));
@@ -155,6 +160,7 @@ public class MainAthos extends NarwhalRobot {
         lm.nameControl(new Button(3), "ClearTracker");
         lm.nameControl(new Button(4), "ClearCSV");
         lm.nameControl(new Button(7), "PursueBall");
+        lm.nameControl(new Button(12), "LimitSwitch");
 
         lm.addMultiListener(() -> {
             drive.arcadeDrive(-0.7 * RobotMath.thresh(lm.getAxis("MoveTurn"), 0.1),
@@ -169,6 +175,10 @@ public class MainAthos extends NarwhalRobot {
         lm.addButtonUpListener("PursueBall", () -> {
             ballCommand.cancel();
             ballCommand = null;
+        });
+
+        lm.addButtonDownListener("LimitSwitch", () -> {
+            Log.info("MainAthos.java", "[Limit Switch]" + limitSwitch.get());
         });
 
         lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignToTarget");

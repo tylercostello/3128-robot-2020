@@ -24,7 +24,7 @@ public class CmdAutoBall extends CommandGroup {
             new CmdHorizontalOffsetFeedbackDrive(
                 gyro, txLimelight, distLimelight, cmdRunning, targetHeight,
                 visionPID, -2 * Angle.DEGREES, 2.5 * Length.ft, 0.6666666666666666666666 * Length.ft,
-                blindPID, 20 * Angle.DEGREES)//,
+                blindPID, 42 * Angle.DEGREES)//,
             //new CmdStreamUpdate(bottomLimelight, topLimelight, useBottom)
         );
     }

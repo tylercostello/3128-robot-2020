@@ -125,7 +125,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
                 Log.info("CmdAutoAim", "Target found.");
                 Log.info("CmdAutoAim", "Switching to FEEDBACK...");
 
-                drive.setWheelPower(new DriveSignal(visionPID.kF, visionPID.kF));
+                drive.setWheelPower(new DriveSignal(0.8*visionPID.kF, 0.8*visionPID.kF));
 
                 currentHorizontalOffset = txLimelight.getValue(LimelightKey.HORIZONTAL_OFFSET, 5);
 
@@ -180,7 +180,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
                         * RobotMath.clamp((decelerationStartDistance - approximateDistance)
                                 / (decelerationStartDistance - decelerationEndDistance), 0.0, 1.0);
 
-                drive.setWheelPower(new DriveSignal(multiplier * leftPower, multiplier * rightPower));
+                drive.setWheelPower(new DriveSignal(0.7*multiplier * leftPower, 0.7*multiplier * rightPower));
                 previousTime = currentTime;
                 previousError = currentError;
             }
@@ -208,7 +208,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
 
             Log.info("CmdAutoAim", "L: " + leftPower + "; R: " + rightPower);
 
-            drive.setWheelPower(new DriveSignal(leftPower, rightPower));
+            drive.setWheelPower(new DriveSignal(0.7*leftPower, 0.7*rightPower)); //TODO: remove the 0.7's once testing is done
 
             previousTime = currentTime;
             previousError = currentError;
