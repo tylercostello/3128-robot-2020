@@ -2,6 +2,7 @@ package org.team3128.compbot.subsystems;
 
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.utility.units.Angle;
+import org.team3128.common.utility.test_suite.*;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -99,4 +100,10 @@ public class Constants extends RobotConstants {
         public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
         public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 0 * Length.in;
 
+        // ---- AUTO TEST SUITE
+        public static CanDevices leftDriveLeader;
+        public static CanDevices leftDriveFollower;
+        public static CanDevices rightDriveLeader;
+        public static CanDevices rightDriveFollower;
+        public static CanDevices PDP;
 }

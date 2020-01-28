@@ -36,6 +36,7 @@ public class ErrorCatcherUtility {
     public Limelight[] limelights = new Limelight[5];
     public static ErrorCode errorCode;
     public CanDevices lastDevice;
+    public double maxVelocity;
 
     /*public TalonSRX talon;
     public VictorSPX victor;
@@ -46,9 +47,10 @@ public class ErrorCatcherUtility {
     
     
 
-    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights){
+    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights, double maxVelocity){
       this.CanChain = CanChain;  
       this.limelights = limelights;
+      this.maxVelocity = maxVelocity;
     }
 
     public void ErrorCatcher(){
@@ -96,7 +98,9 @@ public class ErrorCatcherUtility {
 
                 if (sparkTemp < 5 || sparkTemp>100){
                     errorCode = ErrorCode.CAN_MSG_NOT_FOUND;
-                } else{
+                } else if (device.spark.getEncoder() == null){
+                    errorCode = ErrorCode.SensorNotPresent;
+                } else {
                     errorCode=ErrorCode.OK;
                 }
             }
@@ -132,7 +136,6 @@ public class ErrorCatcherUtility {
                     }
                     break;
                 }
-                
                 if (errorCode == ErrorCode.SensorNotPresent){
                     Log.info("ErrorCatcher", device.name+ " " + device.id +" Encoder is disconnected");
                     NarwhalDashboard.put("ErrorCatcherEncoder", device.name+ " " + device.id +" Encoder is disconnected");
@@ -146,7 +149,8 @@ public class ErrorCatcherUtility {
             //Used because we need the last CAN device in the chain to find which 2 CAN devices are connected by the bad chain
 
         }
-
+    }
+    public void limelightCheck() {
         String limelightError = "";
 
         for(Limelight limelight : limelights){
@@ -164,5 +168,39 @@ public class ErrorCatcherUtility {
             }
         }
         //NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
+    }
+    public void velocityTester(double maxVelocity) {
+        for(CanDevices device : CanChain){
+            if (device.type == CanDevices.DeviceType.TALON && device.use == CanDevices.DeviceUse.LEADER){
+                device.talon.set(ControlMode.Velocity, maxVelocity);
+                int plateauCount = 0;
+                while (plateauCount<5){
+                    if (device.talon.getSelectedSensorVelocity() == maxVelocity)
+                        plateauCount++;
+                }
+                device.talon.set(ControlMode.Velocity, 0);
+            }
+            if (device.type == CanDevices.DeviceType.SPARK && device.use == CanDevices.DeviceUse.LEADER){
+                device.spark.get;
+                int plateauCount = 0;
+                while (plateauCount<5){
+                    if (device.talon.getSelectedSensorVelocity() == maxVelocity)
+                        plateauCount++;
+                }
+            }
+            if (device.type == CanDevices.DeviceType.FALCON && device.use == CanDevices.DeviceUse.LEADER){
+                device.falcon.set(ControlMode.Velocity, maxVelocity);
+                int plateauCount = 0;
+                while (plateauCount<5){
+                    if (device.talon.getSelectedSensorVelocity() == maxVelocity)
+                        plateauCount++;
+                }
+            }
+        }
+    }
+    public void testEverything() {
+        ErrorCatcher();
+        limelightCheck();
+        velocityTester(maxVelocity);
     }
 }
