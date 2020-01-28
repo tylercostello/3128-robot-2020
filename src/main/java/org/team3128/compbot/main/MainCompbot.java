@@ -118,10 +118,10 @@ public class MainCompbot extends NarwhalRobot {
         
         limelights[0] = limelight;
         pdp = new PowerDistributionPanel(0);
-        Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", null , null, null, drive.rightTalon, null);
-        Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", null, null , null, drive.rightTalonSlave, null);
-        Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", null , null, null, drive.leftTalon, null);
-        Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", null, null , null, drive.leftTalonSlave, null);
+        Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 0, "Right Drive Leader", null , null, null, drive.rightTalon, null);
+        Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 1, "Right Drive Follower", null, null , null, drive.rightTalonSlave, null);
+        Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 2, "Left Drive Leader", null , null, null, drive.leftTalon, null);
+        Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 3, "Left Drive Follower", null, null , null, drive.leftTalonSlave, null);
         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
         setCanChain();
         errorCatcher = new ErrorCatcherUtility(CanChain,limelights);

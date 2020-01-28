@@ -47,10 +47,10 @@ public class ErrorCatcherUtility {
     
     
 
-    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights, double maxVelocity){
+    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights){
       this.CanChain = CanChain;  
       this.limelights = limelights;
-      this.maxVelocity = maxVelocity;
+      //this.maxVelocity = maxVelocity;
     }
 
     public void ErrorCatcher(){
@@ -73,13 +73,13 @@ public class ErrorCatcherUtility {
             }
             else if (device.type==CanDevices.DeviceType.SPARK){
                // canError=device.spark.setCANTimeout(10);
-                canError=device.spark.setIdleMode(CANSparkMax.IdleMode.kCoast);
+              /*  canError=device.spark.setIdleMode(CANSparkMax.IdleMode.kCoast);
                 if (canError != CANError.kOk){
                     Log.info("ErrorCatcher", "bad"); 
                 }
                 else{
                     Log.info("ErrorCatcher", "ok");
-                }
+                }*/
                 /*if (device.spark.setCANTimeout(10) != CANError.kOk){
                     errorCode = ErrorCode.RxTimeout;
                 }*/
@@ -107,7 +107,7 @@ public class ErrorCatcherUtility {
 
             else if (device.type==CanDevices.DeviceType.FALCON){
                 errorCode = device.falcon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
-
+                Log.info("ErrorCatcher", "Falcons");
             }
 
             else if (device.type==CanDevices.DeviceType.PDP){
@@ -124,7 +124,18 @@ public class ErrorCatcherUtility {
 
             //If the current CAN device is not good, log it
             if(errorCode != ErrorCode.OK){
-                if (errorCode == ErrorCode.CAN_MSG_NOT_FOUND){
+                Log.info("ErrorCatcher", "There was an error");
+                if(device == CanChain[0]){
+                    Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                    NarwhalDashboard.put("ErrorCatcherCAN", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                }
+                else{
+                    Log.info("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
+                    NarwhalDashboard.put("ErrorCatcherCAN", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
+
+                }
+                break;
+                /*if (errorCode == ErrorCode.CAN_MSG_NOT_FOUND){
                     if(device == CanChain[0]){
                         Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
                         NarwhalDashboard.put("ErrorCatcherCAN", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
@@ -139,7 +150,7 @@ public class ErrorCatcherUtility {
                 if (errorCode == ErrorCode.SensorNotPresent){
                     Log.info("ErrorCatcher", device.name+ " " + device.id +" Encoder is disconnected");
                     NarwhalDashboard.put("ErrorCatcherEncoder", device.name+ " " + device.id +" Encoder is disconnected");
-                }
+                }*/
                 
             } else{
                NarwhalDashboard.put("ErrorCatcherCAN", "No CAN Errors");
@@ -169,6 +180,7 @@ public class ErrorCatcherUtility {
         }
         //NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
     }
+    /*
     public void velocityTester(double maxVelocity) {
         for(CanDevices device : CanChain){
             if (device.type == CanDevices.DeviceType.TALON && device.use == CanDevices.DeviceUse.LEADER){
@@ -181,7 +193,7 @@ public class ErrorCatcherUtility {
                 device.talon.set(ControlMode.Velocity, 0);
             }
             if (device.type == CanDevices.DeviceType.SPARK && device.use == CanDevices.DeviceUse.LEADER){
-                device.spark.get;
+               // device.spark.get();
                 int plateauCount = 0;
                 while (plateauCount<5){
                     if (device.talon.getSelectedSensorVelocity() == maxVelocity)
@@ -198,9 +210,10 @@ public class ErrorCatcherUtility {
             }
         }
     }
+    */
     public void testEverything() {
         ErrorCatcher();
         limelightCheck();
-        velocityTester(maxVelocity);
+        //velocityTester(maxVelocity);
     }
 }

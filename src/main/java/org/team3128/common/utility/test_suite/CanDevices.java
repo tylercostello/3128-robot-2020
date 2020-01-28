@@ -45,9 +45,9 @@ public class CanDevices{
     public LazyTalonFX falcon;
     
 
-    public CanDevices(DeviceType type, DeviceUse use, int id, String name, LazyTalonSRX talon, VictorSPX victor, LazyCANSparkMax spark, LazyTalonFX falcon, PowerDistributionPanel pdp){
+    public CanDevices(DeviceType type, int id, String name, LazyTalonSRX talon, VictorSPX victor, LazyCANSparkMax spark, LazyTalonFX falcon, PowerDistributionPanel pdp){
         this.type = type;
-        this.use = use;
+        //this.use = use;
         this.id = id;
         this.name = name;
         this.talon = talon;
