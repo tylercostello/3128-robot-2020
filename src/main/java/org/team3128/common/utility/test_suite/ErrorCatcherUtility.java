@@ -18,6 +18,7 @@ import com.revrobotics.CANSparkMax;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 import org.team3128.common.hardware.limelight.Limelight;
@@ -124,18 +125,8 @@ public class ErrorCatcherUtility {
 
             //If the current CAN device is not good, log it
             if(errorCode != ErrorCode.OK){
-                Log.info("ErrorCatcher", "There was an error");
-                if(device == CanChain[0]){
-                    Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
-                    NarwhalDashboard.put("ErrorCatcherCAN", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
-                }
-                else{
-                    Log.info("ErrorCatcher", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
-                    NarwhalDashboard.put("ErrorCatcherCAN", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
-
-                }
-                break;
-                /*if (errorCode == ErrorCode.CAN_MSG_NOT_FOUND){
+                Log.info("ErrorCatcher", "ErrorCode: "+errorCode);
+                if (errorCode == ErrorCode.CAN_MSG_NOT_FOUND || errorCode == ErrorCode.SigNotUpdated){
                     if(device == CanChain[0]){
                         Log.info("ErrorCatcher", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
                         NarwhalDashboard.put("ErrorCatcherCAN", "RoboRIO to " +device.name+ " " + device.id +" CAN wire is disconnected");
@@ -150,7 +141,7 @@ public class ErrorCatcherUtility {
                 if (errorCode == ErrorCode.SensorNotPresent){
                     Log.info("ErrorCatcher", device.name+ " " + device.id +" Encoder is disconnected");
                     NarwhalDashboard.put("ErrorCatcherEncoder", device.name+ " " + device.id +" Encoder is disconnected");
-                }*/
+                }
                 
             } else{
                NarwhalDashboard.put("ErrorCatcherCAN", "No CAN Errors");
