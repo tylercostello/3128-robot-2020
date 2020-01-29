@@ -124,7 +124,7 @@ public class MainCompbot extends NarwhalRobot {
         Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 3, "Left Drive Follower", null, null , null, drive.leftTalonSlave, null);
         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
         setCanChain();
-        errorCatcher = new ErrorCatcherUtility(CanChain,limelights);
+        errorCatcher = new ErrorCatcherUtility(CanChain,limelights, Constants.DRIVE_HIGH_SPEED);
 
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
             if (down) {

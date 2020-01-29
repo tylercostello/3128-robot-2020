@@ -241,12 +241,12 @@ public class NEODrive extends Threaded {
 		return 0;
 	}
 
-	private void setWheelPower(DriveSignal setVelocity) {
+	public void setWheelPower(DriveSignal setVelocity) {
 		leftSpark.set(setVelocity.leftVelocity);
 		rightSpark.set(setVelocity.rightVelocity);
 	}
 
-	private void setWheelVelocity(DriveSignal setVelocity) {
+	public void setWheelVelocity(DriveSignal setVelocity) {
 		if (Math.abs(setVelocity.rightVelocity) > (Constants.DRIVE_HIGH_SPEED)
 				|| Math.abs(setVelocity.leftVelocity) > (Constants.DRIVE_HIGH_SPEED)) {
 			DriverStation.getInstance();

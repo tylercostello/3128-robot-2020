@@ -27,15 +27,7 @@ public class CanDevices{
         FALCON,
         PDP;
     } 
-
-    public enum DeviceUse
-    { 
-        LEADER,
-        FOLLOWER,
-        MECHANISM;
-    }
     public DeviceType type;
-    public DeviceUse use;
     public int id;
     public String name;
     public LazyTalonSRX talon;
@@ -47,7 +39,6 @@ public class CanDevices{
 
     public CanDevices(DeviceType type, int id, String name, LazyTalonSRX talon, VictorSPX victor, LazyCANSparkMax spark, LazyTalonFX falcon, PowerDistributionPanel pdp){
         this.type = type;
-        //this.use = use;
         this.id = id;
         this.name = name;
         this.talon = talon;

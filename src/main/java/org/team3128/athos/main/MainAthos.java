@@ -55,11 +55,11 @@ import org.team3128.common.generics.ThreadScheduler;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.hardware.motor.LazyTalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-
+import org.team3128.common.drive.DriveSignal;
 import org.team3128.common.utility.test_suite.*;
 
 public class MainAthos extends NarwhalRobot {
-    NEODrive drive = NEODrive.getInstance();
+    public static NEODrive drive = NEODrive.getInstance();
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -98,6 +98,7 @@ public class MainAthos extends NarwhalRobot {
         CanChain[3] = Constants.leftDriveLeader;
         CanChain[4] = Constants.PDP;
     }
+    public static DriveSignal sparkDrive = new DriveSignal(Constants.TEST_SUITE_DRIVE_VELOCITY,Constants.TEST_SUITE_DRIVE_VELOCITY);
 
     @Override
     protected void constructHardware() {
@@ -158,7 +159,7 @@ public class MainAthos extends NarwhalRobot {
          Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null, null);
          Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
          setCanChain();
-         errorCatcher = new ErrorCatcherUtility(CanChain,limelights);
+         errorCatcher = new ErrorCatcherUtility(CanChain,limelights, Constants.DRIVE_HIGH_SPEED);
          
  
          // DCU

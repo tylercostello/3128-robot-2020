@@ -14,8 +14,9 @@ import org.team3128.common.utility.Log;
 import org.team3128.common.utility.test_suite.CanDevices;
 
 import com.revrobotics.CANError;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
-
+import com.revrobotics.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -24,7 +25,10 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import org.team3128.common.hardware.limelight.Limelight;
 import org.team3128.common.hardware.limelight.LimelightKey;
 import org.team3128.common.hardware.motor.LazyTalonFX;
-
+import edu.wpi.first.wpilibj.Timer;
+import org.team3128.athos.main.MainAthos;
+import org.team3128.common.drive.DriveSignal;
+import org.team3128.athos.subsystems.*;
 /**
  * Utility used to catch breaks in the CAN chain
  * 
@@ -38,6 +42,7 @@ public class ErrorCatcherUtility {
     public static ErrorCode errorCode;
     public CanDevices lastDevice;
     public double maxVelocity;
+    public CANEncoder encoder;
 
     /*public TalonSRX talon;
     public VictorSPX victor;
@@ -45,17 +50,18 @@ public class ErrorCatcherUtility {
     private double pdpTemp;
     private double sparkTemp;
     public CANError canError;
+    //public NEODrive neoDrive;
     
     
 
-    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights){
+    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights, double maxVelocity){
       this.CanChain = CanChain;  
       this.limelights = limelights;
-      //this.maxVelocity = maxVelocity;
+      this.maxVelocity = maxVelocity;
     }
 
     public void ErrorCatcher(){
-
+        //neoDrive=MainAthos.drive;
         //Iterates over each CAN device in the chain, in order, and checks if it is good
         errorCode=ErrorCode.OK;
         //bridge checker
@@ -74,7 +80,7 @@ public class ErrorCatcherUtility {
             }
             else if (device.type==CanDevices.DeviceType.SPARK){
                // canError=device.spark.setCANTimeout(10);
-              /*  canError=device.spark.setIdleMode(CANSparkMax.IdleMode.kCoast);
+               /* canError=device.spark.setIdleMode(CANSparkMax.IdleMode.kCoast);
                 if (canError != CANError.kOk){
                     Log.info("ErrorCatcher", "bad"); 
                 }
@@ -85,15 +91,16 @@ public class ErrorCatcherUtility {
                     errorCode = ErrorCode.RxTimeout;
                 }*/
 
-              /*  canError=device.spark.setCANTimeout(10);
+                canError=device.spark.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 10);
                 if (canError==CANError.kOk){
                     Log.info("ErrorCatcher", "ok");
                 }
                 else
                 {
                     Log.info("ErrorCatcher", ""+canError);
-                }*/
-
+                    errorCode=ErrorCode.SensorNotPresent;
+                }
+                /*
                 sparkTemp=device.spark.getMotorTemperature();
                 Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
 
@@ -103,7 +110,7 @@ public class ErrorCatcherUtility {
                     errorCode = ErrorCode.SensorNotPresent;
                 } else {
                     errorCode=ErrorCode.OK;
-                }
+                }*/
             }
 
             else if (device.type==CanDevices.DeviceType.FALCON){
@@ -171,40 +178,62 @@ public class ErrorCatcherUtility {
         }
         //NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
     }
-    /*
+    
     public void velocityTester(double maxVelocity) {
-        for(CanDevices device : CanChain){
-            if (device.type == CanDevices.DeviceType.TALON && device.use == CanDevices.DeviceUse.LEADER){
+        Log.info("ErrorCatcher", "Spark");
+        int plateauCount = 0;
+        double maxAchieved = 0;
+        MainAthos.sparkDrive = new DriveSignal(Constants.TEST_SUITE_DRIVE_VELOCITY, Constants.TEST_SUITE_DRIVE_VELOCITY);
+        MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
+        encoder=CanChain[0].spark.getEncoder();
+        double time = Timer.getFPGATimestamp();
+        double endTime = Timer.getFPGATimestamp();
+
+        while (encoder.getVelocity() == 0 && (endTime-time) <= 4.2){
+            
+            if (maxAchieved<=encoder.getVelocity())
+                maxAchieved=encoder.getVelocity();
+            endTime = Timer.getFPGATimestamp();
+
+           // Log.info("ErrorCatcher", "Time "+(endTime-time));
+        }
+        MainAthos.sparkDrive = new DriveSignal(0, 0);
+        Log.info("ErrorCatcher", "ran");
+        MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
+        //MainAthos.drive.setWheelPower(MainAthos.sparkDrive);
+        Log.info("ErrorCatcher", "Max Velocity"+maxAchieved);
+        
+        /*for(CanDevices device : CanChain){
+            if (device == null)
+                break;
+            if ((device.type == CanDevices.DeviceType.TALON || device.type == CanDevices.DeviceType.FALCON) && device.name.contains("Leader")){
                 device.talon.set(ControlMode.Velocity, maxVelocity);
                 int plateauCount = 0;
-                while (plateauCount<5){
-                    if (device.talon.getSelectedSensorVelocity() == maxVelocity)
+                double time = Timer.getFPGATimestamp();
+                double maxAchieved = 0;
+                double endTime = Timer.getFPGATimestamp();
+                while (plateauCount<5 && endTime-time <= 4.2){
+                    if (device.talon.getSelectedSensorVelocity()>= maxAchieved)
+                        maxAchieved=device.talon.getSelectedSensorVelocity();
+                    if (device.talon.getSelectedSensorVelocity() >= maxVelocity)
                         plateauCount++;
+                    endTime = Timer.getFPGATimestamp();
+
                 }
                 device.talon.set(ControlMode.Velocity, 0);
+                Log.info("ErrorCatcher", "Max Velocity"+maxAchieved);
+                if (plateauCount == 5)
+                    Log.info("ErrorCatcher", "Achieved in " + (endTime-time) + " seconds");
             }
-            if (device.type == CanDevices.DeviceType.SPARK && device.use == CanDevices.DeviceUse.LEADER){
-               // device.spark.get();
-                int plateauCount = 0;
-                while (plateauCount<5){
-                    if (device.talon.getSelectedSensorVelocity() == maxVelocity)
-                        plateauCount++;
-                }
+            if (device.type == CanDevices.DeviceType.SPARK && device.name.contains("Leader")){
+                
             }
-            if (device.type == CanDevices.DeviceType.FALCON && device.use == CanDevices.DeviceUse.LEADER){
-                device.falcon.set(ControlMode.Velocity, maxVelocity);
-                int plateauCount = 0;
-                while (plateauCount<5){
-                    if (device.talon.getSelectedSensorVelocity() == maxVelocity)
-                        plateauCount++;
-                }
-            }
-        }
+        }*/
     }
-    */
+    
     public void testEverything() {
         ErrorCatcher();
         limelightCheck();
-        //velocityTester(maxVelocity);
+        velocityTester(140);
     }
 }
