@@ -57,6 +57,7 @@ import org.team3128.common.hardware.motor.LazyTalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import org.team3128.common.drive.DriveSignal;
 import org.team3128.common.utility.test_suite.*;
+import org.team3128.common.drive.Drive;
 
 public class MainAthos extends NarwhalRobot {
     public static NEODrive drive = NEODrive.getInstance();

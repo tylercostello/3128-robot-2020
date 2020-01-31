@@ -30,8 +30,9 @@ import org.team3128.common.utility.RobotMath;
 import edu.wpi.first.wpilibj.Timer;
 
 import org.team3128.common.utility.Log;
+import org.team3128.common.drive.Drive;
 
-public class FalconDrive extends Threaded {
+public class FalconDrive extends Drive {
 
 	public enum DriveState {
 		TELEOP, RAMSETECONTROL, TURN, DONE
@@ -97,23 +98,23 @@ public class FalconDrive extends Threaded {
 		configAuto();
 	}
 
-	public void debug() {
+	@Override public void debug() {
 		System.out.println("L enc: " + getLeftDistance() + " velo " + getLeftSpeed());
 		System.out.println("R enc: " + getRightDistance() + " velo " + getRightSpeed());
 		System.out.println("Gyro: " + getAngle()/* getGyroAngle().getDegrees() */);
 	}
 
-	public void debugSpeed() {
+	@Override public void debugSpeed() {
 		System.out.println("L speed " + " actual " + getLeftSpeed());
 		System.out.println("R speed " + " actual " + getRightSpeed());
 
 	}
 
-	public void setRight() {
+	@Override public void setRight() {
 		setWheelVelocity(new DriveSignal(40, 0));
 	}
 
-	private void configAuto() {
+	@Override public void configAuto() {
 		rightTalon.config_kP(0, Constants.K_AUTO_RIGHT_P);
 		rightTalon.config_kD(0, Constants.K_AUTO_RIGHT_D);
 		rightTalon.config_kF(0, Constants.K_AUTO_RIGHT_F);
@@ -123,25 +124,25 @@ public class FalconDrive extends Threaded {
 		leftTalon.config_kF(0, Constants.K_AUTO_LEFT_F);
 	}
 
-	private void configHigh() {
+	@Override public void configHigh() {
 		driveMultiplier = Constants.DRIVE_HIGH_SPEED;
 	}
 
 	boolean teleopstart = true;
 
-	synchronized public void setTeleop() {
+	@Override synchronized public void setTeleop() {
 		driveState = DriveState.TELEOP;
 	}
 
-	public void calibrateGyro() {
+	@Override public void calibrateGyro() {
 		gyroSensor.calibrate();
 	}
 
-	public void printCurrent() {
+	@Override public void printCurrent() {
 		System.out.println(leftTalon);
 	}
 
-	private void configMotors() {
+	@Override public void configMotors() {
 		leftTalonSlave.follow(leftTalon);
 		// leftTalonSlave2.follow(leftTalon);
 		rightTalonSlave.follow(rightTalon);
@@ -156,50 +157,50 @@ public class FalconDrive extends Threaded {
 		configAuto();
 	}
 
-	public void resetMotionProfile() {
+	@Override public void resetMotionProfile() {
 		moveProfiler.reset();
 	}
 
-	public double getAngle() {
+	@Override public double getAngle() {
 		return -gyroSensor.getAngle();
 	}
 
-	public double getDistance() {
+	@Override public double getDistance() {
 		return (getLeftDistance() + getRightDistance()) / 2;
 	}
 
-	public Rotation2D getGyroAngle() {
+	@Override public Rotation2D getGyroAngle() {
 		// -180 through 180
 		return Rotation2D.fromDegrees(gyroSensor.getAngle());
 	}
 
-	public double getLeftDistance() {
+	@Override public double getLeftDistance() {
 		return leftTalon.getSelectedSensorPosition(0) * Constants.kDriveNuToInches;
 	}
 
-	public double getRightDistance() {
+	@Override public double getRightDistance() {
 		return rightTalon.getSelectedSensorPosition(0) * Constants.kDriveNuToInches;
 	}
 
-	public double getSpeed() {
+	@Override public double getSpeed() {
 		return (getLeftSpeed() + getRightSpeed()) / 2;
 	}
 
-	public double getLeftSpeed() {
+	@Override public double getLeftSpeed() {
 		return leftTalon.getSelectedSensorVelocity(0) * Constants.kDriveInchesPerSecPerNUp100ms;
 	}
 
-	public double getRightSpeed() {
+	@Override public double getRightSpeed() {
 		return rightTalon.getSelectedSensorVelocity(0) * Constants.kDriveInchesPerSecPerNUp100ms;
 	}
 
-	public synchronized void setAutoTrajectory(Trajectory autoTraj, boolean isReversed) {
+	@Override public synchronized void setAutoTrajectory(Trajectory autoTraj, boolean isReversed) {
 		this.trajectory = autoTraj;
 		totalTime = trajectory.getTotalTimeSeconds();
 		autonomousDriver = new RamseteController(1.8, 0.7, isReversed, Constants.TRACK_RADIUS); // 2,0.7
 	}
 
-	public synchronized void startTrajectory() {
+	@Override public synchronized void startTrajectory() {
 		if (trajectory == null) {
 			Log.info("FalconDrive", "FATAL // FAILED TRAJECTORY - NULL TRAJECTORY INPUTTED");
 			Log.info("FalconDrive", "Returned to teleop control");
@@ -211,19 +212,19 @@ public class FalconDrive extends Threaded {
 		}
 	}
 
-	public void setBrakeState(NeutralMode mode) {
+	@Override public void setBrakeState(NeutralMode mode) {
 	}
 
-	public double getVoltage() {
+	@Override public double getVoltage() {
 		return 0;
 	}
 
-	private void setWheelPower(DriveSignal signal) {
+	@Override public void setWheelPower(DriveSignal signal) {
 		leftTalon.set(ControlMode.PercentOutput, signal.leftVelocity);
 		rightTalon.set(ControlMode.PercentOutput, signal.rightVelocity);
 	}
 
-	private void setWheelVelocity(DriveSignal setVelocity) {
+	@Override public void setWheelVelocity(DriveSignal setVelocity) {
 		if (Math.abs(setVelocity.rightVelocity) > (Constants.DRIVE_HIGH_SPEED)
 				|| Math.abs(setVelocity.leftVelocity) > (Constants.DRIVE_HIGH_SPEED)) {
 			DriverStation.getInstance();
@@ -249,7 +250,7 @@ public class FalconDrive extends Threaded {
 	 * @param throttle throttle control input scaled between 1 and -1 (-.8 is 10 %,
 	 *                 0 is 50%, 1.0 is 100%)
 	 */
-	public void arcadeDrive(double joyX, double joyY, double throttle, boolean fullSpeed) {
+	@Override public void arcadeDrive(double joyX, double joyY, double throttle, boolean fullSpeed) {
 		synchronized (this) {
 			driveState = DriveState.TELEOP;
 		}
@@ -286,8 +287,7 @@ public class FalconDrive extends Threaded {
 		setWheelVelocity(new DriveSignal(spdL, spdR));
 	}
 
-	@Override
-	public void update() {
+	@Override public void update() {
 		// System.out.println("L speed " + getLeftSpeed() + " position x " +
 		// RobotTracker.getInstance().getOdometry().translationMat.getX());
 		// System.out.println("R speed " + getRightSpeed() + " position y " +
@@ -309,7 +309,7 @@ public class FalconDrive extends Threaded {
 		}
 	}
 
-	public void setRotation(Rotation2D angle) {
+	@Override public void setRotation(Rotation2D angle) {
 		synchronized (this) {
 			wantedHeading = angle;
 			driveState = DriveState.TURN;
@@ -320,7 +320,7 @@ public class FalconDrive extends Threaded {
 	/**
 	 * Set Velocity PID for both sides of the drivetrain (to the same constants)
 	 */
-	public void setDualVelocityPID(double kP, double kD, double kF) {
+	@Override public void setDualVelocityPID(double kP, double kD, double kF) {
 		leftTalon.config_kP(0, kP);
 		leftTalon.config_kD(0, kD);
 		leftTalon.config_kF(0, kF);
@@ -333,7 +333,7 @@ public class FalconDrive extends Threaded {
 				+ ", kD = " + kD + ", kF = " + kF);
 	}
 
-	private void updateTurn() {
+	@Override public void updateTurn() {
 		double error = wantedHeading.rotateBy(RobotTracker.getInstance().getOdometry().rotationMat.inverse())
 				.getDegrees();
 		double deltaSpeed;
@@ -353,11 +353,11 @@ public class FalconDrive extends Threaded {
 		}
 	}
 
-	public void setShiftState(boolean state) {
+	@Override public void setShiftState(boolean state) {
 		configHigh();
 	}
 
-	private void updateRamseteController(boolean isStart) {
+	@Override public void updateRamseteController(boolean isStart) {
 		currentTime = Timer.getFPGATimestamp();
 		if (isStart) {
 			startTime = currentTime;
@@ -378,16 +378,16 @@ public class FalconDrive extends Threaded {
 		setWheelVelocity(signal.command);
 	}
 
-	public void resetGyro() {
+	@Override public void resetGyro() {
 		gyroSensor.reset();
 	}
 
-	public boolean checkSubsystem() {
+	@Override public boolean checkSubsystem() {
 		configMotors();
 		return true;
 	}
 
-	synchronized public void stopMovement() {
+	@Override synchronized public void stopMovement() {
 		leftTalon.set(ControlMode.PercentOutput, 0);
 		rightTalon.set(ControlMode.PercentOutput, 0);
 		setWheelVelocity(new DriveSignal(0, 0));
@@ -396,10 +396,10 @@ public class FalconDrive extends Threaded {
 		resetMotionProfile();
 	}
 
-	synchronized public boolean isFinished() {
+	@Override synchronized public boolean isFinished() {
 		return driveState == DriveState.DONE || driveState == DriveState.TELEOP;
 	}
 
-	public void clearStickyFaults() {
+	@Override public void clearStickyFaults() {
 	}
 }
