@@ -43,7 +43,7 @@ public class Constants extends RobotConstants {
         public static final int LEFT_DRIVE_MIDDLE_ID = 4;
         public static final int LEFT_DRIVE_BACK_ID = 6;
 
-        public static final double TEST_SUITE_DRIVE_VELOCITY = 80; //power
+        public static final double TEST_SUITE_DRIVE_VELOCITY = 20; //power
         // public static final double WHEELBASE = 32.3; // Might be deprecated. I have to find out how to implement arc
                                                      // turns
                                                      // first. (Adham)

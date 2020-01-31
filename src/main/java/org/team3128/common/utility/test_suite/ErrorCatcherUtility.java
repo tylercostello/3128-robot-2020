@@ -41,7 +41,6 @@ public class ErrorCatcherUtility {
     public Limelight[] limelights = new Limelight[5];
     public static ErrorCode errorCode;
     public CanDevices lastDevice;
-    public double maxVelocity;
     public CANEncoder encoder;
 
     /*public TalonSRX talon;
@@ -50,14 +49,16 @@ public class ErrorCatcherUtility {
     private double pdpTemp;
     private double sparkTemp;
     public CANError canError;
+    public boolean forwardWorks;
+    public boolean backwardWorks;
+
     //public NEODrive neoDrive;
     
     
 
-    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights, double maxVelocity){
+    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights){
       this.CanChain = CanChain;  
       this.limelights = limelights;
-      this.maxVelocity = maxVelocity;
     }
 
     public void ErrorCatcher(){
@@ -90,7 +91,7 @@ public class ErrorCatcherUtility {
                 /*if (device.spark.setCANTimeout(10) != CANError.kOk){
                     errorCode = ErrorCode.RxTimeout;
                 }*/
-
+                /*
                 canError=device.spark.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 10);
                 if (canError==CANError.kOk){
                     Log.info("ErrorCatcher", "ok");
@@ -99,8 +100,8 @@ public class ErrorCatcherUtility {
                 {
                     Log.info("ErrorCatcher", ""+canError);
                     errorCode=ErrorCode.SensorNotPresent;
-                }
-                /*
+                }*/
+                
                 sparkTemp=device.spark.getMotorTemperature();
                 Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
 
@@ -110,7 +111,7 @@ public class ErrorCatcherUtility {
                     errorCode = ErrorCode.SensorNotPresent;
                 } else {
                     errorCode=ErrorCode.OK;
-                }*/
+                }
             }
 
             else if (device.type==CanDevices.DeviceType.FALCON){
@@ -126,9 +127,6 @@ public class ErrorCatcherUtility {
                     errorCode = ErrorCode.CAN_MSG_NOT_FOUND;
                 }
             }
-            
-
-
 
             //If the current CAN device is not good, log it
             if(errorCode != ErrorCode.OK){
@@ -179,17 +177,19 @@ public class ErrorCatcherUtility {
         //NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
     }
     
-    public void velocityTester(double maxVelocity) {
+    public void velocityTester() {
         Log.info("ErrorCatcher", "Spark");
         int plateauCount = 0;
         double maxAchieved = 0;
+        forwardWorks = false;
+        backwardWorks = false;
         MainAthos.sparkDrive = new DriveSignal(Constants.TEST_SUITE_DRIVE_VELOCITY, Constants.TEST_SUITE_DRIVE_VELOCITY);
         MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
         encoder=CanChain[0].spark.getEncoder();
         double time = Timer.getFPGATimestamp();
         double endTime = Timer.getFPGATimestamp();
 
-        while (encoder.getVelocity() == 0 && (endTime-time) <= 4.2){
+        while (encoder.getVelocity() < 100 && (endTime-time) <= 4.2){
             
             if (maxAchieved<=encoder.getVelocity())
                 maxAchieved=encoder.getVelocity();
@@ -200,40 +200,52 @@ public class ErrorCatcherUtility {
         MainAthos.sparkDrive = new DriveSignal(0, 0);
         Log.info("ErrorCatcher", "ran");
         MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
-        //MainAthos.drive.setWheelPower(MainAthos.sparkDrive);
-        Log.info("ErrorCatcher", "Max Velocity"+maxAchieved);
-        
-        /*for(CanDevices device : CanChain){
-            if (device == null)
-                break;
-            if ((device.type == CanDevices.DeviceType.TALON || device.type == CanDevices.DeviceType.FALCON) && device.name.contains("Leader")){
-                device.talon.set(ControlMode.Velocity, maxVelocity);
-                int plateauCount = 0;
-                double time = Timer.getFPGATimestamp();
-                double maxAchieved = 0;
-                double endTime = Timer.getFPGATimestamp();
-                while (plateauCount<5 && endTime-time <= 4.2){
-                    if (device.talon.getSelectedSensorVelocity()>= maxAchieved)
-                        maxAchieved=device.talon.getSelectedSensorVelocity();
-                    if (device.talon.getSelectedSensorVelocity() >= maxVelocity)
-                        plateauCount++;
-                    endTime = Timer.getFPGATimestamp();
+        if (maxAchieved > 4){
+            forwardWorks = true;
+        }
+        Log.info("ErrorCatcher", "Max Velocity "+maxAchieved);
+        Log.info("ErrorCatcher", "Movement works "+forwardWorks);
 
-                }
-                device.talon.set(ControlMode.Velocity, 0);
-                Log.info("ErrorCatcher", "Max Velocity"+maxAchieved);
-                if (plateauCount == 5)
-                    Log.info("ErrorCatcher", "Achieved in " + (endTime-time) + " seconds");
-            }
-            if (device.type == CanDevices.DeviceType.SPARK && device.name.contains("Leader")){
-                
-            }
-        }*/
+        MainAthos.sparkDrive = new DriveSignal(-Constants.TEST_SUITE_DRIVE_VELOCITY, -Constants.TEST_SUITE_DRIVE_VELOCITY);
+        MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
+        encoder=CanChain[0].spark.getEncoder();
+        time = Timer.getFPGATimestamp();
+        endTime = Timer.getFPGATimestamp();
+        maxAchieved = 0;
+        while (encoder.getVelocity() > -100 && (endTime-time) <= 4.2){
+            
+            if (maxAchieved>=encoder.getVelocity())
+                maxAchieved=encoder.getVelocity();
+            endTime = Timer.getFPGATimestamp();
+
+           // Log.info("ErrorCatcher", "Time "+(endTime-time));
+        }
+        MainAthos.sparkDrive = new DriveSignal(0, 0);
+        Log.info("ErrorCatcher", "ran");
+        MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
+        if (maxAchieved < -4){
+            backwardWorks = true;
+        }
+        else {
+            backwardWorks = false;
+        }
+        Log.info("ErrorCatcher", "Max Velocity "+maxAchieved);
+        Log.info("ErrorCatcher", "Forward Movement works "+forwardWorks);
+        Log.info("ErrorCatcher", "Backward Movement works "+backwardWorks);
+        if (forwardWorks && backwardWorks){
+            NarwhalDashboard.put("ErrorCatcherMovement", "Movement Works");
+            Log.info("ErrorCatcher", "haha yes");  
+        }
+        else {
+            NarwhalDashboard.put("ErrorCatcherMovement", "Movement Does Not Work");
+            Log.info("ErrorCatcher", "haha no");  
+        }
     }
     
     public void testEverything() {
         ErrorCatcher();
+        ErrorCatcher();
         limelightCheck();
-        velocityTester(140);
+        velocityTester();
     }
 }
