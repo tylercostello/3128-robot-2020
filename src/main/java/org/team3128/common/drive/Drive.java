@@ -97,9 +97,6 @@ import edu.wpi.first.wpilibj.Timer;
  * Abstract class for drivetrain objects to inherit
  */
 
-
-
-
 import org.team3128.common.utility.Log;
 public abstract class Drive extends Threaded {
 

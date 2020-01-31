@@ -19,6 +19,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.platform.DeviceType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
@@ -51,14 +52,17 @@ public class ErrorCatcherUtility {
     public CANError canError;
     public boolean forwardWorks;
     public boolean backwardWorks;
+    public Drive drive;
+    public DriveSignal driveSignal;
 
     //public NEODrive neoDrive;
     
     
 
-    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights){
+    public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights, Drive drive){
       this.CanChain = CanChain;  
       this.limelights = limelights;
+      this.drive = drive;
     }
 
     public void ErrorCatcher(){
@@ -183,8 +187,9 @@ public class ErrorCatcherUtility {
         double maxAchieved = 0;
         forwardWorks = false;
         backwardWorks = false;
-        MainAthos.sparkDrive = new DriveSignal(Constants.TEST_SUITE_DRIVE_VELOCITY, Constants.TEST_SUITE_DRIVE_VELOCITY);
-        MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
+        driveSignal = new DriveSignal(Constants.TEST_SUITE_DRIVE_VELOCITY, Constants.TEST_SUITE_DRIVE_VELOCITY);
+        //MainAthos.sparkDrive = new DriveSignal(Constants.TEST_SUITE_DRIVE_VELOCITY, Constants.TEST_SUITE_DRIVE_VELOCITY);
+      //  MainAthos.drive.setWheelVelocity(MainAthos.sparkDrive);
         encoder=CanChain[0].spark.getEncoder();
         double time = Timer.getFPGATimestamp();
         double endTime = Timer.getFPGATimestamp();
