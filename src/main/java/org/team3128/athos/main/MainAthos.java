@@ -160,7 +160,7 @@ public class MainAthos extends NarwhalRobot {
          Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null, null);
          Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
          setCanChain();
-         errorCatcher = new ErrorCatcherUtility(CanChain,limelights);
+         errorCatcher = new ErrorCatcherUtility(CanChain,limelights,drive);
          
  
          // DCU
