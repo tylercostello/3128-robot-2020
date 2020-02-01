@@ -51,15 +51,27 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+
 import org.team3128.common.generics.ThreadScheduler;
 
+import org.team3128.common.hardware.motor.LazyCANSparkMax;
+import org.team3128.common.hardware.motor.LazyTalonFX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import org.team3128.common.drive.DriveSignal;
+import org.team3128.common.utility.test_suite.*;
+import org.team3128.common.drive.Drive;
+
 public class MainAthos extends NarwhalRobot {
-    NEODrive drive = NEODrive.getInstance();
+    public static NEODrive drive = NEODrive.getInstance();
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
     ThreadScheduler scheduler = new ThreadScheduler();
     Thread auto;
+    
+    Limelight limelight = new Limelight("limelight-c", 26.0, 0, 0, 30);
+    Limelight[] limelights = new Limelight[1];
 
     public Joystick joystick;
     public ListenerManager lm;
@@ -75,17 +87,28 @@ public class MainAthos extends NarwhalRobot {
     public double kF = Constants.K_AUTO_LEFT_F;
 
     public double startTime = 0;
-
+    public PowerDistributionPanel pdp;
     public String trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
 
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
+
 
     public Command ballCommand;
     public Limelight bottomLimelight;
     private DriveCommandRunning driveCmdRunning;
 
     public static DigitalInput limitSwitch;
+
+    public ErrorCatcherUtility errorCatcher;
+    public static CanDevices[] CanChain = new CanDevices[42];
+    public static void setCanChain(){
+        CanChain[0] = Constants.rightDriveLeader;
+        CanChain[1] = Constants.rightDriveFollower;
+        CanChain[2] = Constants.leftDriveFollower;
+        CanChain[3] = Constants.leftDriveLeader;
+        CanChain[4] = Constants.PDP;
+    }
 
     @Override
     protected void constructHardware() {
@@ -111,11 +134,15 @@ public class MainAthos extends NarwhalRobot {
         SmartDashboard.putNumber("D Gain", kD);
         SmartDashboard.putNumber("F Gain", kF);
 
+
         visionPID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
-		blindPID = new PIDConstants(0.23, 0, 0, 0);
+		    blindPID = new PIDConstants(0.23, 0, 0, 0);
         driveCmdRunning = new DriveCommandRunning();
     
         limitSwitch = new DigitalInput(0);
+
+        limelights[0] = limelight;
+
 
         // straight
         // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(180)));
@@ -144,6 +171,31 @@ public class MainAthos extends NarwhalRobot {
 
         trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
                 120 * Constants.inchesToMeters, 0.5, false);
+         //Error Catcher (Auto Test Suite)
+         pdp = new PowerDistributionPanel(0);
+         Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", null , null, NEODrive.rightSpark, null, null);
+         Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", null, null , NEODrive.rightSparkSlave, null, null);
+         Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", null , null, NEODrive.leftSpark, null, null);
+         Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null, null);
+         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
+         setCanChain();
+         errorCatcher = new ErrorCatcherUtility(CanChain,limelights,drive);
+         
+ 
+         // DCU
+         // DriveCalibrationUtility.initialize(gyro, visionPID);
+         //dcu = DriveCalibrationUtility.getInstance();
+ 
+         //dcu.initNarwhalDashboard();
+         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
+             if (down) {
+                 //Janky fix
+                 
+                errorCatcher.testEverything();
+                
+               
+             }
+         });
     }
 
     @Override
