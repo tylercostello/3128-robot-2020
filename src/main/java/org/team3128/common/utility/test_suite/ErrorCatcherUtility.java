@@ -205,7 +205,7 @@ public class ErrorCatcherUtility {
 
         leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
         rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
-        while (leftEncoderVelocity < 500 && rightEncoderVelocity < 500 && (endTime-time) <= 4.2){
+        while (leftEncoderVelocity < 500 && rightEncoderVelocity < 500 && (endTime-time) <= 1){
           
            leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
            rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
@@ -241,7 +241,7 @@ public class ErrorCatcherUtility {
         rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
         Log.info("ErrorCatcher", "Left Encoder velocity: " + leftEncoderVelocity);
         Log.info("ErrorCatcher", "Right Encoder velocity: " + rightEncoderVelocity);
-        while (leftEncoderVelocity > -500 && rightEncoderVelocity > -500 && (endTime-time) <= 4.2){
+        while (leftEncoderVelocity > -500 && rightEncoderVelocity > -500 && (endTime-time) <= 1){
             leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
             rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
             if (leftEncoderVelocity > rightEncoderVelocity){
@@ -286,11 +286,14 @@ public class ErrorCatcherUtility {
             Log.info("ErrorCatcher", "Only backward movement works");  
         }
         else{
-            if (leftEncoderVelocity<=20){
+            if (leftEncoderVelocity>=-20 && rightEncoderVelocity<=-20){
                 NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction. Left Side is broken");
             }
-            else if (rightEncoderVelocity<=20){
+            else if (rightEncoderVelocity>=-20 && leftEncoderVelocity <=-20){
                 NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction. Right Side is broken");   
+            }
+            else if (rightEncoderVelocity>=-20 && leftEncoderVelocity >=-20){
+                NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction. Both Sides are broken");   
             }
             else {
                 NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction");
