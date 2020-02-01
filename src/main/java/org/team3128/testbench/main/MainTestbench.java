@@ -32,7 +32,7 @@ import org.team3128.testbench.subsystems.RobotTracker;
 import org.team3128.common.drive.DriveSignal;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
+import com.revrobotics.*;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -48,35 +48,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
-import org.team3128.common.hardware.motor.LazyCANSparkMax;
-import org.team3128.common.generics.Threaded;
-import org.team3128.common.control.RateLimiter;
-import org.team3128.common.control.AsynchronousPid;
-import org.team3128.common.control.motion.RamseteController;
-import org.team3128.common.control.trajectory.Trajectory;
-import org.team3128.common.control.trajectory.Trajectory.State;
-import org.team3128.common.drive.AutoDriveSignal;
-import org.team3128.common.drive.DriveSignal;
-import org.team3128.common.utility.math.Rotation2D;
-import org.team3128.common.utility.NarwhalUtility;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-
-import com.revrobotics.*;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Timer;
-import org.team3128.common.hardware.motor.LazyCANSparkMax;
-import org.team3128.common.utility.RobotMath;
+import edu.wpi.first.networktables.NetworkTableInstance; 
 
 import java.util.ArrayList;
 import java.util.concurrent.*;
@@ -119,45 +91,15 @@ public class MainTestBench extends NarwhalRobot {
         digitalInput = new DigitalInput(0);
         digitalInput2 = new DigitalInput(1);
 
-
 		shooterMotor = new LazyCANSparkMax(2, MotorType.kBrushless);
 		shooterMotor1 = new LazyCANSparkMax(5, MotorType.kBrushless);
         shooterMotor2 = new LazyCANSparkMax(11, MotorType.kBrushless);
         
         shooterEncoder = shooterMotor1.getEncoder();
 
-
         joystick = new Joystick(1);
         lm = new ListenerManager(joystick);
         addListenerManager(lm);
-
-        // straight
-        // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(180)));
-        // waypoints.add(new Pose2D(60 * Constants.inchesToMeters, 0 *
-        // Constants.inchesToMeters, Rotation2D.fromDegrees(0)));
-
-        // quarterturn
-        // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(0)));
-        // waypoints.add(new Pose2D(60 * Constants.inchesToMeters, 60 *
-        // Constants.inchesToMeters, Rotation2D.fromDegrees(90)));
-
-        // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(0)));
-        // waypoints.add(new Pose2D(60 * Constants.inchesToMeters, 30 *
-        // Constants.inchesToMeters, Rotation2D.fromDegrees(45)));
-
-        // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(0)));
-        // waypoints.add(new Pose2D(30 * Constants.inchesToMeters, 0 *
-        // Constants.inchesToMeters, Rotation2D.fromDegrees(0)));
-        // waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(0)));
-        // waypoints.add(new Pose2D(70 * Constants.inchesToMeters, 40 *
-        // Constants.inchesToMeters, Rotation2D.fromDegrees(20)));
-        // waypoints.add(new Pose2D(140 * Constants.inchesToMeters, 85 *
-        // Constants.inchesToMeters, Rotation2D.fromDegrees(45)));
-        // waypoints.add(
-        //         new Pose2D(0 * Constants.inchesToMeters, 70 * Constants.inchesToMeters, Rotation2D.fromDegrees(-45)));
-
-        // trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
-        //         120 * Constants.inchesToMeters, 0.5, false);
     }
 
     @Override
