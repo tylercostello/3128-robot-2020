@@ -32,6 +32,7 @@ import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.compbot.subsystems.FalconDrive;
 import org.team3128.compbot.subsystems.RobotTracker;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -54,6 +55,10 @@ import java.util.concurrent.*;
 import org.team3128.common.generics.ThreadScheduler;
 
 public class MainCompbot extends NarwhalRobot {
+
+    public DigitalInput digitalInput;
+    public DigitalInput digitalInput2;
+
     FalconDrive drive = FalconDrive.getInstance();
     RobotTracker robotTracker = RobotTracker.getInstance();
 
@@ -80,6 +85,12 @@ public class MainCompbot extends NarwhalRobot {
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
 
+    public boolean inPlace = false;
+    public boolean inPlace2 = false;
+
+    public int countBalls = 0;
+    public int countBalls2 = 0;
+
     Limelight limelight = new Limelight("limelight-c", 26.0, 0, 0, 30);
     Limelight[] limelights = new Limelight[1];
     public ErrorCatcherUtility errorCatcher;
@@ -95,6 +106,9 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void constructHardware() {
 
+        digitalInput = new DigitalInput(0);
+        digitalInput2 = new DigitalInput(1);
+        
         scheduler.schedule(drive, executor);
         scheduler.schedule(robotTracker, executor);
 
@@ -186,6 +200,26 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopPeriodic() {
+        
+        // logic for photoelectric sensor 
+        if (inPlace == false && digitalInput.get()){
+            countBalls++;
+            System.out.println("Number of balls: " + countBalls);
+            inPlace = true;
+        }
+        else if (!digitalInput.get()) {
+            inPlace = false;
+        }
+        
+        if (inPlace2 == false && digitalInput2.get()){
+            countBalls--;
+            System.out.println("Number of balls: " + countBalls);
+            inPlace2 = true;
+        }
+        else if (!digitalInput2.get()) {
+            inPlace2 = false;
+        }
+
     }
 
     double maxLeftSpeed = 0;
