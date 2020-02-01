@@ -61,8 +61,6 @@ public class ErrorCatcherUtility {
     DriveSignal driveSignal = new DriveSignal(40, 40); //Can be changed
     DriveSignal backwardsDriveSignal = new DriveSignal(-40, -40);
     DriveSignal zeroDriveSignal = new DriveSignal(0, 0);
-
-    //public NEODrive neoDrive;
     
     public ErrorCatcherUtility(CanDevices[] CanChain, Limelight[] limelights, Drive drive){
       this.CanChain = CanChain;  
@@ -293,7 +291,7 @@ public class ErrorCatcherUtility {
                 NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction. Right Side is broken");   
             }
             else if (rightEncoderVelocity>=-20 && leftEncoderVelocity >=-20){
-                NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction. Both Sides are broken");   
+                NarwhalDashboard.put("ErrorCatcherMovement", "Is it enabled? Movement does not work in either direction. Both Sides are broken.");   
             }
             else {
                 NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction");
@@ -305,17 +303,13 @@ public class ErrorCatcherUtility {
         switch(canDevice.type){
             case TALON:
                 return canDevice.talon.getSelectedSensorVelocity();
-                //break;
             case FALCON:
                 return  canDevice.falcon.getSelectedSensorVelocity();
-                //break;
             case SPARK:
                 return canDevice.spark.getEncoder().getVelocity();
-               // break;
             default:
                 return 0; 
         }
-        //return 0;
         
     }
     
