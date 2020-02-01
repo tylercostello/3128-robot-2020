@@ -27,9 +27,9 @@ import org.team3128.common.hardware.limelight.Limelight;
 import org.team3128.common.hardware.limelight.LimelightKey;
 import org.team3128.common.hardware.motor.LazyTalonFX;
 import edu.wpi.first.wpilibj.Timer;
-import org.team3128.athos.main.MainAthos;
+//import org.team3128.athos.main.MainAthos;
 import org.team3128.common.drive.DriveSignal;
-import org.team3128.athos.subsystems.*;
+//import org.team3128.athos.subsystems.*;
 import org.team3128.common.drive.Drive;
 
 /**
@@ -55,6 +55,8 @@ public class ErrorCatcherUtility {
     public boolean forwardWorks;
     public boolean backwardWorks;
     public Drive drive;
+    public CANEncoder canEncoder;
+    public CanDevices[] driveLeaders = new CanDevices[2];
 
     DriveSignal driveSignal = new DriveSignal(20, 20); //Can be changed
     DriveSignal backwardsDriveSignal = new DriveSignal(-20, -20);
@@ -77,8 +79,18 @@ public class ErrorCatcherUtility {
         //Iterates over each CAN device in the chain, in order, and checks if it is good
         errorCode=ErrorCode.OK;
         for(CanDevices device : CanChain){
+            
             if (device == null){
                 break;
+            }
+
+            if(device.name.contains("Drive Leader")){
+                if (driveLeaders[0] == null){
+                    driveLeaders[0] = device; 
+                }
+                else if (driveLeaders[1] == null){
+                    driveLeaders[1] = device;
+                }
             }
 
             if(device.type == CanDevices.DeviceType.TALON){
@@ -176,45 +188,46 @@ public class ErrorCatcherUtility {
         //NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
     }
     
+
+
     public void velocityTester() {
         
         double maxAchieved = 0;
         forwardWorks = false;
         backwardWorks = false;
 
-        double encoderVelocity;
+        double encoderVelocity1;
+        double encoderVelocity2;
 
         //Forward Movement
         drive.setWheelVelocity(driveSignal);
         double time = Timer.getFPGATimestamp();
         double endTime = Timer.getFPGATimestamp();
 
-        //Gets encoder velocity
-        switch(CanChain[0].type){
-            case TALON:
-                encoderVelocity = CanChain[0].talon.getSelectedSensorVelocity();
-                break;
-            case FALCON:
-                encoderVelocity = CanChain[0].falcon.getSelectedSensorVelocity();
-                break;
-            case SPARK:
-                encoderVelocity = CanChain[0].spark.getEncoder().getVelocity();
-                break;
-            default:
-                encoderVelocity = 0; 
-        }
+       
 
-        Log.info("ErrorCatcher", "Encoder Velocity: " + encoderVelocity);
-        while (encoderVelocity < 100 && (endTime-time) <= 4.2){
-            if (maxAchieved <= encoderVelocity){
-                maxAchieved=encoderVelocity;
+        encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
+        encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
+        while (encoderVelocity1 < 100 && encoderVelocity2 < 100 && (endTime-time) <= 4.2){
+          
+           encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
+           encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
+           if (encoderVelocity1 < encoderVelocity2){
+            if (maxAchieved <= encoderVelocity1){
+                maxAchieved=encoderVelocity1;
             }
+           }
+           else {
+            if (maxAchieved <= encoderVelocity2){
+                maxAchieved=encoderVelocity2;
+            }
+           }
             endTime = Timer.getFPGATimestamp();
         }
 
         drive.setWheelVelocity(zeroDriveSignal);
 
-        if (maxAchieved > 4){
+        if (maxAchieved > 50){
             forwardWorks = true;
         }
 
@@ -227,24 +240,22 @@ public class ErrorCatcherUtility {
         endTime = Timer.getFPGATimestamp();
         maxAchieved = 0;
 
-        switch(CanChain[0].type){
-            case TALON:
-                encoderVelocity = CanChain[0].talon.getSelectedSensorVelocity();
-                break;
-            case FALCON:
-                encoderVelocity = CanChain[0].falcon.getSelectedSensorVelocity();
-                break;
-            case SPARK:
-                encoderVelocity = CanChain[0].spark.getEncoder().getVelocity();
-                break;
-            default:
-                encoderVelocity = 0; 
-        }
-        Log.info("ErrorCatcher", "Encoder velocity: " + encoderVelocity);
-        while (encoderVelocity > -100 && (endTime-time) <= 4.2){
-
-            if (maxAchieved>=encoderVelocity){
-                maxAchieved=encoderVelocity;
+        encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
+        encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
+        Log.info("ErrorCatcher", "Encoder velocity: " + encoderVelocity1);
+        Log.info("ErrorCatcher", "Encoder velocity: " + encoderVelocity2);
+        while (encoderVelocity1 > -100 && encoderVelocity2 > -100 && (endTime-time) <= 4.2){
+            encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
+            encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
+            if (encoderVelocity1 > encoderVelocity2){
+                if (maxAchieved >= encoderVelocity1){
+                    maxAchieved=encoderVelocity1;
+                }
+               }
+            else {
+                if (maxAchieved >= encoderVelocity2){
+                    maxAchieved=encoderVelocity2;
+                }
             }
 
             endTime = Timer.getFPGATimestamp();
@@ -253,7 +264,7 @@ public class ErrorCatcherUtility {
 
         drive.setWheelVelocity(zeroDriveSignal);
 
-        if (maxAchieved < -4){
+        if (maxAchieved < -50){
             backwardWorks = true;
         }
         else {
@@ -277,9 +288,26 @@ public class ErrorCatcherUtility {
             Log.info("ErrorCatcher", "Only backward movement works");  
         }
         else{
-            NarwhalDashboard.put("ErrorCatcherMovement", "No movement works");
-            Log.info("ErrorCatcher", "No movement works");
+            NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction");
+            Log.info("ErrorCatcher", "Movement does not work in either direction");
         }
+    }
+    public double getEncoderVelocity(CanDevices canDevice){
+        switch(canDevice.type){
+            case TALON:
+                return canDevice.talon.getSelectedSensorVelocity();
+                //break;
+            case FALCON:
+                return  canDevice.falcon.getSelectedSensorVelocity();
+                //break;
+            case SPARK:
+                return canDevice.spark.getEncoder().getVelocity();
+               // break;
+            default:
+                return 0; 
+        }
+        //return 0;
+        
     }
     
     public void testEverything() {
