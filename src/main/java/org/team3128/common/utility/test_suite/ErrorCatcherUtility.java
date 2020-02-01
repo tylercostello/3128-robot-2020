@@ -58,8 +58,8 @@ public class ErrorCatcherUtility {
     public CANEncoder canEncoder;
     public CanDevices[] driveLeaders = new CanDevices[2];
 
-    DriveSignal driveSignal = new DriveSignal(20, 20); //Can be changed
-    DriveSignal backwardsDriveSignal = new DriveSignal(-20, -20);
+    DriveSignal driveSignal = new DriveSignal(40, 40); //Can be changed
+    DriveSignal backwardsDriveSignal = new DriveSignal(-40, -40);
     DriveSignal zeroDriveSignal = new DriveSignal(0, 0);
 
     //public NEODrive neoDrive;
@@ -84,14 +84,11 @@ public class ErrorCatcherUtility {
                 break;
             }
 
-            if(device.name.contains("Drive Leader")){
-                if (driveLeaders[0] == null){
-                    driveLeaders[0] = device; 
-                }
-                else if (driveLeaders[1] == null){
-                    driveLeaders[1] = device;
-                }
-            }
+            if(device.name == "Left Drive Leader")  
+                driveLeaders[0] = device;
+            if(device.name == "Right Drive Leader")  
+                driveLeaders[1] = device;
+            
 
             if(device.type == CanDevices.DeviceType.TALON){
                 errorCode = device.talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
@@ -196,8 +193,8 @@ public class ErrorCatcherUtility {
         forwardWorks = false;
         backwardWorks = false;
 
-        double encoderVelocity1;
-        double encoderVelocity2;
+        double leftEncoderVelocity;
+        double rightEncoderVelocity;
 
         //Forward Movement
         drive.setWheelVelocity(driveSignal);
@@ -206,20 +203,20 @@ public class ErrorCatcherUtility {
 
        
 
-        encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
-        encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
-        while (encoderVelocity1 < 100 && encoderVelocity2 < 100 && (endTime-time) <= 4.2){
+        leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
+        rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
+        while (leftEncoderVelocity < 500 && rightEncoderVelocity < 500 && (endTime-time) <= 4.2){
           
-           encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
-           encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
-           if (encoderVelocity1 < encoderVelocity2){
-            if (maxAchieved <= encoderVelocity1){
-                maxAchieved=encoderVelocity1;
+           leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
+           rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
+           if (leftEncoderVelocity < rightEncoderVelocity){
+            if (maxAchieved <= leftEncoderVelocity){
+                maxAchieved=leftEncoderVelocity;
             }
            }
            else {
-            if (maxAchieved <= encoderVelocity2){
-                maxAchieved=encoderVelocity2;
+            if (maxAchieved <= rightEncoderVelocity){
+                maxAchieved=rightEncoderVelocity;
             }
            }
             endTime = Timer.getFPGATimestamp();
@@ -240,21 +237,21 @@ public class ErrorCatcherUtility {
         endTime = Timer.getFPGATimestamp();
         maxAchieved = 0;
 
-        encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
-        encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
-        Log.info("ErrorCatcher", "Encoder velocity: " + encoderVelocity1);
-        Log.info("ErrorCatcher", "Encoder velocity: " + encoderVelocity2);
-        while (encoderVelocity1 > -100 && encoderVelocity2 > -100 && (endTime-time) <= 4.2){
-            encoderVelocity1 = getEncoderVelocity(driveLeaders[0]);
-            encoderVelocity2 = getEncoderVelocity(driveLeaders[1]);
-            if (encoderVelocity1 > encoderVelocity2){
-                if (maxAchieved >= encoderVelocity1){
-                    maxAchieved=encoderVelocity1;
+        leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
+        rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
+        Log.info("ErrorCatcher", "Left Encoder velocity: " + leftEncoderVelocity);
+        Log.info("ErrorCatcher", "Right Encoder velocity: " + rightEncoderVelocity);
+        while (leftEncoderVelocity > -500 && rightEncoderVelocity > -500 && (endTime-time) <= 4.2){
+            leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
+            rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
+            if (leftEncoderVelocity > rightEncoderVelocity){
+                if (maxAchieved >= leftEncoderVelocity){
+                    maxAchieved=leftEncoderVelocity;
                 }
                }
             else {
-                if (maxAchieved >= encoderVelocity2){
-                    maxAchieved=encoderVelocity2;
+                if (maxAchieved >= rightEncoderVelocity){
+                    maxAchieved=rightEncoderVelocity;
                 }
             }
 
@@ -270,7 +267,8 @@ public class ErrorCatcherUtility {
         else {
             backwardWorks = false;
         }
-
+        Log.info("ErrorCatcher", "Left Encoder velocity: " + leftEncoderVelocity);
+        Log.info("ErrorCatcher", "Right Encoder velocity: " + rightEncoderVelocity);
         Log.info("ErrorCatcher", "Max Velocity "+maxAchieved);
         Log.info("ErrorCatcher", "Forward Movement works "+forwardWorks);
         Log.info("ErrorCatcher", "Backward Movement works "+backwardWorks);
@@ -288,7 +286,15 @@ public class ErrorCatcherUtility {
             Log.info("ErrorCatcher", "Only backward movement works");  
         }
         else{
-            NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction");
+            if (leftEncoderVelocity<=20){
+                NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction. Left Side is broken");
+            }
+            else if (rightEncoderVelocity<=20){
+                NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction. Right Side is broken");   
+            }
+            else {
+                NarwhalDashboard.put("ErrorCatcherMovement", "Movement does not work in either direction");
+            }
             Log.info("ErrorCatcher", "Movement does not work in either direction");
         }
     }
