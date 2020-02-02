@@ -91,6 +91,10 @@ public class MainCompbot extends NarwhalRobot {
     public int countBalls = 0;
     public int countBalls2 = 0;
 
+    //public static LazyCANSparkMax intake;
+    //public static LazyCANSparkMax middle;
+    //public static LazyCANSparkMax feeder;
+
     Limelight limelight = new Limelight("limelight-c", 26.0, 0, 0, 30);
     Limelight[] limelights = new Limelight[1];
     public ErrorCatcherUtility errorCatcher;
@@ -105,6 +109,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void constructHardware() {
+
 
         digitalInput = new DigitalInput(0);
         digitalInput2 = new DigitalInput(1);
@@ -200,12 +205,37 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopPeriodic() {
-        
+        /*
         // logic for photoelectric sensor 
         if (inPlace == false && digitalInput.get()){
             countBalls++;
             System.out.println("Number of balls: " + countBalls);
             inPlace = true;
+
+            if (countBalls == 1){
+                //intake on
+                //middle on
+
+            }
+            if (countBalls == 2){
+                //short intake
+                //middle off
+
+            }
+            if (countBalls == 3){
+                //short intake
+                //middle off
+            }
+            if (countBalls == 4){
+                //intake on until 2 balls pass corner sensor
+                //middle on until 1 ball passes top hopper sensor
+                //intake low
+            }
+            if (countBalls == 5){
+                //intake low
+            }
+
+
         }
         else if (!digitalInput.get()) {
             inPlace = false;
@@ -215,10 +245,31 @@ public class MainCompbot extends NarwhalRobot {
             countBalls--;
             System.out.println("Number of balls: " + countBalls);
             inPlace2 = true;
+
+            if (countBalls == 1){
+                //intake on
+                //middle on
+
+            }
+            if (countBalls == 2){
+                //intake short
+                //middle on until top hopper sensor
+            }
+            if (countBalls == 3){
+                //middle short
+                //middle reverse until ball on intake belt 
+            }
+            if (countBalls == 4){
+                //middle on
+                //short intake
+            }
+
+
         }
         else if (!digitalInput2.get()) {
             inPlace2 = false;
-        }
+        } */
+        
 
     }
 
