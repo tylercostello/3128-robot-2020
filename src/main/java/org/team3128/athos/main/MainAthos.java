@@ -1,7 +1,7 @@
 package org.team3128.athos.main;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
+//import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 import org.team3128.common.generics.RobotConstants;
 
@@ -29,6 +29,7 @@ import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.athos.subsystems.NEODrive;
 import org.team3128.athos.subsystems.RobotTracker;
+import org.team3128.athos.autonomous.deprecated.CmdAutoBall;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -77,6 +78,11 @@ public class MainAthos extends NarwhalRobot {
 
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
+
+    public Limelight ballLimelight = new Limelight("limelight", 26 * Angle.DEGREES, 6.15 * Length.in, 0 * Length.in,
+    14.5 * Length.in);
+
+    public CmdHorizontalOffsetFeedbackDrive alignCommand;
 
     @Override
     protected void constructHardware() {
@@ -127,6 +133,8 @@ public class MainAthos extends NarwhalRobot {
 
         trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
                 120 * Constants.inchesToMeters, 0.5, false);
+
+        cmdDriveRunning = new DriveCommandRunning();
     }
 
     @Override
@@ -156,6 +164,26 @@ public class MainAthos extends NarwhalRobot {
         });
         lm.addButtonUpListener("AlignToTarget", () -> {
             Log.info("MainAthos.java", "[Vision Alignment] Not created yet, would've ended");
+        });
+
+        lm.nameControl(new Button(7), "AlignToBall");
+
+        lm.addButtonDownListener("AlignToBall", () -> {
+            // TODO: Add current implementation of vision alignment
+            Log.info("MainAthos.java", "Starting vision alignment to ball");
+
+            visionPID = new PIDConstants(0, 0.02, 0.0, 0.00001);
+            blindPID = new PIDConstants(0.1, 0, 0, 0);
+
+            CmdAutoBall alignCommand = new CmdAutoBall(ballLimelight, gyro, visionPID, blindPID, cmdDriveRunning);
+            alignCommand.start();
+
+        });
+        lm.addButtonUpListener("AlignToBall", () -> {
+            Log.info("MainAthos.java", "Ending vision alignment to ball");
+
+            alignCommand.cancel();
+            alignCommand = null;
         });
 
         lm.addButtonDownListener("ResetGyro", () -> {

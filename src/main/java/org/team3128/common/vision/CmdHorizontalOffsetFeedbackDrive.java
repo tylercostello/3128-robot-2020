@@ -1,6 +1,8 @@
 package org.team3128.common.vision;
 
+import org.team3128.athos.subsystems.NEODrive;
 import org.team3128.common.drive.DriveCommandRunning;
+import org.team3128.common.drive.DriveSignal;
 import org.team3128.common.drive.SRXTankDrive;
 import org.team3128.common.drive.calibrationutility.DriveCalibrationUtility;
 import org.team3128.common.hardware.limelight.LEDMode;
@@ -18,10 +20,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class CmdHorizontalOffsetFeedbackDrive extends Command {
-    SRXTankDrive drive;
+    NEODrive drive;
     Gyro gyro;
 
-    DriveCalibrationUtility dcu;
+    //DriveCalibrationUtility dcu;
 
     Limelight txLimelight;
     Limelight distanceLimelight;
@@ -95,8 +97,8 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
 
     @Override
     protected void initialize() {
-        drive = SRXTankDrive.getInstance();
-        dcu = DriveCalibrationUtility.getInstance();
+        drive = NEODrive.getInstance();
+        //dcu = DriveCalibrationUtility.getInstance();
 
         txLimelight.setLEDMode(LEDMode.ON);
         distanceLimelight.setLEDMode(LEDMode.ON);
@@ -121,7 +123,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
                 Log.info("CmdAutoAim", "Target found.");
                 Log.info("CmdAutoAim", "Switching to FEEDBACK...");
 
-                drive.tankDrive(visionPID.kF, visionPID.kF);
+                drive.setWheelVelocity(new DriveSignal(visionPID.kF, visionPID.kF));
 
                 currentHorizontalOffset = txLimelight.getValue(LimelightKey.HORIZONTAL_OFFSET, 5);
 
@@ -176,7 +178,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
                         * RobotMath.clamp((decelerationStartDistance - approximateDistance)
                                 / (decelerationStartDistance - decelerationEndDistance), 0.0, 1.0);
 
-                drive.tankDrive(multiplier * leftPower, multiplier * rightPower);
+                drive.setWheelVelocity(new DriveSignal(multiplier * leftPower, multiplier * rightPower));
 
                 previousTime = currentTime;
                 previousError = currentError;
@@ -205,7 +207,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
 
             Log.info("CmdAutoAim", "L: " + leftPower + "; R: " + rightPower);
 
-            drive.tankDrive(leftPower, rightPower);
+            drive.setWheelVelocity(new DriveSignal(leftPower, rightPower));
 
             previousTime = currentTime;
             previousError = currentError;
@@ -218,8 +220,8 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
     @Override
     protected boolean isFinished() {
         if (aimState == HorizontalOffsetFeedbackDriveState.BLIND) {
-            leftVel = Math.abs(drive.getLeftMotors().getSelectedSensorVelocity(0));
-            rightVel = Math.abs(drive.getRightMotors().getSelectedSensorVelocity(0));
+            leftVel = Math.abs(drive.getLeftSpeed());
+            rightVel = Math.abs(drive.getRightSpeed());
 
             if (leftVel < VELOCITY_THRESHOLD && rightVel < VELOCITY_THRESHOLD) {
                 plateauReachedCount += 1;
@@ -242,7 +244,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
         }
         txLimelight.setLEDMode(LEDMode.OFF);
         distanceLimelight.setLEDMode(LEDMode.OFF);
-
+        
         NarwhalDashboard.put("align_status", "blind");
 
         cmdRunning.isRunning = false;
