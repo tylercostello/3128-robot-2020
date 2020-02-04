@@ -50,12 +50,18 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import org.team3128.compbot.main.MainCompbot;
+import org.team3128.compbot.subsystems.*;
 
 //import java.util.ArrayList;
 import java.util.concurrent.*;
 
 import org.team3128.common.generics.ThreadScheduler;
 import org.team3128.common.generics.Threaded;
+import com.revrobotics.*;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+//import java.util.Queue; 
+import java.util.*;
 
 
 public class Hopper extends Threaded {
@@ -67,79 +73,108 @@ public class Hopper extends Threaded {
     public static LazyCANSparkMax feeder;
     public boolean inPlace = false;
     public boolean inPlace2 = false;
+    public LinkedList<Ball> ballList = new LinkedList<Ball>();
     public Hopper (){
         
     }
 
-    public void stopBreakingStuff(){
+    public void hoppityHop() {
+        
         digitalInput = new DigitalInput(0);
         digitalInput2 = new DigitalInput(1);
+
         intake = new LazyCANSparkMax(0, MotorType.kBrushless);
+        CANEncoder intakeEncoder = intake.getEncoder();
+
         middle = new LazyCANSparkMax(0, MotorType.kBrushless);
+        CANEncoder middleEncoder = middle.getEncoder();
+
         feeder = new LazyCANSparkMax(0, MotorType.kBrushless);
-            // logic for photoelectric sensor 
-            if (inPlace == false && digitalInput.get()){
-                countBalls++;
-            // System.out.println("Number of balls: " + countBalls);
-                inPlace = true;
+        CANEncoder feederEncoder = feeder.getEncoder();
 
-                if (countBalls == 1){
-                    //intake on
-                    //middle on
-
-                }
-                if (countBalls == 2){
-                    //short intake
-                    //middle off
-
-                }
-                if (countBalls == 3){
-                    //short intake
-                    //middle off
-                }
-                if (countBalls == 4){
-                    //intake on until 2 balls pass corner sensor
-                    //middle on until 1 ball passes top hopper sensor
-                    //intake low
-                }
-                if (countBalls == 5){
-                    //intake low
-                }
-
-
-            }
-            else if (!digitalInput.get()) {
-                inPlace = false;
-            }
+    
+        // logic for photoelectric sensor 
+        if (inPlace == false && digitalInput.get()){
+            //countBalls++;
+            inPlace = true;
+            ballList.add(new Ball());
+            System.out.println("Number of balls: " + ballList.size());
             
-            if (inPlace2 == false && digitalInput2.get()){
-                countBalls--;
-                //System.out.println("Number of balls: " + countBalls);
-                inPlace2 = true;
-
-                if (countBalls == 1){
-                    //intake on
-                    //middle on
-
-                }
-                if (countBalls == 2){
-                    //intake short
-                    //middle on until top hopper sensor
-                }
-                if (countBalls == 3){
-                    //middle short
-                    //middle reverse until ball on intake belt 
-                }
-                if (countBalls == 4){
-                    //middle on
-                    //short intake
-                }
-
-
+            switch(ballList.size()) {
+                case 1:
+                    //intake.moveOneBall();
+                    //middle.movethree or whatever
+                    //feeder.half ball
+                    //for ball in balllist update position
+                    break;
+                case 2:
+                    //intake.moveone
+                    //middle.move half
+                    //ballArray[1] = true;
+                    break;
+                case 3:
+                    //intake one
+                    //middle move hakdsggasdf
+                    //ballArray[2] = true;
+                    break;
+                case 4:
+                    //intake one
+                    //middle move hasdkfadsgasdff
+                    //ballArray[3] = true;
+                    break;
+                case 5:
+                    //intake halff
+                    //ballArray[0] = true;
+                    break;
+                default:
+                    Log.info("hoppity hop hop", "yuckity yuck yuck something brokity broke broke");
+                    Log.info("hoppity hop hop", String.valueOf(1 / 0));
+                    break;
             }
-            else if (!digitalInput2.get()) {
-                inPlace2 = false;
+        } else if (!digitalInput.get()) {
+            inPlace = false;
+        }
+        
+        if (inPlace2 == false && digitalInput2.get()){
+            //countBalls--;
+            //System.out.println("Number of balls: " + countBalls);
+            inPlace2 = true;
+
+            switch(ballList.size()) {
+                case 1:
+                //intake.moveOneBall();
+                //middle.movethree or whatever
+                //feeder.half ball
+                //for ball in balllist update position
+                break;
+                case 2:
+                    //eckstake.move half
+                    //middle.move half
+                    //ballArray[1] = true;
+                    break;
+                case 3:
+                    //intake one
+                    //middle move hakdsggasdf
+                    //ballArray[2] = true;
+                    break;
+                case 4:
+                    //intake one
+                    //middle move hasdkfadsgasdff
+                    //ballArray[3] = true;
+                    break;
+                case 5:
+                    //intake halff
+                    //ballArray[0] = true;
+                    break;
+                default:
+                    Log.info("hoppity hop hop", "yuckity yuck yuck something brokity broke broke");
+                    Log.info("hoppity hop hop", String.valueOf(1 / 0));
+                    break;
             }
+        }
+        else if (!digitalInput2.get()) {
+            inPlace2 = false;
+        }
     }
 
     @Override
