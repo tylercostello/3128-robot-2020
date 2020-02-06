@@ -9,6 +9,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import org.team3128.common.generics.Threaded;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 
+import edu.wpi.first.wpilibj.RobotController;
+
 public class Shooter extends Threaded {
 
     public static final Shooter instance = new Shooter();
@@ -18,11 +20,12 @@ public class Shooter extends Threaded {
 
     public static boolean DEBUG = true;
     public static int setpoint = 0; // rotations per minute
-    public static double output, error;
+    public static double output, error, startVoltage, voltage;
 
     private Shooter() {
         configMotors();
         configEncoders();
+        startVoltage = RobotController.getBatteryVoltage();
     }
 
     private void configMotors() {
@@ -56,10 +59,11 @@ public class Shooter extends Threaded {
     public void update() {
         error = setpoint - getRPM();
         output = Constants.K_SHOOTER_P * error;
+        voltage = RobotController.getBatteryVoltage();
         LEFT_SHOOTER.set(output);
         RIGHT_SHOOTER.set(-output);
         if (DEBUG) {
-            Log.info("Shooter", "Error  is: " + error + ", vel is: " + getRPM() + ", output is: " + output);
+            Log.info("Shooter", "Error  is: " + error + ", vel is: " + getRPM() + ", output is: " + output + ", voltage is " + (startVoltage - voltage));
         }
     }
 }
