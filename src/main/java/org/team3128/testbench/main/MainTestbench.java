@@ -125,10 +125,12 @@ public class MainTestBench extends NarwhalRobot {
 
         lm.addButtonDownListener("setSetpoint0", () -> {
             shooter.setSetpoint(0);
+            Log.info("Button4", "pressed");
         });
 
         lm.addButtonDownListener("setSetpoint1", () -> {
             shooter.setSetpoint(2000);
+            Log.info("Button5", "pressed");
         });
 
     }
@@ -159,7 +161,7 @@ public class MainTestBench extends NarwhalRobot {
 
     @Override
     protected void teleopInit() {
-
+        scheduler.resume();
     }
 
     @Override
@@ -174,6 +176,7 @@ public class MainTestBench extends NarwhalRobot {
     @Override
     protected void disabledInit() {
         shooter.setSetpoint(0);
+        scheduler.pause();
     }
 
     public static void main(String... args) {
