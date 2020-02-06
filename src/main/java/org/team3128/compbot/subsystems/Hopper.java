@@ -17,7 +17,7 @@ import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.vision.CmdHorizontalOffsetFeedbackDrive;
-import org.team3128.athos.subsystems.Constants;
+import org.team3128.compbot.subsystems.Constants;
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
@@ -78,18 +78,18 @@ public class Hopper extends Threaded {
         
     }
 
-    public void hoppityHop() {
+    public void hoppityHop(LazyCANSparkMax intake, LazyCANSparkMax middle, LazyCANSparkMax feeder) {
         
         digitalInput = new DigitalInput(0);
         digitalInput2 = new DigitalInput(1);
 
-        intake = new LazyCANSparkMax(0, MotorType.kBrushless);
+        //intake = new LazyCANSparkMax(0, MotorType.kBrushless);
         CANEncoder intakeEncoder = intake.getEncoder();
 
-        middle = new LazyCANSparkMax(0, MotorType.kBrushless);
+        //middle = new LazyCANSparkMax(0, MotorType.kBrushless);
         CANEncoder middleEncoder = middle.getEncoder();
 
-        feeder = new LazyCANSparkMax(0, MotorType.kBrushless);
+        //feeder = new LazyCANSparkMax(0, MotorType.kBrushless);
         CANEncoder feederEncoder = feeder.getEncoder();
 
     
@@ -138,24 +138,23 @@ public class Hopper extends Threaded {
         if (inPlace2 == false && digitalInput2.get()){
             //countBalls--;
             //System.out.println("Number of balls: " + countBalls);
+            ballList.removeFirst();
             inPlace2 = true;
 
             switch(ballList.size()) {
                 case 1:
-                //intake.moveOneBall();
-                //middle.movethree or whatever
-                //feeder.half ball
-                //for ball in balllist update position
-                break;
+                    //everything.move half
+                    //shoot
+                    break;
                 case 2:
-                    //eckstake.move half
+                    //feeder.move half
+                    //shoot
                     //middle.move half
-                    //ballArray[1] = true;
+                    //intake move half
                     break;
                 case 3:
-                    //intake one
-                    //middle move hakdsggasdf
-                    //ballArray[2] = true;
+                    //everything move half
+                    //shoot
                     break;
                 case 4:
                     //intake one
@@ -175,6 +174,19 @@ public class Hopper extends Threaded {
         else if (!digitalInput2.get()) {
             inPlace2 = false;
         }
+    }
+
+    public void moveRollers() {
+        //takes in roller motors and ball objects, moves the roller motors 
+        // and updates the ball object locations using encoder values
+        //somehow needs to account for ball location when moving between 
+        // rollers and also has to reset the encoder values when photoelectric
+        // sensor is triggered.
+        // like when sensor a is triggered and then untriggered, set ball a's 
+        // position to half the distance the rollers moved from trigger to
+        // untrigger
+
+        //also we probably want this as a separate class so it can be a command
     }
 
     @Override

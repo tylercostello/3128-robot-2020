@@ -106,4 +106,10 @@ public class Constants extends RobotConstants {
         public static CanDevices rightDriveLeader;
         public static CanDevices rightDriveFollower;
         public static CanDevices PDP;
+
+        // ---- Roller Constants
+        // ratio = inches per revolution or something
+        public static final double ROLLER_1_RATIO = 0;
+        public static final double ROLLER_2_RATIO = 0;
+        public static final double ROLLER_3_RATIO = 0;
 }

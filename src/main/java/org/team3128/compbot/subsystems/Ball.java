@@ -17,7 +17,7 @@ import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.vision.CmdHorizontalOffsetFeedbackDrive;
-import org.team3128.athos.subsystems.Constants;
+import org.team3128.compbot.subsystems.Constants;
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
@@ -61,6 +61,7 @@ import org.team3128.common.generics.Threaded;
 public class Ball{
     public double position;
     public double width;
+    //maybe int roller number?
 
     public Ball (){
         
