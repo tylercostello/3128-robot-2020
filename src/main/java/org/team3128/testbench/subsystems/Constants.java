@@ -109,6 +109,7 @@ public class Constants extends RobotConstants {
         // ---- SHOOTER
         public static final int SHOOTER_MOTOR_LEFT_ID = 5;
         public static final int SHOOTER_MOTOR_RIGHT_ID = 11;
-        public static final double K_SHOOTER_P = 0.8 / 4500;
+        public static final double K_SHOOTER_P = 0.0004;
+        public static final double K_SHOOTER_D = 0.000008;
 
 }
