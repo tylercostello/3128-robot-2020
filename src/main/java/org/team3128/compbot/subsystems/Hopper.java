@@ -166,7 +166,7 @@ public class Hopper extends Threaded {
                     //ballArray[0] = true;
                     break;
                 default:
-                    Log.info("hoppity hop hop", "yuckity yuck yuck something brokity broke broke");
+                    Log.info("hoppity hop hop", "yuck ity yuck yuck something brokity broke broke");
                     Log.info("hoppity hop hop", String.valueOf(1 / 0));
                     break;
             }
