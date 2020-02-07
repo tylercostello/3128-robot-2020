@@ -108,8 +108,25 @@ public class Constants extends RobotConstants {
         public static CanDevices PDP;
 
         // ---- SHOOTER
-        public static final int SHOOTER_MOTOR_ID = 5;
+        public static final int SHOOTER_MOTOR_LEFT_ID = 5;
+        public static final int SHOOTER_MOTOR_RIGHT_ID = 11;
         public static final int SHOOTER_MOTOR_1_ID = 0;
         public static final double K_SHOOTER_P = 0;
+
+        // ---- HOPPER
+        public static final int ALIGN_MOTOR_ID = 0;
+        public static final int HOPPER_FEEDER_MOTOR_ID = 0;
+        public static final int CORNER_MOTOR_ID = 0;
+        public static final int SHOOTER_FEEDER_MOTOR_ID = 0;
+
+        public static final int SENSOR_1_ID = 0;
+        public static final int SENSOR_2_ID = 0;
+        public static final int SENSOR_3_ID = 0;
+        public static final int SENSOR_4_ID = 0;
+
+        // ---- INTAKE
+        public static final int INTAKE_MOTOR_ID = 0;
+        public static final double INTAKE_MOTOR_ON_VALUE = 0.5;
+        public static final double INTAKE_MOTOR_OFF_VALUE = -0.2;
 
 }
