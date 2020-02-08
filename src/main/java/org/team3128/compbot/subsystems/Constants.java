@@ -16,6 +16,7 @@ public class Constants extends RobotConstants {
         // MECHANISM CONSTANTS:
         public static final double ENCODER_RESOLUTION_PER_ROTATION = 2048;
         public static final double inchesToMeters = 0.0254;
+        public static final double DT = 0.005; // time between update() method calls for mechanisms
 
         // ---- DRIVE
         public static final double kDriveInchesPerSecPerNUp100ms = (1000d / 1) * (1 / ENCODER_RESOLUTION_PER_ROTATION)
@@ -128,5 +129,16 @@ public class Constants extends RobotConstants {
         public static final int INTAKE_MOTOR_ID = 0;
         public static final double INTAKE_MOTOR_ON_VALUE = 0.5;
         public static final double INTAKE_MOTOR_OFF_VALUE = -0.2;
+
+        // ---- ARM
+        public static final int ARM_MOTOR_LEADER = 0;
+        public static final int ARM_MOTOR_FOLLOWER = 0;
+        public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Coast;
+        public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING) rotations of the
+                                                                             // motor, we get 1 rotation of the arm
+        public static final double kP_ARM = 0;
+        public static final double kI_ARM = 0;
+        public static final double kD_ARM = 0;
+        public static final double SET_INTSAT = 2 / kI_ARM; // set limit on integral accumulation
 
 }
