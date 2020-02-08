@@ -152,6 +152,10 @@ public class MainTestBench extends NarwhalRobot {
 
     @Override
     protected void teleopPeriodic() {
+        shooterMotor1.set(.2);
+        shooterMotor2.set(-.2);
+        shooterMotor.set(.2);
+        system.out.print(starti)
         
         if (inPlace == false && digitalInput.get()){
             countBalls++;
