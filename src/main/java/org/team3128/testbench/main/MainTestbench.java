@@ -152,6 +152,7 @@ public class MainTestBench extends NarwhalRobot {
 
     @Override
     protected void teleopPeriodic() {
+        
         if (inPlace == false && digitalInput.get()){
             countBalls++;
             System.out.println("Number of balls: " + countBalls);
