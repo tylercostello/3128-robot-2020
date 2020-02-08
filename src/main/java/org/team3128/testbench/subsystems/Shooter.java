@@ -1,6 +1,7 @@
 package org.team3128.testbench.subsystems;
 
 import org.team3128.common.utility.Log;
+import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.test_suite.CanDevices;
 
 import com.revrobotics.CANEncoder;
@@ -20,8 +21,8 @@ public class Shooter extends Threaded {
     public static CANEncoder SHOOTER_ENCODER;
 
     public static boolean DEBUG = true;
-    public static int setpoint = 0; // rotations per minute
-    public static double output, error, startVoltage, voltage, pastError, time, pastTime;
+    public static double setpoint = 0.0; // rotations per minute
+    public static double output, currentError, startVoltage, voltageBattery, voltageMotor, leftOutput, rightPower, pastError, currentTime, pastTime;
 
     private Shooter() {
         configMotors();
@@ -60,16 +61,28 @@ public class Shooter extends Threaded {
 
     @Override
     public void update() {
-        time = Timer.getFPGATimestamp();
-        error = setpoint - getRPM();
-        output = Constants.K_SHOOTER_P * error + Constants.K_SHOOTER_D * (pastError - error) / (pastTime - time);
-        voltage = RobotController.getBatteryVoltage();
+        currentTime = Timer.getFPGATimestamp();
+        currentError = setpoint - getRPM();
+
+        output += Constants.K_SHOOTER_P * currentError;
+        output += Constants.K_SHOOTER_D * (currentError - pastError) / (currentTime - pastTime);
+        output += Constants.K_SHOOTER_FF;
+
+        //output = (Constants.K_SHOOTER_FF + ((Constants.K_SHOOTER_P * currentError) + (Constants.K_SHOOTER_D * (pastError - currentError) / (pastTime - currentTime))));
+        output = RobotMath.clamp(output, -1, 1);
+
+        // Log.info("[Shooter]", " " + output);
+        voltageBattery = RobotController.getBatteryVoltage();
+        voltageMotor = LEFT_SHOOTER.getBusVoltage();
+
         LEFT_SHOOTER.set(output);
-        RIGHT_SHOOTER.set(-output);
+        RIGHT_SHOOTER.set(output);
+
         if (DEBUG) {
-            Log.info("Shooter", "Error  is: " + error + ", vel is: " + getRPM() + ", output is: " + output + ", voltage is " + (startVoltage - voltage));
+            // Log.info("Shooter", "Error  is: " + error + ", vel is: " + getRPM() + ", output is: " + output + ", voltage battery is " + (startVoltage - voltageBattery) + ", voltage bus is " + voltageMotor);
         }
-        pastError = error;
-        pastTime = time;
+
+        pastError = currentError;
+        pastTime = currentTime;
     }
 }
