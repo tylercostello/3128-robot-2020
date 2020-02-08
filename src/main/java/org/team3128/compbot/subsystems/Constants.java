@@ -112,7 +112,11 @@ public class Constants extends RobotConstants {
         public static final int SHOOTER_MOTOR_LEFT_ID = 5;
         public static final int SHOOTER_MOTOR_RIGHT_ID = 11;
         public static final int SHOOTER_MOTOR_1_ID = 0;
-        public static final double K_SHOOTER_P = 0;
+        public static final double kP_SHOOTER = 0;
+        public static final double kI_SHOOTER = 0;
+        public static final double kD_SHOOTER = 0;
+        public static final double SHOOTER_SATURATION_LIMIT = 1; // set limit on integral accumulation (in this case, 1
+                                                                 // volt)
 
         // ---- HOPPER
         public static final int ALIGN_MOTOR_ID = 0;
@@ -135,10 +139,11 @@ public class Constants extends RobotConstants {
         public static final int ARM_MOTOR_FOLLOWER = 0;
         public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Coast;
         public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING) rotations of the
-                                                                             // motor, we get 1 rotation of the arm
+                                                                             // motor, we get 1 rotation of the arm (ask
+                                                                             // mech for this)
         public static final double kP_ARM = 0;
         public static final double kI_ARM = 0;
         public static final double kD_ARM = 0;
-        public static final double SET_INTSAT = 2 / kI_ARM; // set limit on integral accumulation
+        public static final double ARM_SATURATION_LIMIT = 2 / kI_ARM; // set limit on integral accumulation
 
 }

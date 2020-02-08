@@ -3,6 +3,7 @@ package org.team3128.compbot.subsystems;
 import org.team3128.common.utility.Log;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -76,17 +77,31 @@ public class Arm extends Threaded {
         current = ((ARM_ENCODER.getPosition() / Constants.ARM_GEARING) * 360) % 360; // TODO: account for possible
                                                                                      // negative values
         error = setpoint - current;
-        accumulator += error;
-        if (accumulator > Constants.SET_INTSAT) {
-            accumulator = Constants.SET_INTSAT;
-        } else if (accumulator < -Constants.SET_INTSAT) {
-            accumulator = -Constants.SET_INTSAT;
+        accumulator += error * Constants.DT;
+        if (accumulator > Constants.ARM_SATURATION_LIMIT) {
+            accumulator = Constants.ARM_SATURATION_LIMIT;
+        } else if (accumulator < -Constants.ARM_SATURATION_LIMIT) {
+            accumulator = -Constants.ARM_SATURATION_LIMIT;
         }
         double kP_term = Constants.kP_ARM * error;
         double kI_term = Constants.kI_ARM * accumulator;
         double kD_term = Constants.kD_ARM * (error - prevError) / Constants.DT;
 
-        output = armFeedForward(setpoint) + kP_term + kI_term + kD_term;
+        double voltage_output = armFeedForward(setpoint) + kP_term + kI_term + kD_term;
+        double voltage = RobotController.getBatteryVoltage();
+
+        output = voltage_output / voltage;
+        if (output > 1) {
+            Log.info("ARM",
+                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this");
+            output = 1;
+        } else if (output < -1) {
+            Log.info("ARM",
+                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
+            output = -1;
+        }
+
+        ARM_MOTOR_LEADER.set(ControlMode.Percent, output);
 
         prevError = error;
     }
