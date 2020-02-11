@@ -106,7 +106,7 @@ public class MainTestBench extends NarwhalRobot {
         lm.nameControl(new Button(3), "ClearTracker");
         lm.nameControl(new Button(4), "setSetpoint0");
         lm.nameControl(new Button(5), "setSetpoint1");
-        lm.nameControl(new Button(7), "PrintVelocity");
+        lm.nameControl(new Button(7), "EndVoltage");
 
         lm.addMultiListener(() -> {
             // drive.arcadeDrive(-0.7 * RobotMath.thresh(lm.getAxis("MoveTurn"), 0.1),
@@ -130,12 +130,15 @@ public class MainTestBench extends NarwhalRobot {
         });
 
         lm.addButtonDownListener("setSetpoint1", () -> {
-            shooter.setSetpoint(2000);
             Log.info("Button5", "pressed");
+            Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
+            shooter.setSetpoint(shooter.setpoint);
         });
 
-        lm.addButtonDownListener("PrintVelocity", () -> {
-            Log.info("Shooter", "Velocity: " + shooter.getRPM() + " Voltage Bus: " + shooter.LEFT_SHOOTER.getBusVoltage()); 
+
+
+        lm.addButtonDownListener("EndVoltage", () -> {
+            Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage())); 
 
         });
 

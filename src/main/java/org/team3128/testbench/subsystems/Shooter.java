@@ -21,8 +21,10 @@ public class Shooter extends Threaded {
     public static CANEncoder SHOOTER_ENCODER;
 
     public static boolean DEBUG = true;
-    public static double setpoint = 0.0; // rotations per minute
-    public static double output, currentError, startVoltage, voltageBattery, voltageMotor, leftOutput, rightPower, pastError, currentTime, pastTime;
+    public static int setpoint = 250;
+    public static int increment = 250;    
+    public static int counter = 0;
+    public static double sumOutput, sumBatteryVoltage, sumRPM, sumBusVoltage, output, currentError, startVoltage, voltageBattery, voltageMotor, leftOutput, rightPower, pastError, currentTime, pastTime;
 
     private Shooter() {
         configMotors();
@@ -77,6 +79,27 @@ public class Shooter extends Threaded {
 
         LEFT_SHOOTER.set(output);
         RIGHT_SHOOTER.set(output);
+
+        if (Math.abs(setpoint - getRPM()) <= 5){
+            counter += 1;
+
+            sumOutput += output;
+            sumBatteryVoltage += RobotController.getBatteryVoltage(); 
+            sumRPM += getRPM();
+            sumBusVoltage += LEFT_SHOOTER.getBusVoltage();
+
+            if ((increment) != 0 && (counter >= 400)) {
+                Log.info("Shooter", "Current Setpoint: " + setpoint + " Average RPM: " + (sumRPM/counter) + " Average Voltage Battery: " + (sumBatteryVoltage/counter) + " Average Voltage Bus: " + (sumBusVoltage/counter) + " Average Percent Output: " + (sumOutput/counter)); 
+                setpoint += increment;
+                counter = 0;
+            }
+        }
+        
+        if (setpoint >= 4000){
+            Log.info("Shooter", "Finished with automated loop");
+            setpoint = 250;
+            increment = 0;
+        }
 
         if (DEBUG) {
             // Log.info("Shooter", "Error  is: " + error + ", vel is: " + getRPM() + ", output is: " + output + ", voltage battery is " + (startVoltage - voltageBattery) + ", voltage bus is " + voltageMotor);
