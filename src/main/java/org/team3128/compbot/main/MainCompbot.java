@@ -16,7 +16,6 @@ import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.vision.CmdHorizontalOffsetFeedbackDrive;
-import org.team3128.athos.subsystems.Constants;
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
@@ -29,7 +28,9 @@ import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
-import org.team3128.compbot.subsystems.FalconDrive;
+import org.team3128.compbot.commands.CmdAlignShoot;
+import org.team3128.compbot.subsystems.*;
+import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.RobotTracker;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -39,6 +40,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -56,10 +58,14 @@ import org.team3128.common.generics.ThreadScheduler;
 
 public class MainCompbot extends NarwhalRobot {
 
-    public DigitalInput digitalInput;
-    public DigitalInput digitalInput2;
+    public Command triggerCommand;
+    private DriveCommandRunning driveCmdRunning;
 
     FalconDrive drive = FalconDrive.getInstance();
+    Hopper hopper = Hopper.getInstance();
+    Arm arm = Arm.getInstance();
+    Shooter shooter = Shooter.getInstance();
+    Intake intake = Intake.getInstance();
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -74,10 +80,6 @@ public class MainCompbot extends NarwhalRobot {
     public NetworkTable table;
     public NetworkTable limelightTable;
 
-    public double kP = Constants.K_AUTO_LEFT_P;
-    public double kD = Constants.K_AUTO_LEFT_D;
-    public double kF = Constants.K_AUTO_LEFT_F;
-
     public double startTime = 0;
 
     public String trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
@@ -85,32 +87,29 @@ public class MainCompbot extends NarwhalRobot {
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
 
-    public boolean inPlace = false;
-    public boolean inPlace2 = false;
-
-    public int countBalls = 0;
-    public int countBalls2 = 0;
-
     Limelight limelight = new Limelight("limelight-c", 26.0, 0, 0, 30);
     Limelight[] limelights = new Limelight[1];
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
-    public static void setCanChain(){
-        CanChain[0] = Constants.rightDriveLeader;
-        CanChain[1] = Constants.rightDriveFollower;
-        CanChain[2] = Constants.leftDriveFollower;
-        CanChain[3] = Constants.leftDriveLeader;
-        CanChain[4] = Constants.PDP;
+
+    public static void setCanChain() {
+        CanChain[0] = Constants.TestSuiteConstants.rightDriveLeader;
+        CanChain[1] = Constants.TestSuiteConstants.rightDriveFollower;
+        CanChain[2] = Constants.TestSuiteConstants.leftDriveFollower;
+        CanChain[3] = Constants.TestSuiteConstants.leftDriveLeader;
+        CanChain[4] = Constants.TestSuiteConstants.PDP;
     }
 
     @Override
     protected void constructHardware() {
-
-        digitalInput = new DigitalInput(0);
-        digitalInput2 = new DigitalInput(1);
-        
         scheduler.schedule(drive, executor);
+        scheduler.schedule(hopper, executor);
+        scheduler.schedule(shooter, executor);
+        scheduler.schedule(arm, executor);
+        scheduler.schedule(intake, executor);
         scheduler.schedule(robotTracker, executor);
+
+        driveCmdRunning = new DriveCommandRunning();
 
         // // Instatiator if we're using the NavX
         // gyro = new NavX();
@@ -123,30 +122,35 @@ public class MainCompbot extends NarwhalRobot {
         lm = new ListenerManager(joystick);
         addListenerManager(lm);
 
-        // display PID coefficients on SmartDashboard
-        SmartDashboard.putNumber("P Gain", kP);
-        SmartDashboard.putNumber("D Gain", kD);
-        SmartDashboard.putNumber("F Gain", kF);
-
         // initialization of auto test suite
-        
+
         limelights[0] = limelight;
         pdp = new PowerDistributionPanel(0);
-        Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 0, "Right Drive Leader", null , null, null, drive.rightTalon, null);
-        Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 1, "Right Drive Follower", null, null , null, drive.rightTalonSlave, null);
-        Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 2, "Left Drive Leader", null , null, null, drive.leftTalon, null);
-        Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 3, "Left Drive Follower", null, null , null, drive.leftTalonSlave, null);
-        Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
+        // Constants.TestSuiteConstants.rightDriveLeader = new
+        // CanDevices(CanDevices.DeviceType.FALCON, 0, "Right Drive Leader", null, null,
+        // null, drive.rightTalon, null);
+        // Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON,
+        // 1, "Right Drive Follower", null,
+        // null, null, drive.rightTalonSlave, null);
+        // Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 2,
+        // "Left Drive Leader", null, null,
+        // null, drive.leftTalon, null);
+        // Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 3,
+        // "Left Drive Follower", null, null,
+        // null, drive.leftTalonSlave, null);
+        // Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power
+        // Distribution Panel", null, null, null, null,
+        // pdp);
         setCanChain();
-        errorCatcher = new ErrorCatcherUtility(CanChain,limelights,drive);
+        errorCatcher = new ErrorCatcherUtility(CanChain, limelights, drive);
 
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
             if (down) {
-                //Janky fix
-                
-               errorCatcher.testEverything();
-               
-               errorCatcher.testEverything();
+                // Janky fix
+
+                errorCatcher.testEverything();
+
+                errorCatcher.testEverything();
             }
         });
     }
@@ -166,18 +170,26 @@ public class MainCompbot extends NarwhalRobot {
         lm.nameControl(new Button(4), "ClearCSV");
 
         lm.addMultiListener(() -> {
-            drive.arcadeDrive(-0.7 * RobotMath.thresh(lm.getAxis("MoveTurn"), 0.1),
-                    -1.0 * RobotMath.thresh(lm.getAxis("MoveForwards"), 0.1), -1.0 * lm.getAxis("Throttle"), true);
+            if (!driveCmdRunning.isRunning) {
+                double horiz = -0.7 * lm.getAxis("MoveTurn");
+                double vert = -1.0 * lm.getAxis("MoveForwards");
+                double throttle = -1.0 * lm.getAxis("Throttle");
 
+                drive.arcadeDrive(horiz, vert, throttle, true);
+            }
         }, "MoveTurn", "MoveForwards", "Throttle");
 
-        lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignToTarget");
-        lm.addButtonDownListener("AlignToTarget", () -> {
-            // TODO: Add current implementation of vision alignment
-            Log.info("MainCompbot.java", "[Vision Alignment] Not created yet, would've started");
+        lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
+        lm.addButtonDownListener("AlignShoot", () -> {
+            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, limelight, driveCmdRunning,
+                    Constants.VisionConstants.TX_OFFSET, 5);
+            triggerCommand.start();
+            Log.info("MainCompbot.java", "[Vision Alignment] Started");
         });
-        lm.addButtonUpListener("AlignToTarget", () -> {
-            Log.info("MainCompbot.java", "[Vision Alignment] Not created yet, would've ended");
+        lm.addButtonUpListener("AlignShoot", () -> {
+            triggerCommand.cancel();
+            triggerCommand = null;
+            Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
 
         lm.addButtonDownListener("ResetGyro", () -> {
@@ -200,25 +212,6 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopPeriodic() {
-        
-        // logic for photoelectric sensor 
-        if (inPlace == false && digitalInput.get()){
-            countBalls++;
-            System.out.println("Number of balls: " + countBalls);
-            inPlace = true;
-        }
-        else if (!digitalInput.get()) {
-            inPlace = false;
-        }
-        
-        if (inPlace2 == false && digitalInput2.get()){
-            countBalls--;
-            System.out.println("Number of balls: " + countBalls);
-            inPlace2 = true;
-        }
-        else if (!digitalInput2.get()) {
-            inPlace2 = false;
-        }
 
     }
 
@@ -279,28 +272,6 @@ public class MainCompbot extends NarwhalRobot {
         SmartDashboard.putNumber("Max Speed", maxSpeed);
         SmartDashboard.putNumber("Min Speed", minSpeed);
 
-        // read PID coefficients from SmartDashboard
-        double p = SmartDashboard.getNumber("P Gain", 0);
-        double d = SmartDashboard.getNumber("D Gain", 0);
-        double f = SmartDashboard.getNumber("F Gain", 0);
-
-        boolean hasChanged = false;
-        if ((p != kP)) {
-            kP = p;
-            hasChanged = true;
-        }
-        if ((d != kD)) {
-            kD = d;
-            hasChanged = true;
-        }
-        if ((f != kF)) {
-            kF = f;
-            hasChanged = true;
-        }
-        if (hasChanged) {
-            drive.setDualVelocityPID(kP, kD, kF);
-        }
-
         trackerCSV += "\n" + String.valueOf(Timer.getFPGATimestamp() - startTime) + ","
                 + String.valueOf(robotTracker.getOdometry().translationMat.getX()) + ","
                 + String.valueOf(robotTracker.getOdometry().translationMat.getY()) + ","
@@ -317,11 +288,11 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void autonomousInit() {
         waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(0)));
-        waypoints.add(
-                new Pose2D(0 * Constants.inchesToMeters, 70 * Constants.inchesToMeters, Rotation2D.fromDegrees(-45)));
+        waypoints.add(new Pose2D(0 * Constants.MechanismConstants.inchesToMeters,
+                70 * Constants.MechanismConstants.inchesToMeters, Rotation2D.fromDegrees(-45)));
 
         trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
-                120 * Constants.inchesToMeters, 0.5, false);
+                120 * Constants.MechanismConstants.inchesToMeters, 0.5, false);
 
         trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
         Log.info("MainCompbot", "going into autonomousinit");

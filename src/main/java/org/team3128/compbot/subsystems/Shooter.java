@@ -20,23 +20,23 @@ public class Shooter extends Threaded {
     public static CANEncoder SHOOTER_ENCODER;
 
     public static boolean DEBUG = true;
-    public static int setpoint = 0; // rotations per minute
-    double setpoint;
+    static double setpoint = 0; // rotations per minute
     double current = 0;
     double error = 0;
     double output = 0;
     double accumulator = 0;
     double prevError = 0;
 
+    boolean isReady = false;
+
     private Shooter() {
         configMotors();
         configEncoders();
-        startVoltage = RobotController.getBatteryVoltage();
     }
 
     private void configMotors() {
-        LEFT_SHOOTER = new LazyCANSparkMax(Constants.SHOOTER_MOTOR_LEFT_ID, MotorType.kBrushless);
-        RIGHT_SHOOTER = new LazyCANSparkMax(Constants.SHOOTER_MOTOR_RIGHT_ID, MotorType.kBrushless);
+        LEFT_SHOOTER = new LazyCANSparkMax(Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID, MotorType.kBrushless);
+        RIGHT_SHOOTER = new LazyCANSparkMax(Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID, MotorType.kBrushless);
         if (DEBUG) {
             Log.info("Shooter", "Config motors");
         }
@@ -57,7 +57,7 @@ public class Shooter extends Threaded {
         return SHOOTER_ENCODER.getVelocity();
     }
 
-    public static void setSetpoint(int passedSetpoint) {
+    public void setSetpoint(double passedSetpoint) {
         setpoint = passedSetpoint;
     }
 
@@ -65,15 +65,16 @@ public class Shooter extends Threaded {
     public void update() {
         current = getRPM();
         error = setpoint - current;
-        accumulator += error * Constants.DT;
-        if (accumulator > Constants.SHOOTER_SATURATION_LIMIT) {
-            accumulator = Constants.SHOOTER_SATURATION_LIMIT;
-        } else if (accumulator < -Constants.SHOOTER_SATURATION_LIMIT) {
-            accumulator = -Constants.SHOOTER_SATURATION_LIMIT;
+        accumulator += error * Constants.MechanismConstants.DT;
+        if (accumulator > Constants.ShooterConstants.SHOOTER_SATURATION_LIMIT) {
+            accumulator = Constants.ShooterConstants.SHOOTER_SATURATION_LIMIT;
+        } else if (accumulator < -Constants.ShooterConstants.SHOOTER_SATURATION_LIMIT) {
+            accumulator = -Constants.ShooterConstants.SHOOTER_SATURATION_LIMIT;
         }
-        double kP_term = Constants.kP_SHOOTER * error;
-        double kI_term = Constants.kI_SHOOTER * accumulator;
-        double kD_term = Constants.kD_SHOOTER * (error - prevError) / Constants.DT;
+        double kP_term = Constants.ShooterConstants.SHOOTER_PID.kP * error;
+        double kI_term = Constants.ShooterConstants.SHOOTER_PID.kI * accumulator;
+        double kD_term = Constants.ShooterConstants.SHOOTER_PID.kD * (error - prevError)
+                / Constants.MechanismConstants.DT;
 
         double voltage_output = shooterFeedForward(setpoint) + kP_term + kI_term + kD_term;
         double voltage = RobotController.getBatteryVoltage();
@@ -96,7 +97,16 @@ public class Shooter extends Threaded {
 
     }
 
-    private double shooterFeedForward(int setpoint2) {
+    private double shooterFeedForward(double desiredSetpoint) {
         return 0; // TODO: add feedforward implementation for arm control
+    }
+
+    public double getRPMFromDistance(double distance) {
+        return 0;
+        // TODO: do stuff here
+    }
+
+    public boolean isReady() {
+        return isReady; // TODO: set isReady based on shooter RPM
     }
 }

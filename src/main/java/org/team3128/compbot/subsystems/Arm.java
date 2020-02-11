@@ -5,11 +5,13 @@ import org.team3128.common.utility.Log;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.team3128.common.generics.Threaded;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
+import org.team3128.common.hardware.motor.LazyTalonFX;
 
 public class Arm extends Threaded {
     public enum ArmState {
@@ -27,8 +29,7 @@ public class Arm extends Threaded {
     }
 
     public static final Arm instance = new Arm();
-    LazyCANSparkMax ARM_MOTOR_LEADER, ARM_MOTOR_FOLLOWER;
-    CANEncoder ARM_ENCODER;
+    LazyTalonFX ARM_MOTOR_LEADER, ARM_MOTOR_FOLLOWER;
     DigitalInput LIMIT_SWITCH;
     double setpoint;
     double current = 0;
@@ -39,33 +40,28 @@ public class Arm extends Threaded {
     ArmState ARM_STATE;
     boolean isZeroing = false;
 
-    public Arm getInstance() {
+    public static Arm getInstance() {
         return instance;
     }
 
     private Arm() {
         configMotors();
-        configEncoders();
         configSensors();
         setState(ArmState.STARTING);
     }
 
     private void configSensors() {
-        LIMIT_SWITCH = new DigitalInput(Constants.ARM_LIMIT_SWITCH_ID)
-    }
-
-    private void configEncoders() {
-        ARM_ENCODER = ARM_MOTOR_LEADER.getEncoder();
+        LIMIT_SWITCH = new DigitalInput(Constants.ArmConstants.ARM_LIMIT_SWITCH_ID);
     }
 
     private void configMotors() {
-        ARM_MOTOR_LEADER = new LazyCANSparkMax(Constants.ARM_MOTOR_LEADER_ID, MotorType.kBrushless);
-        ARM_MOTOR_FOLLOWER = new LazyCANSparkMax(Constants.ARM_MOTOR_FOLLOWER_ID, MotorType.kBrushless);
+        ARM_MOTOR_LEADER = new LazyTalonFX(Constants.ArmConstants.ARM_MOTOR_LEADER_ID);
+        ARM_MOTOR_FOLLOWER = new LazyTalonFX(Constants.ArmConstants.ARM_MOTOR_FOLLOWER_ID);
 
         ARM_MOTOR_FOLLOWER.follow(ARM_MOTOR_LEADER);
 
-        ARM_MOTOR_LEADER.setNeutralMode(Constants.ARM_NEUTRAL_MODE);
-        ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ARM_NEUTRAL_MODE);
+        ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
+        ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
     }
 
     private void setSetpoint(double desiredPos) {
@@ -81,33 +77,46 @@ public class Arm extends Threaded {
         return 0; // TODO: add feedforward implementation for arm control
     }
 
+    public double getAngle() {
+        return (((getEncoderPos() / Constants.MechanismConstants.ENCODER_RESOLUTION_PER_ROTATION)
+                / Constants.ArmConstants.ARM_GEARING) * 360) % 360; // TODO: account for
+        // possible negative
+    }
+
     public void zero() {
         isZeroing = true;
+    }
+
+    private double getEncoderPos() {
+        return ARM_MOTOR_LEADER.getSelectedSensorPosition(0);
+    }
+
+    private double getEncoderVel() {
+        return ARM_MOTOR_LEADER.getSelectedSensorVelocity(0);
     }
 
     @Override
     public void update() {
         if (isZeroing) {
             if (!LIMIT_SWITCH.get()) {
-                ARM_MOTOR_LEADER.set(ControlMode.Percent, Constants.ZEROING_POWER);
+                ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, Constants.ArmConstants.ZEROING_POWER);
             }
         } else {
 
             if (ARM_STATE.armAngle != setpoint) {
                 Log.info("ARM", "Setpoint override (setpoint has been set without using ArmState)");
             }
-            current = ((ARM_ENCODER.getPosition() / Constants.ARM_GEARING) * 360) % 360; // TODO: account for possible
-                                                                                        // negative values
+            current = getAngle();
             error = setpoint - current;
-            accumulator += error * Constants.DT;
-            if (accumulator > Constants.ARM_SATURATION_LIMIT) {
-                accumulator = Constants.ARM_SATURATION_LIMIT;
-            } else if (accumulator < -Constants.ARM_SATURATION_LIMIT) {
-                accumulator = -Constants.ARM_SATURATION_LIMIT;
+            accumulator += error * Constants.MechanismConstants.DT;
+            if (accumulator > Constants.ArmConstants.ARM_SATURATION_LIMIT) {
+                accumulator = Constants.ArmConstants.ARM_SATURATION_LIMIT;
+            } else if (accumulator < -Constants.ArmConstants.ARM_SATURATION_LIMIT) {
+                accumulator = -Constants.ArmConstants.ARM_SATURATION_LIMIT;
             }
-            double kP_term = Constants.kP_ARM * error;
-            double kI_term = Constants.kI_ARM * accumulator;
-            double kD_term = Constants.kD_ARM * (error - prevError) / Constants.DT;
+            double kP_term = Constants.ArmConstants.ARM_PID.kP * error;
+            double kI_term = Constants.ArmConstants.ARM_PID.kI * accumulator;
+            double kD_term = Constants.ArmConstants.ARM_PID.kD * (error - prevError) / Constants.MechanismConstants.DT;
 
             double voltage_output = armFeedForward(setpoint) + kP_term + kI_term + kD_term;
             double voltage = RobotController.getBatteryVoltage();
@@ -123,9 +132,10 @@ public class Arm extends Threaded {
                 output = -1;
             }
 
-            ARM_MOTOR_LEADER.set(ControlMode.Percent, output);
+            ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
 
             prevError = error;
+        }
     }
 
 }
