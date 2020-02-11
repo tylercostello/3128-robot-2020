@@ -90,7 +90,7 @@ public class Hopper extends Threaded {
     }
 
     public boolean isEmpty() {
-        return false;
+        return false; // TODO: return if the hopper is empty
     }
 
 }

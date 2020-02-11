@@ -27,7 +27,7 @@ public class Shooter extends Threaded {
     double accumulator = 0;
     double prevError = 0;
 
-    boolean isReady = false;
+    int plateauCount = 0;
 
     private Shooter() {
         configMotors();
@@ -82,6 +82,13 @@ public class Shooter extends Threaded {
         output = voltage_output / voltage;
 
         prevError = error;
+
+        if (error <= Constants.ShooterConstants.RPM_THRESHOLD) {
+            plateauCount++;
+        } else {
+            plateauCount = 0;
+        }
+
         if (output > 1) {
             Log.info("SHOOTER",
                     "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
@@ -94,7 +101,6 @@ public class Shooter extends Threaded {
 
         LEFT_SHOOTER.set(output);
         RIGHT_SHOOTER.set(-output);
-
     }
 
     private double shooterFeedForward(double desiredSetpoint) {
@@ -103,10 +109,10 @@ public class Shooter extends Threaded {
 
     public double getRPMFromDistance(double distance) {
         return 0;
-        // TODO: do stuff here
+        // TODO: relationship between RPM and distance
     }
 
     public boolean isReady() {
-        return isReady; // TODO: set isReady based on shooter RPM
+        return (plateauCount > Constants.ShooterConstants.PLATEAU_COUNT);
     }
 }
