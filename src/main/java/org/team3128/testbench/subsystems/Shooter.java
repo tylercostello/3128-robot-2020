@@ -92,12 +92,16 @@ public class Shooter extends Threaded {
                 Log.info("Shooter", "Current Setpoint: " + setpoint + " Average RPM: " + (sumRPM/counter) + " Average Voltage Battery: " + (sumBatteryVoltage/counter) + " Average Voltage Bus: " + (sumBusVoltage/counter) + " Average Percent Output: " + (sumOutput/counter)); 
                 setpoint += increment;
                 counter = 0;
+                sumOutput = 0;
+                sumBatteryVoltage = 0; 
+                sumRPM = 0; 
+                sumBusVoltage = 0; 
             }
         }
         
-        if (setpoint >= 4000){
+        if (setpoint >= 4500){
             Log.info("Shooter", "Finished with automated loop");
-            setpoint = 250;
+            setpoint = 0;
             increment = 0;
         }
 

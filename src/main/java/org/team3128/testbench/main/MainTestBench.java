@@ -132,7 +132,7 @@ public class MainTestBench extends NarwhalRobot {
         lm.addButtonDownListener("setSetpoint1", () -> {
             Log.info("Button5", "pressed");
             Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
-            shooter.setSetpoint(shooter.setpoint);
+            shooter.setSetpoint(250);
         });
 
 
@@ -184,7 +184,7 @@ public class MainTestBench extends NarwhalRobot {
 
     @Override
     protected void disabledInit() {
-        shooter.setSetpoint(0);
+        //shooter.setSetpoint(0);
         scheduler.pause();
     }
 
