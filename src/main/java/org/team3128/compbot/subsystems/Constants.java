@@ -154,22 +154,24 @@ public class Constants extends RobotConstants {
                 public static final double RPM_THRESHOLD = 50; // the maximum difference between an RPM and the setpoint
                                                                // for a
                                                                // data point to be considered as a plataeu
-                public static final int PLATEAU_COUNT = 50; //50 * 0.005s = 0.25 seconds of plateau required
+                public static final int PLATEAU_COUNT = 50; // 50 * 0.005s = 0.25 seconds of plateau required
         }
 
         public static class HopperConstants {
-                public static final int ALIGN_MOTOR_ID = 0;
                 public static final int HOPPER_FEEDER_MOTOR_ID = 0;
                 public static final int CORNER_MOTOR_ID = 0;
                 public static final int SHOOTER_FEEDER_MOTOR_ID = 0;
+                public static final int GATEKEEPER_MOTOR_ID = 0;
 
+                public static final int SENSOR_0_ID = 0;
                 public static final int SENSOR_1_ID = 0;
                 public static final int SENSOR_2_ID = 0;
                 public static final int SENSOR_3_ID = 0;
                 public static final int SENSOR_4_ID = 0;
 
-                public static final HopperState HOPPER_STATE = HopperState.DEBUG;
                 public static final double DEBUG_MOTOR_POWER = 0.5;
+                public static final int CAPACITY = 5; // num of balls that the hopper can store
+                public static final double BASE_POWER = 0.5;
         }
 
         public static class IntakeConstants {

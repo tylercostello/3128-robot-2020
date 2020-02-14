@@ -21,8 +21,10 @@ import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
 import org.team3128.common.narwhaldashboard.NarwhalDashboard;
 import org.team3128.common.listener.ListenerManager;
+import org.team3128.common.listener.POVValue;
 import org.team3128.common.listener.controllers.ControllerExtreme3D;
 import org.team3128.common.listener.controltypes.Button;
+import org.team3128.common.listener.controltypes.POV;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.math.Rotation2D;
@@ -206,6 +208,35 @@ public class MainCompbot extends NarwhalRobot {
 
         lm.addButtonDownListener("ClearTracker", () -> {
             robotTracker.resetOdometry();
+        });
+
+        lm.nameControl(new POV(0), "IntakePOV");
+        lm.addListener("IntakePOV", (POVValue pov) -> {
+            switch (pov.getDirectionValue()) {
+            case 8:
+            case 1:
+            case 7:
+                // push all balls backwards to clear hopper
+
+                break;
+            case 3:
+            case 4:
+            case 5:
+                // start intake command
+
+                // povCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, limelight,
+                // driveCmdRunning,
+                // povCommand.start();
+
+                break;
+            case 0:
+                povCommand.cancel();
+                povCommand = null;
+
+                break;
+            default:
+                break;
+            }
         });
 
     }

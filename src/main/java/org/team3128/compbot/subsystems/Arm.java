@@ -100,6 +100,8 @@ public class Arm extends Threaded {
         if (isZeroing) {
             if (!LIMIT_SWITCH.get()) {
                 ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, Constants.ArmConstants.ZEROING_POWER);
+            } else {
+                isZeroing = false;
             }
         } else {
 

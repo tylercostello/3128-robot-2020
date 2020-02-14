@@ -77,13 +77,13 @@ public class Shooter extends Threaded {
                 / Constants.MechanismConstants.DT;
 
         double voltage_output = shooterFeedForward(setpoint) + kP_term + kI_term + kD_term;
-        double voltage = RobotController.getBatteryVoltage();
+        double voltage = RobotController.getBatteryVoltage(); // TODO: investigate bus voltage
 
         output = voltage_output / voltage;
 
         prevError = error;
 
-        if (error <= Constants.ShooterConstants.RPM_THRESHOLD) {
+        if (Math.abs(error) <= Constants.ShooterConstants.RPM_THRESHOLD) {
             plateauCount++;
         } else {
             plateauCount = 0;
