@@ -1,3 +1,5 @@
+package org.team3128.compbot.commands;
+
 import java.lang.invoke.WrongMethodTypeException;
 import java.security.GuardedObject;
 import java.util.Arrays;
