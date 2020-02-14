@@ -32,6 +32,7 @@ import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.compbot.commands.CmdAlignShoot;
 import org.team3128.compbot.subsystems.*;
+import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.RobotTracker;
 
@@ -93,6 +94,8 @@ public class MainCompbot extends NarwhalRobot {
     Limelight[] limelights = new Limelight[1];
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
+
+    public Command povCommand;
 
     public static void setCanChain() {
         CanChain[0] = Constants.TestSuiteConstants.rightDriveLeader;
@@ -224,9 +227,9 @@ public class MainCompbot extends NarwhalRobot {
             case 5:
                 // start intake command
 
-                // povCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, limelight,
+                povCommand = new CmdIntake(hopper);
                 // driveCmdRunning,
-                // povCommand.start();
+                povCommand.start();
 
                 break;
             case 0:
