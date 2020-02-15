@@ -25,7 +25,7 @@ public class Hopper extends Threaded {
         POS_3(new boolean[] { true, true, false, true, false }),
         POS_4(new boolean[] { true, true, true, true, false }),
         POS_5(new boolean[] { true, true, true, true, true }),
-        POS_6(new boolean[] { true, true, true, false, false });
+        POS_6(new boolean[] { false, true, true, true, false });
 
         public boolean[] hopperState;
 
@@ -115,10 +115,8 @@ public class Hopper extends Threaded {
 
     public void setBallOrder(boolean[] CurrBallArray) {
         if (CurrBallArray.length == ballArray.length) {
-            int tempI = 0;
-            for (boolean element : ballArray) {
-                element = CurrBallArray[tempI];
-                tempI++;
+            for (int i = 0; i < ballArray.length; i++) {
+                ballArray[i] = CurrBallArray[i];
             }
         }
     }
@@ -146,7 +144,7 @@ public class Hopper extends Threaded {
         return (getNumBalls() == Constants.HopperConstants.CAPACITY);
     }
 
-    private boolean[] shift(boolean[] in_array) {
+    public boolean[] shift(boolean[] in_array) {
         boolean[] out_array = new boolean[in_array.length];
         for (int i = 0; i < in_array.length - 1; i++) {
             out_array[i] = in_array[i + 1];

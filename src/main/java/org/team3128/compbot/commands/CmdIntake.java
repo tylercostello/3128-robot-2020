@@ -1,4 +1,4 @@
-//authors:
+// authors:
 //   The Cult of Mason
 
 package org.team3128.compbot.commands;
@@ -10,6 +10,8 @@ import java.util.Arrays;
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.Hopper;
 import org.team3128.compbot.subsystems.Hopper.HopperState;
+
+import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -24,6 +26,8 @@ public class CmdIntake extends Command {
     boolean empty1 = false;
     boolean empty2 = false;
     boolean broken = false;
+    double currentTime;
+    double brokenTime;
     int position = 0;
     boolean[] updatedArray = new boolean[Constants.HopperConstants.CAPACITY];
 
@@ -54,9 +58,16 @@ public class CmdIntake extends Command {
                 totalCount = 2;
                 break;
             case 3:
-                topCount = 2;
-                middleCount = 1;
                 totalCount = 3;
+                if (Arrays.equals(hopper.getBallArray(), Hopper.HopperState.POS_3.hopperState)) {
+                    topCount = 2;
+                    middleCount = 1;
+                } else if (Arrays.equals(hopper.getBallArray(), Hopper.HopperState.POS_6.hopperState)){
+                    topCount = 1;
+                    middleCount = 2;
+                } else {
+                    Log.info("CmdIntake", "there are 3 balls in the shooter in a weird configuration");
+                }
                 break;
             case 4:
                 topCount = 2;
@@ -86,7 +97,7 @@ public class CmdIntake extends Command {
                 if (totalCount > (middleCount + topCount)) {
                     hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                 } else {
-                    hopper.setMotorPowers(0, 0, 0);
+                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
                 }
                 break;
             case 1:
@@ -95,10 +106,10 @@ public class CmdIntake extends Command {
                     hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                     //boolean[] updatedArray = {true, false, false, false, true};
                 } else if (topCount < (topCount + middleCount)) {
-                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
+                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                     //boolean[] updatedArray = {true, false, false, false, false};
                 } else {
-                    hopper.setMotorPowers(0, 0, 0);
+                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
                 }
                 break;
             case 2:
@@ -108,27 +119,29 @@ public class CmdIntake extends Command {
                 } else if (totalCount > (middleCount + topCount)) {
                     hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                 } else {
-                    hopper.setMotorPowers(0, 0, 0);
+                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
                 }
                 break;
             case 3:
                 updatedArray = new boolean[] {true, true, false, true, false};
                 if (topCount < 2) {
-                    Log.info("CmdIntake", "something screwed up; topCount should be 2 but it isn't");
+                    //Log.info("CmdIntake", "something screwed up; topCount should be 2 but it isn't");
+                    Log.info("CmdIntake", "this had better have happened only because we just shot 2 balls and then reorganized");
                 }
                 if (totalCount > (middleCount + topCount)) {
                     hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                 } else {
-                    hopper.setMotorPowers(0, 0, 0);
+                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
                 }
                 break;
             case 4:
                 if (totalCount > (middleCount + topCount)) {
+                    hopper.setMotorPowers(0, 0, 0);
                     updatedArray = new boolean[] {true, true, true, true, true};
                 } else{
+                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
                     updatedArray = new boolean[] {true, true, true, true, false};
                 }
-                hopper.setMotorPowers(0, 0, 0);
                 break;
         }
 
@@ -147,8 +160,16 @@ public class CmdIntake extends Command {
     @Override
     protected void end() {
         // handle what happens when the command is terminated
+        brokenTime = Timer.getFPGATimestamp();
+        currentTime = brokenTime;
         hopper.INTAKE_MOTOR.set(0);
+        if (hopper.getNumBalls() == 5) {
+            hopper.setMotorPowers(0, 0, 0);
+        } else {
+            hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+        }
         while(!broken) {
+            currentTime = Timer.getFPGATimestamp();
             updateCount();
             switch(middleCount + topCount) {
                 case 0:
@@ -156,8 +177,10 @@ public class CmdIntake extends Command {
                     if (totalCount > (middleCount + topCount)) {
                         hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                     } else {
-                        hopper.setMotorPowers(0, 0, 0);
-                        broken = true;
+                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+                        if(currentTime - 250 > brokenTime) {
+                            broken = true;
+                        }
                     }
                     break;
                 case 1:
@@ -166,11 +189,13 @@ public class CmdIntake extends Command {
                         hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                         //boolean[] updatedArray = {true, false, false, false, true};
                     } else if (topCount < (topCount + middleCount)) {
-                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
+                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                         //boolean[] updatedArray = {true, false, false, false, false};
                     } else {
-                        hopper.setMotorPowers(0, 0, 0);
-                        broken = true;
+                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+                        if(currentTime - 250 > brokenTime) {
+                            broken = true;
+                        }
                     }
                     break;
                 case 2:
@@ -180,8 +205,10 @@ public class CmdIntake extends Command {
                     } else if (totalCount > (middleCount + topCount)) {
                         hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                     } else {
-                        hopper.setMotorPowers(0, 0, 0);
-                        broken = true;
+                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+                        if(currentTime - 250 > brokenTime) {
+                            broken = true;
+                        }
                     }
                     break;
                 case 3:
@@ -192,18 +219,23 @@ public class CmdIntake extends Command {
                     if (totalCount > (middleCount + topCount)) {
                         hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                     } else {
-                        hopper.setMotorPowers(0, 0, 0);
-                        broken = true;
+                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+                        if(currentTime - 250 > brokenTime) {
+                            broken = true;
+                        }
                     }
                     break;
                 case 4:
                     if (totalCount > (middleCount + topCount)) {
+                        hopper.setMotorPowers(0, 0, 0);
                         updatedArray = new boolean[] {true, true, true, true, true};
                     } else{
+                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
                         updatedArray = new boolean[] {true, true, true, true, false};
                     }
-                    hopper.setMotorPowers(0, 0, 0);
-                    broken = true;
+                    if(currentTime - 250 > brokenTime) {
+                        broken = true;
+                    }
                     break;
             }
         }
