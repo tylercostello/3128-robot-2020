@@ -102,7 +102,14 @@ public class CmdAlignShoot extends Command {
 
                 double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE;
 
-                double limelight_height = Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle);
+                double limelight_height = Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle); // TODO:
+                                                                                                                    // add
+                                                                                                                    // limelight
+                                                                                                                    // height
+                                                                                                                    // to
+                                                                                                                    // this
+                                                                                                                    // (when
+                                                                                                                    // stowed)
 
                 double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
                         / (RobotMath.tan(initData.ty()));
@@ -191,7 +198,7 @@ public class CmdAlignShoot extends Command {
         }
 
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady() && hopper.isReady()) {
-            //hopper.shoot();
+            // hopper.shoot();
             numBallsShot++;
         }
     }
