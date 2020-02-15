@@ -218,7 +218,7 @@ public class CmdAlignShoot extends Command {
         limelight.setLEDMode(LEDMode.OFF);
 
         // NarwhalDashboard.put("align_status", "blind");
-
+        //hopper.organize();
         cmdRunning.isRunning = false;
 
         Log.info("CmdAlignShoot", "Command Finished.");
