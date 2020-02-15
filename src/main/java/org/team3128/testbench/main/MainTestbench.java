@@ -55,7 +55,7 @@ import java.util.concurrent.*;
 
 import org.team3128.common.generics.ThreadScheduler;
 
-public class MainTestBench extends NarwhalRobot {
+public class MainTestbench extends NarwhalRobot {
     // NEODrive drive = NEODrive.getInstance();
     // RobotTracker robotTracker = RobotTracker.getInstance();
 
@@ -155,7 +155,7 @@ public class MainTestBench extends NarwhalRobot {
         shooterMotor1.set(.2);
         shooterMotor2.set(-.2);
         shooterMotor.set(.2);
-        system.out.print(starti)
+        //system.out.print(start)
         
         if (inPlace == false && digitalInput.get()){
             countBalls++;
@@ -208,7 +208,7 @@ public class MainTestBench extends NarwhalRobot {
     }
 
     public static void main(String... args) {
-        RobotBase.startRobot(MainTestBench::new);
+        RobotBase.startRobot(MainTestbench::new);
     }
 
     @Override

@@ -101,11 +101,7 @@ public class Constants extends RobotConstants {
         public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 0 * Length.in;
 
         // ---- AUTO TEST SUITE
-        public static CanDevices leftDriveLeader;
-        public static CanDevices leftDriveFollower;
-        public static CanDevices rightDriveLeader;
-        public static CanDevices rightDriveFollower;
-        public static CanDevices PDP;
+ 
 
         // ---- Roller Constants
         // ratio = inches per revolution or something

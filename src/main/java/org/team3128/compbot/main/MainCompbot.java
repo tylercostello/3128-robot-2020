@@ -59,7 +59,7 @@ public class MainCompbot extends NarwhalRobot {
     public DigitalInput digitalInput;
     public DigitalInput digitalInput2;
 
-    FalconDrive drive = FalconDrive.getInstance();
+    static FalconDrive drive = FalconDrive.getInstance();
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -69,7 +69,7 @@ public class MainCompbot extends NarwhalRobot {
     public Joystick joystick;
     public ListenerManager lm;
     public Gyro gyro;
-    public PowerDistributionPanel pdp;
+    public static PowerDistributionPanel pdp;
 
     public NetworkTable table;
     public NetworkTable limelightTable;
@@ -90,6 +90,11 @@ public class MainCompbot extends NarwhalRobot {
 
     public int countBalls = 0;
     public int countBalls2 = 0;
+    public static CanDevices leftDriveLeader;
+    public static CanDevices leftDriveFollower;
+    public static CanDevices rightDriveLeader;
+    public static CanDevices rightDriveFollower;
+    public static CanDevices PDP;
 
     //public static LazyCANSparkMax intake;
     //public static LazyCANSparkMax middle;
@@ -100,11 +105,16 @@ public class MainCompbot extends NarwhalRobot {
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
     public static void setCanChain(){
-        CanChain[0] = Constants.rightDriveLeader;
-        CanChain[1] = Constants.rightDriveFollower;
-        CanChain[2] = Constants.leftDriveFollower;
-        CanChain[3] = Constants.leftDriveLeader;
-        CanChain[4] = Constants.PDP;
+        rightDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 0, "Right Drive Leader", drive.rightTalon);
+        rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 1, "Right Drive Follower", drive.rightTalonSlave);
+        leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 2, "Left Drive Leader", drive.leftTalon);
+        leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 3, "Left Drive Follower", drive.leftTalonSlave);
+        PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", pdp);
+        CanChain[0] = rightDriveLeader;
+        CanChain[1] = rightDriveFollower;
+        CanChain[2] = leftDriveFollower;
+        CanChain[3] = leftDriveLeader;
+        CanChain[4] = PDP;
     }
 
     @Override
@@ -137,11 +147,7 @@ public class MainCompbot extends NarwhalRobot {
         
         limelights[0] = limelight;
         pdp = new PowerDistributionPanel(0);
-        Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 0, "Right Drive Leader", null , null, null, drive.rightTalon, null);
-        Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 1, "Right Drive Follower", null, null , null, drive.rightTalonSlave, null);
-        Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 2, "Left Drive Leader", null , null, null, drive.leftTalon, null);
-        Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 3, "Left Drive Follower", null, null , null, drive.leftTalonSlave, null);
-        Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
+
         setCanChain();
         errorCatcher = new ErrorCatcherUtility(CanChain,limelights,drive);
 
