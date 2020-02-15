@@ -314,6 +314,7 @@ public class ErrorCatcherUtility {
     }
     
     public void testEverything() {
+        //janky fix
         ErrorCatcherCAN();
         ErrorCatcherCAN();
         limelightCheck();

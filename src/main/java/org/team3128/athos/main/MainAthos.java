@@ -103,6 +103,7 @@ public class MainAthos extends NarwhalRobot {
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices leftDriveLeader, rightDriveLeader, leftDriveFollower, rightDriveFollower, PDP;
     public static CanDevices[] CanChain = new CanDevices[42];
+    
     public static void setCanChain(){
         rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", NEODrive.rightSpark);
         rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", NEODrive.rightSparkSlave);

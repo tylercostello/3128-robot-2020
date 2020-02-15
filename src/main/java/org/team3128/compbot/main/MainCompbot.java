@@ -96,9 +96,6 @@ public class MainCompbot extends NarwhalRobot {
     public static CanDevices rightDriveFollower;
     public static CanDevices PDP;
 
-    //public static LazyCANSparkMax intake;
-    //public static LazyCANSparkMax middle;
-    //public static LazyCANSparkMax feeder;
 
     Limelight limelight = new Limelight("limelight-c", 26.0, 0, 0, 30);
     Limelight[] limelights = new Limelight[1];
@@ -152,11 +149,7 @@ public class MainCompbot extends NarwhalRobot {
         errorCatcher = new ErrorCatcherUtility(CanChain,limelights,drive);
 
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
-            if (down) {
-                //Janky fix
-                
-               errorCatcher.testEverything();
-               
+            if (down) {               
                errorCatcher.testEverything();
             }
         });
