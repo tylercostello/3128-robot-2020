@@ -29,6 +29,7 @@ public class CmdOrganize extends Command {
     boolean empty1 = false;
     boolean empty2 = false;
     boolean broken = false;
+    boolean firstBallPast = false;
     int position = 0;
     double brokenTime = 0;
     double currentTime = 0;
@@ -71,15 +72,20 @@ public class CmdOrganize extends Command {
         brokenTime = Timer.getFPGATimestamp();
         currentTime = brokenTime;
         while(currentTime - 100 < brokenTime) { // TODO: tune times
-            currentTime = Timer.getFPGATimestamp();
+            currentTime = Timer.getFPGATimestamp(); // TODO: maybe add timeouts
         }
         hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
-        while(!hopper.SENSOR_0.get()) {
+        while(!hopper.SENSOR_0.get() || !firstBallPast) {
+            if (hopper.SENSOR_0.get()) {
+                firstBallPast = true;
+            }
         }
         hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
         while(!hopper.SENSOR_1.get()) {
         }
         hopper.setMotorPowers(0, 0, 0);
+        //hopper.setBallOrder(hopper.HopperState.POS_3.hopperState);
+        hopper.setBallOrder(new boolean[] {true, true, false, true, false});
     }
 
     @Override
