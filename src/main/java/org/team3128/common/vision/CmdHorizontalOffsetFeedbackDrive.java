@@ -1,5 +1,6 @@
 package org.team3128.common.vision;
 
+import org.team3128.athos.subsystems.NEODrive;
 import org.team3128.common.drive.DriveCommandRunning;
 import org.team3128.common.drive.SRXTankDrive;
 import org.team3128.common.drive.calibrationutility.DriveCalibrationUtility;
@@ -14,11 +15,14 @@ import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
 import org.team3128.common.utility.units.Angle;
 
+import org.team3128.common.drive.DriveSignal;
+import org.team3128.common.drive.AutoDriveSignal;
+
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class CmdHorizontalOffsetFeedbackDrive extends Command {
-    SRXTankDrive drive;
+    NEODrive drive;
     Gyro gyro;
 
     DriveCalibrationUtility dcu;
@@ -95,11 +99,11 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
 
     @Override
     protected void initialize() {
-        drive = SRXTankDrive.getInstance();
+        drive = NEODrive.getInstance();
         dcu = DriveCalibrationUtility.getInstance();
 
-        txLimelight.setLEDMode(LEDMode.ON);
-        distanceLimelight.setLEDMode(LEDMode.ON);
+        txLimelight.setLEDMode(LEDMode.OFF);
+        distanceLimelight.setLEDMode(LEDMode.OFF);
         if (isLowHatch) {
             distanceLimelight.setStreamMode(StreamMode.LIMELIGHT_CAMERA);
         }
@@ -121,7 +125,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
                 Log.info("CmdAutoAim", "Target found.");
                 Log.info("CmdAutoAim", "Switching to FEEDBACK...");
 
-                drive.tankDrive(visionPID.kF, visionPID.kF);
+                drive.setWheelPower(new DriveSignal(0.8*visionPID.kF, 0.8*visionPID.kF));
 
                 currentHorizontalOffset = txLimelight.getValue(LimelightKey.HORIZONTAL_OFFSET, 5);
 
@@ -176,8 +180,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
                         * RobotMath.clamp((decelerationStartDistance - approximateDistance)
                                 / (decelerationStartDistance - decelerationEndDistance), 0.0, 1.0);
 
-                drive.tankDrive(multiplier * leftPower, multiplier * rightPower);
-
+                drive.setWheelPower(new DriveSignal(0.7*multiplier * leftPower, 0.7*multiplier * rightPower));
                 previousTime = currentTime;
                 previousError = currentError;
             }
@@ -205,7 +208,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
 
             Log.info("CmdAutoAim", "L: " + leftPower + "; R: " + rightPower);
 
-            drive.tankDrive(leftPower, rightPower);
+            drive.setWheelPower(new DriveSignal(0.7*leftPower, 0.7*rightPower)); //TODO: remove the 0.7's once testing is done
 
             previousTime = currentTime;
             previousError = currentError;
@@ -218,8 +221,8 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
     @Override
     protected boolean isFinished() {
         if (aimState == HorizontalOffsetFeedbackDriveState.BLIND) {
-            leftVel = Math.abs(drive.getLeftMotors().getSelectedSensorVelocity(0));
-            rightVel = Math.abs(drive.getRightMotors().getSelectedSensorVelocity(0));
+            leftVel = Math.abs(drive.getLeftSpeed());
+            rightVel = Math.abs(drive.getRightSpeed());
 
             if (leftVel < VELOCITY_THRESHOLD && rightVel < VELOCITY_THRESHOLD) {
                 plateauReachedCount += 1;

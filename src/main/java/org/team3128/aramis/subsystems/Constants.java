@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import org.team3128.common.utility.test_suite.*;
 
+import org.team3128.common.hardware.motor.LazyCANSparkMax;
 
 import org.team3128.common.generics.RobotConstants;
 
@@ -111,9 +112,11 @@ public class Constants extends RobotConstants {
     public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 0 * Length.in;
 
 
+
     //public static CanDevices[] CanChain = new CanDevices[42];
 
     /*public static CanDevices leftDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 13, "Left Drive Leader");
+
     public static CanDevices leftDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 5, "Left Drive Follower");
     public static CanDevices rightDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 15, "Right Drive Leader");
     public static CanDevices rightDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 6, "Right Drive Follower");
@@ -125,11 +128,14 @@ public class Constants extends RobotConstants {
         CanChain[2] = rightDriveLeader;
         CanChain[3] = rightDriveFollower;
         CanChain[4] = PDP;
+
     }*/
     public static CanDevices leftDriveLeader;
     public static CanDevices leftDriveFollower;
     public static CanDevices rightDriveLeader;
     public static CanDevices rightDriveFollower;
     public static CanDevices PDP;
+    
+
 
 }
