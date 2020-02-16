@@ -30,9 +30,7 @@ import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
-import org.team3128.compbot.commands.CmdAlignShoot;
-import org.team3128.compbot.commands.CmdShooterFF;
-import org.team3128.compbot.commands.CmdArmFF;
+import org.team3128.compbot.commands.*;
 import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
@@ -94,10 +92,13 @@ public class MainCompbot extends NarwhalRobot {
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
 
-    Limelight limelight = new Limelight("limelight-c", 26.0, 0, 0, 30);
-    Limelight[] limelights = new Limelight[1];
+    public Limelight topLimelight, ballLimelight;
+    public Limelight[] limelights;
+
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
+
+    public PIDConstants ballPID, blindBallPID;
 
     public Command povCommand;
 
@@ -120,6 +121,9 @@ public class MainCompbot extends NarwhalRobot {
 
         driveCmdRunning = new DriveCommandRunning();
 
+        ballPID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
+        blindBallPID = new PIDConstants(0.23, 0, 0, 0);
+        
         // // Instatiator if we're using the NavX
         // gyro = new NavX();
 
@@ -131,25 +135,18 @@ public class MainCompbot extends NarwhalRobot {
         lm = new ListenerManager(joystick);
         addListenerManager(lm);
 
+        // initialization of limelights 
+
+        topLimelight = new Limelight("limelight-b", 26.0, 0, 0, 30);
+        ballLimelight = new Limelight("limelight-c", Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE, Constants.VisionConstants.BOTTOM_LIMELIGHT_HEIGHT, Constants.VisionConstants.BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT, 14.5 * Length.in);
+        limelights = new Limelight[2];
+
         // initialization of auto test suite
 
-        limelights[0] = limelight;
+        limelights[0] = topLimelight;
+        limelights[1] = ballLimelight;
+
         pdp = new PowerDistributionPanel(0);
-        // Constants.TestSuiteConstants.rightDriveLeader = new
-        // CanDevices(CanDevices.DeviceType.FALCON, 0, "Right Drive Leader", null, null,
-        // null, drive.rightTalon, null);
-        // Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON,
-        // 1, "Right Drive Follower", null,
-        // null, null, drive.rightTalonSlave, null);
-        // Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, 2,
-        // "Left Drive Leader", null, null,
-        // null, drive.leftTalon, null);
-        // Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, 3,
-        // "Left Drive Follower", null, null,
-        // null, drive.leftTalonSlave, null);
-        // Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power
-        // Distribution Panel", null, null, null, null,
-        // pdp);
         setCanChain();
         errorCatcher = new ErrorCatcherUtility(CanChain, limelights, drive);
 
@@ -190,7 +187,7 @@ public class MainCompbot extends NarwhalRobot {
 
         lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
         lm.addButtonDownListener("AlignShoot", () -> {
-            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, limelight, driveCmdRunning,
+            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, topLimelight, driveCmdRunning,
                     Constants.VisionConstants.TX_OFFSET, 5);
             triggerCommand.start();
             Log.info("MainCompbot.java", "[Vision Alignment] Started");
@@ -234,10 +231,13 @@ public class MainCompbot extends NarwhalRobot {
             case 4:
             case 5:
                 // start intake command
-
-                povCommand = new CmdIntake(hopper);
+                povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, driveCmdRunning, ballPID, blindBallPID, Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
                 // driveCmdRunning,
-                povCommand.start();
+                if (arm.ARM_STATE == Arm.ArmState.STOWED) {
+                    povCommand.start();
+                } else {
+                    arm.zero();
+                }
 
                 break;
             case 0:
