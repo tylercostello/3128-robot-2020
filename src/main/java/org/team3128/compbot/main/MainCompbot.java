@@ -265,6 +265,8 @@ public class MainCompbot extends NarwhalRobot {
     double currentRightDistance;
     double currentSpeed;
     double currentDistance;
+    boolean currentArmLimitSwitch;
+    double currentArmAngle;
 
     @Override
     protected void updateDashboard() {
@@ -275,6 +277,9 @@ public class MainCompbot extends NarwhalRobot {
 
         currentSpeed = drive.getSpeed();
         currentDistance = drive.getDistance();
+        
+        currentArmLimitSwitch = arm.getLimitStatus();
+        currentArmAngle = arm.getAngle();
 
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
