@@ -37,7 +37,7 @@ public class Arm extends Threaded {
     double output = 0;
     double accumulator = 0;
     double prevError = 0;
-    ArmState ARM_STATE;
+    public ArmState ARM_STATE;
     boolean isZeroing = false;
 
     public static Arm getInstance() {
@@ -84,7 +84,7 @@ public class Arm extends Threaded {
     }
 
     public void zero() {
-        isZeroing = true;
+        setState(ArmState.STOWED);
     }
 
     private double getEncoderPos() {
@@ -97,47 +97,39 @@ public class Arm extends Threaded {
 
     @Override
     public void update() {
-        if (isZeroing) {
-            if (!LIMIT_SWITCH.get()) {
-                ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, Constants.ArmConstants.ZEROING_POWER);
-            } else {
-                isZeroing = false;
-            }
-        } else {
 
-            if (ARM_STATE.armAngle != setpoint) {
-                Log.info("ARM", "Setpoint override (setpoint has been set without using ArmState)");
-            }
-            current = getAngle();
-            error = setpoint - current;
-            accumulator += error * Constants.MechanismConstants.DT;
-            if (accumulator > Constants.ArmConstants.ARM_SATURATION_LIMIT) {
-                accumulator = Constants.ArmConstants.ARM_SATURATION_LIMIT;
-            } else if (accumulator < -Constants.ArmConstants.ARM_SATURATION_LIMIT) {
-                accumulator = -Constants.ArmConstants.ARM_SATURATION_LIMIT;
-            }
-            double kP_term = Constants.ArmConstants.ARM_PID.kP * error;
-            double kI_term = Constants.ArmConstants.ARM_PID.kI * accumulator;
-            double kD_term = Constants.ArmConstants.ARM_PID.kD * (error - prevError) / Constants.MechanismConstants.DT;
-
-            double voltage_output = armFeedForward(setpoint) + kP_term + kI_term + kD_term;
-            double voltage = RobotController.getBatteryVoltage();
-
-            output = voltage_output / voltage;
-            if (output > 1) {
-                Log.info("ARM",
-                        "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this");
-                output = 1;
-            } else if (output < -1) {
-                Log.info("ARM",
-                        "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
-                output = -1;
-            }
-
-            ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
-
-            prevError = error;
+        if (ARM_STATE.armAngle != setpoint) {
+            Log.info("ARM", "Setpoint override (setpoint has been set without using ArmState)");
         }
+        current = getAngle();
+        error = setpoint - current;
+        accumulator += error * Constants.MechanismConstants.DT;
+        if (accumulator > Constants.ArmConstants.ARM_SATURATION_LIMIT) {
+            accumulator = Constants.ArmConstants.ARM_SATURATION_LIMIT;
+        } else if (accumulator < -Constants.ArmConstants.ARM_SATURATION_LIMIT) {
+            accumulator = -Constants.ArmConstants.ARM_SATURATION_LIMIT;
+        }
+        double kP_term = Constants.ArmConstants.ARM_PID.kP * error;
+        double kI_term = Constants.ArmConstants.ARM_PID.kI * accumulator;
+        double kD_term = Constants.ArmConstants.ARM_PID.kD * (error - prevError) / Constants.MechanismConstants.DT;
+
+        double voltage_output = armFeedForward(setpoint) + kP_term + kI_term + kD_term;
+        double voltage = RobotController.getBatteryVoltage();
+
+        output = voltage_output / voltage;
+        if (output > 1) {
+            Log.info("ARM",
+                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this");
+            output = 1;
+        } else if (output < -1) {
+            Log.info("ARM",
+                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
+            output = -1;
+        }
+
+        ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
+
+        prevError = error;
     }
 
 }

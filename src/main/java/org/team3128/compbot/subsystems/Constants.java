@@ -17,6 +17,8 @@ public class Constants extends RobotConstants {
 
         public static class GameConstants {
                 public static final double SHOOTER_TARGET_HEIGHT = 98.25; // height of target in INCHES
+                public static final double BALL_HEIGHT = 9; // height of the ball in centimeters 
+                                                            // TODO: check ball height
         }
 
         public static class MechanismConstants {

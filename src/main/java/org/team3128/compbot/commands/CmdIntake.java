@@ -80,6 +80,9 @@ public class CmdIntake extends Command {
                 totalCount = 5;
                 break;
         }
+        
+        arm.zero();
+
     }
 
     @Override
