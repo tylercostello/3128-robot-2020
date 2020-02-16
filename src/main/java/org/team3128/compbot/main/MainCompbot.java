@@ -109,8 +109,6 @@ public class MainCompbot extends NarwhalRobot {
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
 
-    public PIDConstants ballPID, blindBallPID;
-
     public Command povCommand;
 
     public static void setCanChain() {
@@ -131,9 +129,6 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
-
-        ballPID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
-        blindBallPID = new PIDConstants(0.23, 0, 0, 0);
         
         // // Instatiator if we're using the NavX
         // gyro = new NavX();
@@ -238,7 +233,7 @@ public class MainCompbot extends NarwhalRobot {
             case 4:
             case 5:
                 // start intake command
-                povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, driveCmdRunning, ballPID, blindBallPID, Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
+                povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, driveCmdRunning, Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID, Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
                 // driveCmdRunning,
                 if (arm.ARM_STATE == Arm.ArmState.STOWED) {
                     povCommand.start();

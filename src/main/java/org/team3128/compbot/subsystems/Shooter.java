@@ -104,7 +104,8 @@ public class Shooter extends Threaded {
     }
 
     public double shooterFeedForward(double desiredSetpoint) {
-        return 0; // TODO: add feedforward implementation for arm control
+        double ff = (0.00211 * desiredSetpoint) + 0.041;
+        return (ff); // TODO: add feedforward implementation for arm control
     }
 
     public double getRPMFromDistance(double distance) {
