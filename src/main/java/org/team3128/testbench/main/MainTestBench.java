@@ -27,8 +27,7 @@ import org.team3128.common.listener.controltypes.Button;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.math.Rotation2D;
-import org.team3128.testbench.subsystems.NEODrive;
-import org.team3128.testbench.subsystems.RobotTracker;
+import org.team3128.testbench.subsystems.Shooter;
 import org.team3128.common.drive.DriveSignal;
 
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -48,19 +47,15 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance; 
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
 import org.team3128.common.generics.ThreadScheduler;
 
-public class MainTestbench extends NarwhalRobot {
-    // NEODrive drive = NEODrive.getInstance();
-    // RobotTracker robotTracker = RobotTracker.getInstance();
-
-    public LazyCANSparkMax shooterMotor, shooterMotor1, shooterMotor2; 
-    private CANEncoder shooterEncoder;
+public class MainTestBench extends NarwhalRobot {
+    Shooter shooter = Shooter.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
     ThreadScheduler scheduler = new ThreadScheduler();
@@ -71,7 +66,7 @@ public class MainTestbench extends NarwhalRobot {
 
     public Joystick joystick;
     public ListenerManager lm;
-    
+
     public NetworkTable table;
     public NetworkTable limelightTable;
 
@@ -88,14 +83,10 @@ public class MainTestbench extends NarwhalRobot {
     @Override
     protected void constructHardware() {
 
+        scheduler.schedule(shooter, executor);
+
         digitalInput = new DigitalInput(0);
         digitalInput2 = new DigitalInput(1);
-
-		shooterMotor = new LazyCANSparkMax(2, MotorType.kBrushless);
-		shooterMotor1 = new LazyCANSparkMax(5, MotorType.kBrushless);
-        shooterMotor2 = new LazyCANSparkMax(11, MotorType.kBrushless);
-        
-        shooterEncoder = shooterMotor1.getEncoder();
 
         joystick = new Joystick(1);
         lm = new ListenerManager(joystick);
@@ -113,12 +104,14 @@ public class MainTestbench extends NarwhalRobot {
         lm.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
         lm.nameControl(new Button(6), "PrintCSV");
         lm.nameControl(new Button(3), "ClearTracker");
-        lm.nameControl(new Button(4), "ClearCSV");
-        lm.nameControl(new Button(7), "SetPower");
+        lm.nameControl(new Button(4), "setSetpoint0");
+        lm.nameControl(new Button(5), "setSetpoint1");
+        lm.nameControl(new Button(7), "EndVoltage");
 
         lm.addMultiListener(() -> {
             // drive.arcadeDrive(-0.7 * RobotMath.thresh(lm.getAxis("MoveTurn"), 0.1),
-            //         -1.0 * RobotMath.thresh(lm.getAxis("MoveForwards"), 0.1), -1.0 * lm.getAxis("Throttle"), true);
+            // -1.0 * RobotMath.thresh(lm.getAxis("MoveForwards"), 0.1), -1.0 *
+            // lm.getAxis("Throttle"), true);
 
         }, "MoveTurn", "MoveForwards", "Throttle");
 
@@ -131,80 +124,68 @@ public class MainTestbench extends NarwhalRobot {
             Log.info("MainAthos.java", "[Vision Alignment] Not created yet, would've ended");
         });
 
-        lm.addButtonDownListener("SetPower", () -> {
-
+        lm.addButtonDownListener("setSetpoint0", () -> {
+            shooter.setSetpoint(0);
+            Log.info("Button4", "pressed");
         });
 
-        lm.addButtonDownListener("PrintCSV", () -> {
-            Log.info("MainAthos", trackerCSV);
-        });
-        lm.addButtonDownListener("ClearCSV", () -> {
-            trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
-            Log.info("MainAthos", "CSV CLEARED");
-            startTime = Timer.getFPGATimestamp();
+        lm.addButtonDownListener("setSetpoint1", () -> {
+            Log.info("Button5", "pressed");
+            Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
+            shooter.setSetpoint(250);
         });
 
-        lm.addButtonDownListener("ClearTracker", () -> {
-            // robotTracker.resetOdometry();
+
+
+        lm.addButtonDownListener("EndVoltage", () -> {
+            Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage())); 
+
         });
 
     }
 
     @Override
     protected void teleopPeriodic() {
-        shooterMotor1.set(.2);
-        shooterMotor2.set(-.2);
-        shooterMotor.set(.2);
-        //system.out.print(start)
-        
-        if (inPlace == false && digitalInput.get()){
+        if (inPlace == false && digitalInput.get()) {
             countBalls++;
             System.out.println("Number of balls: " + countBalls);
             inPlace = true;
-        }
-        else if (!digitalInput.get()) {
+        } else if (!digitalInput.get()) {
             inPlace = false;
         }
-        
-        if (inPlace2 == false && digitalInput2.get()){
+
+        if (inPlace2 == false && digitalInput2.get()) {
             countBalls--;
             System.out.println("Number of balls: " + countBalls);
             inPlace2 = true;
-        }
-        else if (!digitalInput2.get()) {
+        } else if (!digitalInput2.get()) {
             inPlace2 = false;
         }
     }
 
     @Override
     protected void updateDashboard() {
-        
+
     }
 
     @Override
     protected void teleopInit() {
-
+        scheduler.resume();
     }
 
     @Override
     protected void autonomousInit() {
-    
+
     }
 
     @Override
     protected void autonomousPeriodic() {
-        shooterMotor1.set(-0.8);
-        shooterMotor2.set(0.8);
-        Log.info("", "[Velocity] " + String.valueOf(shooterEncoder.getVelocity()));
-        shooterMotor.set(0.7);
     }
 
     @Override
     protected void disabledInit() {
-        shooterMotor1.set(0);
-        shooterMotor2.set(0);
-        shooterMotor.set(0);
-        //scheduler.pause();
+        //shooter.setSetpoint(0);
+        scheduler.pause();
     }
 
     public static void main(String... args) {
