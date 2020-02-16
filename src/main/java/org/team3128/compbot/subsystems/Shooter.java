@@ -103,7 +103,7 @@ public class Shooter extends Threaded {
         RIGHT_SHOOTER.set(-output);
     }
 
-    private double shooterFeedForward(double desiredSetpoint) {
+    public double shooterFeedForward(double desiredSetpoint) {
         return 0; // TODO: add feedforward implementation for arm control
     }
 

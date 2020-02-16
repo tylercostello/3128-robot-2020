@@ -29,8 +29,8 @@ public class Arm extends Threaded {
     }
 
     public static final Arm instance = new Arm();
-    LazyTalonFX ARM_MOTOR_LEADER, ARM_MOTOR_FOLLOWER;
-    DigitalInput LIMIT_SWITCH;
+    public LazyTalonFX ARM_MOTOR_LEADER, ARM_MOTOR_FOLLOWER;
+    public DigitalInput LIMIT_SWITCH;
     double setpoint;
     double current = 0;
     double error = 0;
@@ -73,7 +73,7 @@ public class Arm extends Threaded {
         setSetpoint(armState.armAngle);
     }
 
-    private double armFeedForward(double desired) {
+    public double armFeedForward(double desired) {
         return 0; // TODO: add feedforward implementation for arm control
     }
 

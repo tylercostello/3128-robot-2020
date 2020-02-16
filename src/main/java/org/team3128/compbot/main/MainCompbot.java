@@ -31,6 +31,8 @@ import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.compbot.commands.CmdAlignShoot;
+import org.team3128.compbot.commands.CmdShooterFF;
+import org.team3128.compbot.commands.CmdArmFF;
 import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
@@ -62,6 +64,8 @@ import org.team3128.common.generics.ThreadScheduler;
 public class MainCompbot extends NarwhalRobot {
 
     public Command triggerCommand;
+    public Command armFFCommand;
+    public Command shooterFFCommand;
     private DriveCommandRunning driveCmdRunning;
 
     FalconDrive drive = FalconDrive.getInstance();
@@ -169,10 +173,10 @@ public class MainCompbot extends NarwhalRobot {
         lm.nameControl(ControllerExtreme3D.TWIST, "MoveTurn");
         lm.nameControl(ControllerExtreme3D.JOYY, "MoveForwards");
         lm.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
-        lm.nameControl(new Button(5), "ResetGyro");
-        lm.nameControl(new Button(6), "PrintCSV");
         lm.nameControl(new Button(3), "ClearTracker");
-        lm.nameControl(new Button(4), "ClearCSV");
+        lm.nameControl(new Button(5), "startShooterFF");
+        lm.nameControl(new Button(6), "startArmFF");
+        lm.nameControl(new Button(7), "endVoltage");
 
         lm.addMultiListener(() -> {
             if (!driveCmdRunning.isRunning) {
@@ -197,20 +201,24 @@ public class MainCompbot extends NarwhalRobot {
             Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
 
-        lm.addButtonDownListener("ResetGyro", () -> {
-            drive.resetGyro();
-        });
-        lm.addButtonDownListener("PrintCSV", () -> {
-            Log.info("MainCompbot", trackerCSV);
-        });
-        lm.addButtonDownListener("ClearCSV", () -> {
-            trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
-            Log.info("MainCompbot", "CSV CLEARED");
-            startTime = Timer.getFPGATimestamp();
+
+        lm.addButtonDownListener("runArmFF", () -> {
+            Log.info("Button5", "pressed");
+            Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
+            armFFCommand = new CmdArmFF(arm);
+            armFFCommand.start();
         });
 
-        lm.addButtonDownListener("ClearTracker", () -> {
-            robotTracker.resetOdometry();
+        lm.addButtonDownListener("runShooterFF", () -> {
+            Log.info("Button6", "pressed");
+            Log.info("Arm", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
+            shooterFFCommand = new CmdShooterFF(shooter);
+            shooterFFCommand.start();
+        });
+
+        lm.addButtonDownListener("endVoltage", () -> {
+            Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage())); 
+
         });
 
         lm.nameControl(new POV(0), "IntakePOV");
