@@ -135,6 +135,8 @@ public class Constants extends RobotConstants {
                                                              // allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
                 public static final PIDConstants VISION_PID = new PIDConstants(057, 0.032, 0.0, 0.00003);
+                public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
+                public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
 
         public static class TestSuiteConstants {
@@ -146,10 +148,10 @@ public class Constants extends RobotConstants {
         }
 
         public static class ShooterConstants {
-                public static final int SHOOTER_MOTOR_LEFT_ID = 5;
-                public static final int SHOOTER_MOTOR_RIGHT_ID = 11;
-                public static final int SHOOTER_MOTOR_1_ID = 0;
-                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0, 0, 0);
+                public static final int SHOOTER_MOTOR_LEFT_ID = 1;
+                public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
+                public static final PIDConstants SHOOTER_PID = new PIDConstants(0.000000001, 0.0000009, 0, 00000051);
+ 
                 public static final double SHOOTER_SATURATION_LIMIT = 1; // set limit on integral accumulation (in this
                                                                          // case, 1
                                                                          // volt)
@@ -160,10 +162,9 @@ public class Constants extends RobotConstants {
         }
 
         public static class HopperConstants {
-                public static final int HOPPER_FEEDER_MOTOR_ID = 0;
-                public static final int CORNER_MOTOR_ID = 0;
-                public static final int SHOOTER_FEEDER_MOTOR_ID = 0;
-                public static final int GATEKEEPER_MOTOR_ID = 0;
+                public static final int HOPPER_FEEDER_MOTOR_ID = 10;
+                public static final int CORNER_MOTOR_ID = 7;
+                public static final int GATEKEEPER_MOTOR_ID = 9;
 
                 public static final int SENSOR_0_ID = 0;
                 public static final int SENSOR_1_ID = 0;
