@@ -3,6 +3,7 @@ package org.team3128.compbot.commands;
 import org.team3128.common.drive.DriveCommandRunning;
 import org.team3128.common.drive.DriveSignal;
 import org.team3128.common.hardware.limelight.LEDMode;
+import org.team3128.common.hardware.limelight.Pipeline;
 import org.team3128.common.hardware.limelight.Limelight;
 import org.team3128.common.hardware.limelight.LimelightData;
 import org.team3128.common.hardware.limelight.LimelightKey;
@@ -19,12 +20,14 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.*;
+import org.team3128.compbot.commands.*;
 
 public class CmdAlignShoot extends Command {
     FalconDrive drive;
     Shooter shooter;
     Hopper hopper;
     Arm arm;
+    boolean gotDistance = false;
 
     Gyro gyro;
 
@@ -48,6 +51,8 @@ public class CmdAlignShoot extends Command {
 
     private double desiredRPM;
     private double effective_distance;
+
+    private Command hopperShoot, organize;
 
     int targetFoundCount;
     int plateauReachedCount;
@@ -81,6 +86,7 @@ public class CmdAlignShoot extends Command {
     @Override
     protected void initialize() {
         limelight.setLEDMode(LEDMode.ON);
+        limelight.setPipeline(Pipeline.ZOOM);
         cmdRunning.isRunning = false;
     }
 
@@ -141,6 +147,33 @@ public class CmdAlignShoot extends Command {
 
                 cmdRunning.isRunning = false;
             } else {
+
+                if (!gotDistance) {
+                    LimelightData initData = limelight.getValues(Constants.VisionConstants.SAMPLE_RATE);
+
+                    double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE;
+
+                    double limelight_height = Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle); // TODO:
+                                                                                                                        // add
+                                                                                                                        // limelight
+                                                                                                                        // height
+                                                                                                                        // to
+                                                                                                                        // this
+                                                                                                                        // (when
+                                                                                                                        // stowed)
+
+                    double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
+                            / (RobotMath.tan(initData.ty()));
+
+                    effective_distance = distance / RobotMath.cos(initData.tx());
+
+                    desiredRPM = shooter.getRPMFromDistance(effective_distance);
+
+                    shooter.setSetpoint(desiredRPM);
+
+                    gotDistance = true;
+                }
+
                 currentHorizontalOffset = limelight.getValue(LimelightKey.HORIZONTAL_OFFSET, 5);
 
                 currentTime = RobotController.getFPGATime();
@@ -198,7 +231,8 @@ public class CmdAlignShoot extends Command {
         }
 
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady() && hopper.isReady()) {
-            // hopper.shoot();
+            hopperShoot = new CmdShoot(hopper);
+            hopperShoot.start();
             numBallsShot++;
         }
     }
@@ -218,7 +252,8 @@ public class CmdAlignShoot extends Command {
         limelight.setLEDMode(LEDMode.OFF);
 
         // NarwhalDashboard.put("align_status", "blind");
-        //hopper.organize();
+        organize = new CmdOrganize(hopper);
+        organize.start();
         cmdRunning.isRunning = false;
 
         Log.info("CmdAlignShoot", "Command Finished.");

@@ -143,4 +143,8 @@ public class Limelight {
     public void setStreamMode(StreamMode mode) {
         limelightTable.getEntry("stream").setNumber(mode.getStream());
     }
+
+    public void setPipeline(Pipeline pipeline) {
+        limelightTable.getEntry("pipeline").setNumber(pipeline.getPipeline());
+    }
 }
