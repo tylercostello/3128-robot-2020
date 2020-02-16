@@ -95,8 +95,16 @@ public class Arm extends Threaded {
         return ARM_MOTOR_LEADER.getSelectedSensorVelocity(0);
     }
 
+    public boolean getLimitStatus() {
+        return LIMIT_SWITCH.get();
+    }
+
     @Override
     public void update() {
+
+        if (getLimitStatus()) {
+            ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
+        }
 
         if (ARM_STATE.armAngle != setpoint) {
             Log.info("ARM", "Setpoint override (setpoint has been set without using ArmState)");
