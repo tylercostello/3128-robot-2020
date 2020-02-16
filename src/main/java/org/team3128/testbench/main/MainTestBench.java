@@ -189,7 +189,7 @@ public class MainTestBench extends NarwhalRobot {
     }
 
     public static void main(String... args) {
-        RobotBase.startRobot(MainTestbench::new);
+        RobotBase.startRobot(MainTestBench::new);
     }
 
     @Override
