@@ -66,7 +66,7 @@ public class MainCompbot extends NarwhalRobot {
     public Command shooterFFCommand;
     private DriveCommandRunning driveCmdRunning;
 
-    FalconDrive drive = FalconDrive.getInstance();
+    static FalconDrive drive = FalconDrive.getInstance();
     Hopper hopper = Hopper.getInstance();
     Arm arm = Arm.getInstance();
     Shooter shooter = Shooter.getInstance();
@@ -80,7 +80,7 @@ public class MainCompbot extends NarwhalRobot {
     public Joystick joystick;
     public ListenerManager lm;
     public Gyro gyro;
-    public PowerDistributionPanel pdp;
+    public static PowerDistributionPanel pdp;
 
     public NetworkTable table;
     public NetworkTable limelightTable;
@@ -94,6 +94,17 @@ public class MainCompbot extends NarwhalRobot {
 
     public Limelight topLimelight, ballLimelight;
     public Limelight[] limelights;
+    public boolean inPlace = false;
+    public boolean inPlace2 = false;
+
+    public int countBalls = 0;
+    public int countBalls2 = 0;
+    public static CanDevices leftDriveLeader;
+    public static CanDevices leftDriveFollower;
+    public static CanDevices rightDriveLeader;
+    public static CanDevices rightDriveFollower;
+    public static CanDevices PDP;
+
 
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
@@ -151,12 +162,8 @@ public class MainCompbot extends NarwhalRobot {
         errorCatcher = new ErrorCatcherUtility(CanChain, limelights, drive);
 
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
-            if (down) {
-                // Janky fix
-
-                errorCatcher.testEverything();
-
-                errorCatcher.testEverything();
+            if (down) {               
+               errorCatcher.testEverything();
             }
         });
     }

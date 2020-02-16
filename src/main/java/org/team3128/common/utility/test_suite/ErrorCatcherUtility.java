@@ -172,15 +172,15 @@ public class ErrorCatcherUtility {
 
             if(tempLatency == 0){
                 Log.info("ErrorCatcher", limelight.hostname + " is disconnected.");
-                //limelightError += limelight.hostname + "is disconnected.\n";
-                NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is disconnected.");  
+                limelightError = limelightError + "" + limelight.hostname + "is disconnected.\n ";
+                //NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is disconnected.");  
             } else{
                 Log.info("ErrorCatcher", limelight.hostname + " is connected.");
-                //limelightError += limelight.hostname + "is connected.\n";
-                NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is connected.");  
+                limelightError = limelightError + "" + limelight.hostname + "is connected.\n ";
+                //NarwhalDashboard.put("ErrorCatcherLimelight", limelight.hostname + " is connected.");  
             }
         }
-        //NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
+        NarwhalDashboard.put("ErrorCatcherLimelight", limelightError);
     }
     
 
@@ -314,6 +314,7 @@ public class ErrorCatcherUtility {
     }
     
     public void testEverything() {
+        //janky fix
         ErrorCatcherCAN();
         ErrorCatcherCAN();
         limelightCheck();
