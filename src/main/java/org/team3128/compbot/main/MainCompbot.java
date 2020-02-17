@@ -35,6 +35,7 @@ import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.RobotTracker;
+import org.team3128.compbot.subsystems.Arm.ArmState;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -271,9 +272,18 @@ public class MainCompbot extends NarwhalRobot {
     String currentArmLimitSwitch;
     double currentArmAngle;
     double currentArmPos;
+    double currentArmVoltage;
+    double currentArmPower;
+    double currentBatteryVoltage;
+    double currentArmCurrent;
 
     @Override
     protected void updateDashboard() {
+        if (!arm.getLimitStatus()) {
+            arm.ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
+            arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
+        }
+
         currentLeftSpeed = drive.getLeftSpeed();
         currentLeftDistance = drive.getLeftDistance();
         currentRightSpeed = drive.getRightSpeed();
@@ -286,12 +296,21 @@ public class MainCompbot extends NarwhalRobot {
         currentArmAngle = arm.getAngle();
         currentArmPos = arm.ARM_MOTOR_LEADER.getSelectedSensorPosition(0);
 
+        currentArmVoltage = arm.ARM_MOTOR_LEADER.getMotorOutputVoltage();
+        currentArmPower = arm.output;
+        currentArmCurrent = arm.ARM_MOTOR_LEADER.getStatorCurrent();
+
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
+
+        SmartDashboard.putNumber("voltage", RobotController.getBatteryVoltage());
 
         SmartDashboard.putString("Arm Limit Switch", currentArmLimitSwitch);
         SmartDashboard.putNumber("Arm Angle", currentArmAngle);
         SmartDashboard.putNumber("Arm Position", currentArmPos);
+        SmartDashboard.putNumber("Arm Voltage", currentArmVoltage);
+        SmartDashboard.putNumber("Arm Current", currentArmCurrent);
+        SmartDashboard.putNumber("Arm Power", currentArmPower);
 
         SmartDashboard.putNumber("Gyro Angle", drive.getAngle());
         SmartDashboard.putNumber("Left Distance", currentLeftDistance);
@@ -334,8 +353,7 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void teleopInit() {
         scheduler.resume();
-        hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
-        hopper.setMotorPowers(0, -0.5, -0.40);
+        arm.setState(ArmState.STARTING);
     }
 
     @Override
@@ -358,7 +376,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void disabledInit() {
-        hopper.setMotorPowers(0, 0, 0);
+        arm.setState(ArmState.STARTING);
         scheduler.pause();
     }
 

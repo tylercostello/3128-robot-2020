@@ -189,6 +189,7 @@ public class Constants extends RobotConstants {
                 public static final int ARM_MOTOR_FOLLOWER_ID = 4;
                 public static final int ARM_LIMIT_SWITCH_ID = 0;
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Coast;
+                public static final double MAX_ARM_ANGLE = 80;
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)
                                                                                      // rotations of the
                 // motor, we get 1 rotation of the arm (ask
@@ -196,7 +197,7 @@ public class Constants extends RobotConstants {
                 public static final double ARM_LENGTH = 30; // TODO: ASK MECH AND CHANGE LATER
                 public static final double LIMELIGHT_ARM_LENGTH = 27; // TODO: ASK MECH AND CHANGE LATER
                 public static final double LIMELIGHT_ARM_ANGLE = 5; // TODO: ASK MECH AND CHANGE LATER
-                public static final PIDConstants ARM_PID = new PIDConstants(0, 0, 0, 0);
+                public static final PIDConstants ARM_PID = new PIDConstants(0, 0.08, 0, 0);
                 public static final double ARM_SATURATION_LIMIT = 2 / ARM_PID.kI; // set limit on integral accumulation
                 public static final double ZEROING_POWER = -0.2;
         }

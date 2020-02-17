@@ -17,7 +17,7 @@ public class Arm extends Threaded {
     public enum ArmState {
         STOWED(0), // arm is all the way down
         INTAKE(0), // intaking balls
-        STARTING(45), // within frame perimeter
+        STARTING(5), // within frame perimeter
         FAR_RANGE(60), // far range shooting
         SHORT_RANGE(20); // short range shooting
 
@@ -34,7 +34,7 @@ public class Arm extends Threaded {
     double setpoint;
     double current = 0;
     double error = 0;
-    double output = 0;
+    public double output = 0;
     double accumulator = 0;
     double prevError = 0;
     public ArmState ARM_STATE;
@@ -77,7 +77,7 @@ public class Arm extends Threaded {
     }
 
     public double armFeedForward(double desired) {
-        return 0; // TODO: add feedforward implementation for arm control
+        return -0.38; // true value = -0.46
     }
 
     public double getAngle() {
@@ -104,6 +104,13 @@ public class Arm extends Threaded {
 
     @Override
     public void update() {
+        if (setpoint > Constants.ArmConstants.MAX_ARM_ANGLE) {
+            setpoint = Constants.ArmConstants.MAX_ARM_ANGLE;
+        }
+
+        if (setpoint < 0) {
+            setpoint = 0;
+        }
 
         if (!getLimitStatus()) {
             ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
