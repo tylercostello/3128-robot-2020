@@ -17,7 +17,7 @@ public class Constants extends RobotConstants {
 
         public static class GameConstants {
                 public static final double SHOOTER_TARGET_HEIGHT = 98.25; // height of target in INCHES
-                public static final double BALL_HEIGHT = 9; // height of the ball in centimeters 
+                public static final double BALL_HEIGHT = 9; // height of the ball in centimeters
                                                             // TODO: check ball height
         }
 
@@ -151,7 +151,7 @@ public class Constants extends RobotConstants {
                 public static final int SHOOTER_MOTOR_LEFT_ID = 8;
                 public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
                 public static final PIDConstants SHOOTER_PID = new PIDConstants(0.000000001, 0.0000009, 0, 00000051);
- 
+
                 public static final double SHOOTER_SATURATION_LIMIT = 1; // set limit on integral accumulation (in this
                                                                          // case, 1
                                                                          // volt)
@@ -166,11 +166,11 @@ public class Constants extends RobotConstants {
                 public static final int CORNER_MOTOR_ID = 7;
                 public static final int GATEKEEPER_MOTOR_ID = 9;
 
-                public static final int SENSOR_0_ID = 0;
-                public static final int SENSOR_1_ID = 0;
-                public static final int SENSOR_2_ID = 0;
-                public static final int SENSOR_3_ID = 0;
-                public static final int SENSOR_4_ID = 0;
+                public static final int SENSOR_0_ID = 1;
+                public static final int SENSOR_1_ID = 2;
+                public static final int SENSOR_2_ID = 3;
+                public static final int SENSOR_3_ID = 4;
+                public static final int SENSOR_4_ID = 5;
 
                 public static final double DEBUG_MOTOR_POWER = 0.5;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
@@ -179,16 +179,16 @@ public class Constants extends RobotConstants {
         }
 
         public static class IntakeConstants {
-                public static final int INTAKE_MOTOR_ID = 0;
-                public static final double INTAKE_MOTOR_ON_VALUE = 0.5;
-                public static final double INTAKE_MOTOR_OFF_VALUE = -0.2;
+                public static final int INTAKE_MOTOR_ID = 5;
+                public static final double INTAKE_MOTOR_ON_VALUE = -0.5;
+                public static final double INTAKE_MOTOR_OFF_VALUE = 0;
         }
 
         public static class ArmConstants {
                 public static final int ARM_MOTOR_LEADER_ID = 5;
                 public static final int ARM_MOTOR_FOLLOWER_ID = 4;
                 public static final int ARM_LIMIT_SWITCH_ID = 0;
-                public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
+                public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Coast;
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)
                                                                                      // rotations of the
                 // motor, we get 1 rotation of the arm (ask

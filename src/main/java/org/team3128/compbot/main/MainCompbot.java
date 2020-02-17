@@ -118,7 +118,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
-        
+
         // // Instatiator if we're using the NavX
         // gyro = new NavX();
 
@@ -130,10 +130,12 @@ public class MainCompbot extends NarwhalRobot {
         lm = new ListenerManager(joystick);
         addListenerManager(lm);
 
-        // initialization of limelights 
+        // initialization of limelights
 
         topLimelight = new Limelight("limelight-b", 26.0, 0, 0, 30);
-        ballLimelight = new Limelight("limelight-c", Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE, Constants.VisionConstants.BOTTOM_LIMELIGHT_HEIGHT, Constants.VisionConstants.BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT, 14.5 * Length.in);
+        ballLimelight = new Limelight("limelight-c", Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE,
+                Constants.VisionConstants.BOTTOM_LIMELIGHT_HEIGHT,
+                Constants.VisionConstants.BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT, 14.5 * Length.in);
         limelights = new Limelight[2];
 
         // initialization of auto test suite
@@ -166,8 +168,8 @@ public class MainCompbot extends NarwhalRobot {
         lm.nameControl(ControllerExtreme3D.JOYY, "MoveForwards");
         lm.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
         lm.nameControl(new Button(3), "ClearTracker");
-        lm.nameControl(new Button(5), "startShooterFF");
-        lm.nameControl(new Button(6), "startArmFF");
+        lm.nameControl(new Button(5), "runShooterFF");
+        lm.nameControl(new Button(6), "runArmFF");
         lm.nameControl(new Button(7), "endVoltage");
 
         lm.addMultiListener(() -> {
@@ -193,7 +195,6 @@ public class MainCompbot extends NarwhalRobot {
             Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
 
-
         lm.addButtonDownListener("runArmFF", () -> {
             Log.info("Button5", "pressed");
             Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
@@ -209,7 +210,7 @@ public class MainCompbot extends NarwhalRobot {
         });
 
         lm.addButtonDownListener("endVoltage", () -> {
-            Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage())); 
+            Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage()));
 
         });
 
@@ -226,7 +227,9 @@ public class MainCompbot extends NarwhalRobot {
             case 4:
             case 5:
                 // start intake command
-                povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, driveCmdRunning, Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID, Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
+                povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, driveCmdRunning,
+                        Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID,
+                        Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
                 // driveCmdRunning,
                 if (arm.ARM_STATE == Arm.ArmState.STOWED) {
                     povCommand.start();
@@ -265,8 +268,9 @@ public class MainCompbot extends NarwhalRobot {
     double currentRightDistance;
     double currentSpeed;
     double currentDistance;
-    boolean currentArmLimitSwitch;
+    String currentArmLimitSwitch;
     double currentArmAngle;
+    double currentArmPos;
 
     @Override
     protected void updateDashboard() {
@@ -277,12 +281,17 @@ public class MainCompbot extends NarwhalRobot {
 
         currentSpeed = drive.getSpeed();
         currentDistance = drive.getDistance();
-        
-        currentArmLimitSwitch = arm.getLimitStatus();
+
+        currentArmLimitSwitch = String.valueOf(arm.getLimitStatus());
         currentArmAngle = arm.getAngle();
+        currentArmPos = arm.ARM_MOTOR_LEADER.getSelectedSensorPosition(0);
 
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
+
+        SmartDashboard.putString("Arm Limit Switch", currentArmLimitSwitch);
+        SmartDashboard.putNumber("Arm Angle", currentArmAngle);
+        SmartDashboard.putNumber("Arm Position", currentArmPos);
 
         SmartDashboard.putNumber("Gyro Angle", drive.getAngle());
         SmartDashboard.putNumber("Left Distance", currentLeftDistance);
