@@ -334,6 +334,8 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void teleopInit() {
         scheduler.resume();
+        hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+        hopper.setMotorPowers(0, -0.5, -0.40);
     }
 
     @Override
@@ -356,6 +358,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void disabledInit() {
+        hopper.setMotorPowers(0, 0, 0);
         scheduler.pause();
     }
 

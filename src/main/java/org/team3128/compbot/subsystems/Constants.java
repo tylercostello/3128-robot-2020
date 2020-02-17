@@ -163,7 +163,7 @@ public class Constants extends RobotConstants {
 
         public static class HopperConstants {
                 public static final int HOPPER_FEEDER_MOTOR_ID = 10;
-                public static final int CORNER_MOTOR_ID = 7;
+                public static final int CORNER_MOTOR_ID = 2;
                 public static final int GATEKEEPER_MOTOR_ID = 9;
 
                 public static final int SENSOR_0_ID = 1;
@@ -180,7 +180,7 @@ public class Constants extends RobotConstants {
 
         public static class IntakeConstants {
                 public static final int INTAKE_MOTOR_ID = 5;
-                public static final double INTAKE_MOTOR_ON_VALUE = -0.5;
+                public static final double INTAKE_MOTOR_ON_VALUE = 0.5;
                 public static final double INTAKE_MOTOR_OFF_VALUE = 0;
         }
 

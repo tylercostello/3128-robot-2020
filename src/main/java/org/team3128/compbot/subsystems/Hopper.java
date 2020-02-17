@@ -22,10 +22,8 @@ public class Hopper extends Threaded {
         POS_0(new boolean[] { false, false, false, false, false }),
         POS_1(new boolean[] { true, false, false, false, false }),
         POS_2(new boolean[] { true, true, false, false, false }),
-        POS_3(new boolean[] { true, true, false, true, false }),
-        POS_4(new boolean[] { true, true, true, true, false }),
-        POS_5(new boolean[] { true, true, true, true, true }),
-        POS_6(new boolean[] { false, true, true, true, false });
+        POS_3(new boolean[] { true, true, false, true, false }), POS_4(new boolean[] { true, true, true, true, false }),
+        POS_5(new boolean[] { true, true, true, true, true }), POS_6(new boolean[] { false, true, true, true, false });
 
         public boolean[] hopperState;
 
@@ -45,7 +43,8 @@ public class Hopper extends Threaded {
     private boolean inPlaceExit = false;
     private boolean isMoving;
 
-    private DigitalInput[] sensorPositions = { SENSOR_0, SENSOR_1, SENSOR_2 }; // top to bottom //0 = 1.5, 1 = 3, 2 = 4 mathhh
+    private DigitalInput[] sensorPositions = { SENSOR_0, SENSOR_1, SENSOR_2 }; // top to bottom //0 = 1.5, 1 = 3, 2 = 4
+                                                                               // mathhh
 
     public static Hopper getInstance() {
         return instance;
@@ -78,20 +77,18 @@ public class Hopper extends Threaded {
     @Override
     public void update() {
         if (!isMoving) {
-            checkSensors(); //TODO: do we need this?
+            checkSensors(); // TODO: do we need this?
         }
         // countBalls(SENSOR_0, SENSOR_4);
     }
 
-    /*private void checkSensors() {
-        ballArray[0] = SENSOR_0.get();
-        ballArray[1] = SENSOR_1.get();
-        ballArray[2] = SENSOR_2.get();
-        ballArray[3] = SENSOR_3.get();
-        ballArray[4] = SENSOR_4.get();
-    }*/
+    /*
+     * private void checkSensors() { ballArray[0] = SENSOR_0.get(); ballArray[1] =
+     * SENSOR_1.get(); ballArray[2] = SENSOR_2.get(); ballArray[3] = SENSOR_3.get();
+     * ballArray[4] = SENSOR_4.get(); }
+     */
     private void checkSensors() {
-        
+
     }
 
     private void configMotors() {
@@ -157,7 +154,7 @@ public class Hopper extends Threaded {
         boolean[] out_array = new boolean[in_array.length];
         for (int i = 0; i < in_array.length; i++) {
             boolean added = false;
-            if(in_array[i]) {
+            if (in_array[i]) {
                 out_array[i] = in_array[i];
             } else if (!added) {
                 out_array[i] = true;
@@ -193,7 +190,7 @@ public class Hopper extends Threaded {
 
     public void setMotorPowers(double p_Gatekeeer, double p_Corner, double p_HopperFeeder) {
         GATEKEEPER_MOTOR.set(p_Gatekeeer);
-        //SHOOTER_FEEDER_MOTOR.set(p_ShooterFeeder);
+        // SHOOTER_FEEDER_MOTOR.set(p_ShooterFeeder);
         CORNER_MOTOR.set(p_Corner);
         HOPPER_FEEDER_MOTOR.set(p_HopperFeeder);
     }
