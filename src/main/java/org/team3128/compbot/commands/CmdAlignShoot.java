@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.*;
+import org.team3128.compbot.subsystems.Hopper.ActionState;
 import org.team3128.compbot.commands.*;
 
 public class CmdAlignShoot extends Command {
@@ -88,6 +89,7 @@ public class CmdAlignShoot extends Command {
         limelight.setLEDMode(LEDMode.ON);
         limelight.setPipeline(Pipeline.ZOOM);
         cmdRunning.isRunning = false;
+        hopper.setAction(Hopper.ActionState.SHOOTING);
     }
 
     @Override
@@ -231,8 +233,9 @@ public class CmdAlignShoot extends Command {
         }
 
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady() && hopper.isReady()) {
-            hopperShoot = new CmdShoot(hopper);
-            hopperShoot.start();
+            // hopperShoot = new CmdShoot(hopper);
+            // hopperShoot.start();
+            hopper.shoot();
             numBallsShot++;
         }
     }
@@ -257,17 +260,19 @@ public class CmdAlignShoot extends Command {
         cmdRunning.isRunning = false;
 
         Log.info("CmdAlignShoot", "Command Finished.");
+        hopper.setAction(Hopper.ActionState.ORGANIZING);
     }
 
     @Override
     protected void interrupted() {
-        drive.stopMovement();
-        limelight.setLEDMode(LEDMode.OFF);
+        end();
+        // drive.stopMovement();
+        // limelight.setLEDMode(LEDMode.OFF);
 
-        // NarwhalDashboard.put("align_status", "blind");
+        // // NarwhalDashboard.put("align_status", "blind");
 
-        cmdRunning.isRunning = false;
+        // cmdRunning.isRunning = false;
 
-        Log.info("CmdAlignShoot", "Command Finished.");
+        // Log.info("CmdAlignShoot", "Command Finished.");
     }
 }

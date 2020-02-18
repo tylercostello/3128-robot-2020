@@ -174,8 +174,10 @@ public class Constants extends RobotConstants {
 
                 public static final double DEBUG_MOTOR_POWER = 0.5;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
-                public static final double BASE_POWER = 0.5;
+                public static final double BASE_POWER = -0.5;
                 public static final double GATEKEEPER_POWER = 0.5;
+                public static final double BALL_SPACING = 7;
+                public static final double SHOOTER_SPACING = 2;
         }
 
         public static class IntakeConstants {
