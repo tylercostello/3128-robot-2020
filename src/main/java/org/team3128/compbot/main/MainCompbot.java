@@ -111,7 +111,7 @@ public class MainCompbot extends NarwhalRobot {
 
     public Command povCommand;
 
-    public static void setCanChain() {
+    public static void setCanChain() {  
         CanChain[0] = Constants.TestSuiteConstants.rightDriveLeader;
         CanChain[1] = Constants.TestSuiteConstants.rightDriveFollower;
         CanChain[2] = Constants.TestSuiteConstants.leftDriveFollower;
