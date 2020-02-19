@@ -265,13 +265,13 @@ public class Hopper extends Threaded {
             empty0 = false;
 
             startPos = CORNER_ENCODER.getPosition();
-            setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
             isLoading = true;
         } else if (openTheGates && !isLoading) {
             setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
         }
         if (isLoading) {
-            setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
             if (CORNER_ENCODER.getPosition() - Constants.HopperConstants.SHOOTER_SPACING >= startPos) {
                 isLoading = false;
             }
