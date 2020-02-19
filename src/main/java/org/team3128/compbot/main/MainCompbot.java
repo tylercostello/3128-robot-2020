@@ -36,6 +36,7 @@ import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.RobotTracker;
 import org.team3128.compbot.subsystems.Arm.ArmState;
+import org.team3128.compbot.subsystems.Hopper.ActionState;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -229,20 +230,22 @@ public class MainCompbot extends NarwhalRobot {
             case 4:
             case 5:
                 // start intake command
-                povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, driveCmdRunning,
-                        Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID,
-                        Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
+                // povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, arm, driveCmdRunning,
+                //         Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID,
+                //         Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
                 // driveCmdRunning,
-                if (arm.ARM_STATE == Arm.ArmState.STOWED) {
-                    povCommand.start();
+                if (arm.ARM_STATE == Arm.ArmState.INTAKE) {
+                    // povCommand.start();
+                    hopper.setAction(Hopper.ActionState.INTAKING);
                 } else {
-                    arm.zero();
+                    arm.setState(Arm.ArmState.INTAKE);
                 }
 
                 break;
             case 0:
-                povCommand.cancel();
-                povCommand = null;
+                // povCommand.cancel();
+                // povCommand = null;
+                hopper.setAction(Hopper.ActionState.STANDBY);
 
                 break;
             default:

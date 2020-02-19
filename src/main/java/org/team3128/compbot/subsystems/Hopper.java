@@ -19,11 +19,13 @@ import org.team3128.common.game_elements.Ball;
 public class Hopper extends Threaded {
 
     public enum HopperState {
-        POS_0(new boolean[] { false, false, false, false, false }),
-        POS_1(new boolean[] { true, false, false, false, false }),
-        POS_2(new boolean[] { true, true, false, false, false }),
-        POS_3(new boolean[] { true, true, false, true, false }), POS_4(new boolean[] { true, true, true, true, false }),
-        POS_5(new boolean[] { true, true, true, true, true }), POS_6(new boolean[] { false, true, true, true, false });
+        POS_0(new boolean[] { false, false, false, false }),
+        POS_1(new boolean[] { false, false, false, true }),
+        POS_2(new boolean[] { false, false, true, true }),
+        POS_3(new boolean[] { false, true, true, true }),
+        POS_4(new boolean[] { true, true, true, true });
+        //POS_5(new boolean[] { true, true, true, true }),
+        //POS_6(new boolean[] { false, true, true, true });
 
         public boolean[] hopperState;
 
@@ -32,16 +34,38 @@ public class Hopper extends Threaded {
         }
     }
 
+    public enum ActionState {
+        STANDBY,
+        INTAKING,
+        SHOOTING,
+        ORGANIZING;
+
+        private ActionState() {
+
+        }
+    }
+
     public LazyCANSparkMax INTAKE_MOTOR, HOPPER_FEEDER_MOTOR, CORNER_MOTOR, GATEKEEPER_MOTOR;
     public CANEncoder HOPPER_FEEDER_ENCODER, CORNER_ENCODER;
     public DigitalInput SENSOR_0, SENSOR_1, SENSOR_2;
 
-    boolean[] ballArray = { false, false, false, false, false };
+    boolean[] ballArray = { false, false, false, false };
     private static final Hopper instance = new Hopper();
 
     private boolean inPlaceEntry = false;
     private boolean inPlaceExit = false;
     private boolean isMoving;
+    private boolean isShooting, isIntaking;
+    private boolean empty0 = true;
+    private boolean empty1 = true;
+    private boolean isFeeding = false;
+    private boolean isLoading = false;
+    private boolean isOrganizing = false;
+    private boolean openTheGates = false;
+    private double startPos = 0;
+    private int ballCount;
+
+    public ActionState actionState;
 
     private DigitalInput[] sensorPositions = { SENSOR_0, SENSOR_1, SENSOR_2 }; // top to bottom //0 = 1.5, 1 = 3, 2 = 4
                                                                                // mathhh
@@ -54,41 +78,105 @@ public class Hopper extends Threaded {
         configMotors();
         configEncoders();
         configSensors();
+        ballCount = 0; //TODO: initial ball count
     }
-
-    // public void countBalls(DigitalInput entrySensor, DigitalInput exitSensor) {
-    // if (inPlaceEntry == false && entrySensor.get()) {
-    // countBalls++;
-    // System.out.println("Number of balls: " + countBalls);
-    // inPlaceEntry = true;
-    // } else if (!entrySensor.get()) {
-    // inPlaceEntry = false;
-    // }
-
-    // if (inPlaceExit == false && exitSensor.get()) {
-    // countBalls--;
-    // System.out.println("Number of balls: " + countBalls);
-    // inPlaceExit = true;
-    // } else if (!exitSensor.get()) {
-    // inPlaceExit = false;
-    // }
-    // }
 
     @Override
     public void update() {
-        if (!isMoving) {
-            checkSensors(); // TODO: do we need this?
+
+        // if (isIntaking) {
+        //     INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+        // } else {
+        //     INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
+        // }
+
+        switch (actionState) {
+            case STANDBY:
+                INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
+                standbyIntake();
+
+            case INTAKING:
+                INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+                standbyIntake();
+
+            case SHOOTING:
+                INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
+                loadShoot();
+            
+            case ORGANIZING:
+                INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
+                organize();
         }
-        // countBalls(SENSOR_0, SENSOR_4);
-    }
 
-    /*
-     * private void checkSensors() { ballArray[0] = SENSOR_0.get(); ballArray[1] =
-     * SENSOR_1.get(); ballArray[2] = SENSOR_2.get(); ballArray[3] = SENSOR_3.get();
-     * ballArray[4] = SENSOR_4.get(); }
-     */
-    private void checkSensors() {
+        // if (!isShooting) {
+        //     if (!isFull()) {
+        //         setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+        //     } else {
+        //         setMotorPowers(0, 0, 0);
+        //     }
+        //     if (SENSOR_1.get()) {
+        //         setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        //         empty1 = false;
+        //     } else if (!empty1) {
+        //         empty1 = true;
+        //         ballCount++;
+        //         // switch (armCount) {
+        //         //     case 1:
+        //         //         updatedArray = new boolean[] {false, false, false, true, false};
+                        
+        //         //         break;
+        //         //     case 2:
+        //         //         updatedArray = new boolean[] {false, false, true, true, false};
+        //         //         break;
+        //         //     case 3:
+        //         //         updatedArray = new boolean[] {false, true, true, true, false};
+        //         //         break;
+        //         //     case 4:
+        //         //         updatedArray = new boolean[] {true, true, true, true, false};
+        //         //         break;
+        //         // }
 
+        //         setBallOrder(addBall(getBallArray()));
+
+        //         startPos = CORNER_ENCODER.getPosition();
+        //         setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        //         isFeeding = true;
+        //     }
+        //     if (isFeeding && CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING < startPos) {
+        //         setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+        //         isFeeding = false;
+        //     }
+        // } else if (!isOrganizing) {
+        //     if (!SENSOR_0.get()) {
+        //         if (!empty0 && openTheGates) {
+        //             ballCount--;
+        //             setBallOrder(shift(getBallArray()));
+        //             openTheGates = false;
+        //         }
+        //         empty0 = true;
+        //         setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        //     } else if (empty0) {
+        //         empty0 = false;
+
+        //         startPos = CORNER_ENCODER.getPosition();
+        //         setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        //         isLoading = true;
+        //     } else if (openTheGates) {
+        //         setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        //     }
+        //     if (isLoading && CORNER_ENCODER.getPosition() - Constants.HopperConstants.SHOOTER_SPACING < startPos) {
+        //         setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+        //         isLoading = false;
+        //     }
+        // } else {
+        //     if (SENSOR_1.get()) {
+        //         empty1 = false;
+        //         setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        //     } else if (!empty1) {
+        //         empty1 = true;
+        //         isOrganizing = false;
+        //     }
+        // }
     }
 
     private void configMotors() {
@@ -138,7 +226,7 @@ public class Hopper extends Threaded {
     }
 
     public boolean isFull() {
-        return (getNumBalls() == Constants.HopperConstants.CAPACITY);
+        return (getNumBalls() == Constants.HopperConstants.CAPACITY - 1);
     }
 
     public boolean[] shift(boolean[] in_array) {
@@ -152,7 +240,8 @@ public class Hopper extends Threaded {
 
     private boolean[] addBall(boolean[] in_array) {
         boolean[] out_array = new boolean[in_array.length];
-        for (int i = 0; i < in_array.length; i++) {
+        // for (int i = 0; i < in_array.length; i++) {
+        for (int i = in_array.length - 1; i >= 0; i--) {
             boolean added = false;
             if (in_array[i]) {
                 out_array[i] = in_array[i];
@@ -193,5 +282,93 @@ public class Hopper extends Threaded {
         // SHOOTER_FEEDER_MOTOR.set(p_ShooterFeeder);
         CORNER_MOTOR.set(p_Corner);
         HOPPER_FEEDER_MOTOR.set(p_HopperFeeder);
+    }
+
+    // public void setIsShooting(boolean value) {
+    //     isShooting = value;
+    // }
+
+    // public void setIsIntaking(boolean value) {
+    //     isIntaking = value;
+    //     if (isIntaking) {
+    //         INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+    //     } else {
+    //         INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
+    //     }
+    // }
+
+    public void setGatekeepers(boolean value) {
+        openTheGates = value;
+    }
+
+    // public void setIsOrganizing(boolean value) {
+    //     isOrganizing = value;
+    // }
+
+    public void shoot() {
+        setGatekeepers(true);
+    }
+
+    public void setAction(ActionState state) {
+        this.actionState = state;
+    }
+
+    public void standbyIntake() {
+        if (!isFull()) {
+            setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+        } else {
+            setMotorPowers(0, 0, 0);
+        }
+        if (SENSOR_1.get()) {
+            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+            empty1 = false;
+        } else if (!empty1) {
+            empty1 = true;
+            ballCount++;
+
+            setBallOrder(addBall(getBallArray()));
+
+            startPos = CORNER_ENCODER.getPosition();
+            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+            isFeeding = true;
+        }
+        if (isFeeding && CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING < startPos) {
+            setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+            isFeeding = false;
+        }
+    }
+
+    public void loadShoot() {
+        if (!SENSOR_0.get()) {
+            if (!empty0 && openTheGates) {
+                ballCount--;
+                setBallOrder(shift(getBallArray()));
+                openTheGates = false;
+            }
+            empty0 = true;
+            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        } else if (empty0) {
+            empty0 = false;
+
+            startPos = CORNER_ENCODER.getPosition();
+            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+            isLoading = true;
+        } else if (openTheGates) {
+            setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        }
+        if (isLoading && CORNER_ENCODER.getPosition() - Constants.HopperConstants.SHOOTER_SPACING < startPos) {
+            setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+            isLoading = false;
+        }
+    }
+
+    public void organize() {
+        if (SENSOR_1.get()) {
+            empty1 = false;
+            setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+        } else if (!empty1) {
+            empty1 = true;
+            setAction(ActionState.STANDBY);
+        }
     }
 }
