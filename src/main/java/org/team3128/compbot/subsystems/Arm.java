@@ -17,7 +17,7 @@ public class Arm extends Threaded {
     public enum ArmState {
         STOWED(0), // arm is all the way down
         INTAKE(0), // intaking balls
-        STARTING(5), // within frame perimeter
+        STARTING(42), // within frame perimeter 47.66
         FAR_RANGE(60), // far range shooting
         SHORT_RANGE(20); // short range shooting
 
@@ -77,7 +77,7 @@ public class Arm extends Threaded {
     }
 
     public double armFeedForward(double desired) {
-        return -0.38; // true value = -0.46
+        return 0; // true value = -0.46
     }
 
     public double getAngle() {

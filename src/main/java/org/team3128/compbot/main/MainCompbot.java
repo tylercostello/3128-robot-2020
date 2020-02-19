@@ -185,9 +185,10 @@ public class MainCompbot extends NarwhalRobot {
 
         lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
         lm.addButtonDownListener("AlignShoot", () -> {
-            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, topLimelight, driveCmdRunning,
-                    Constants.VisionConstants.TX_OFFSET, 5);
-            triggerCommand.start();
+            // triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro,
+            // topLimelight, driveCmdRunning,
+            // Constants.VisionConstants.TX_OFFSET, 5);
+            // triggerCommand.start();
             Log.info("MainCompbot.java", "[Vision Alignment] Started");
         });
         lm.addButtonUpListener("AlignShoot", () -> {
@@ -197,14 +198,14 @@ public class MainCompbot extends NarwhalRobot {
         });
 
         lm.addButtonDownListener("runArmFF", () -> {
-            Log.info("Button5", "pressed");
+            Log.info("Button6", "pressed");
             Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
-            armFFCommand = new CmdArmFF(arm);
-            armFFCommand.start();
+            // armFFCommand = new CmdArmFF(arm);
+            // armFFCommand.start();
         });
 
         lm.addButtonDownListener("runShooterFF", () -> {
-            Log.info("Button6", "pressed");
+            Log.info("Button5", "pressed");
             Log.info("Arm", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
             shooterFFCommand = new CmdShooterFF(shooter);
             shooterFFCommand.start();
@@ -276,6 +277,8 @@ public class MainCompbot extends NarwhalRobot {
     double currentArmPower;
     double currentBatteryVoltage;
     double currentArmCurrent;
+    double currentShooterSpeed;
+    double currentShooterPower;
 
     @Override
     protected void updateDashboard() {
@@ -300,6 +303,9 @@ public class MainCompbot extends NarwhalRobot {
         currentArmPower = arm.output;
         currentArmCurrent = arm.ARM_MOTOR_LEADER.getStatorCurrent();
 
+        currentShooterSpeed = shooter.getRPM();
+        currentShooterPower = shooter.output;
+
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
@@ -311,6 +317,9 @@ public class MainCompbot extends NarwhalRobot {
         SmartDashboard.putNumber("Arm Voltage", currentArmVoltage);
         SmartDashboard.putNumber("Arm Current", currentArmCurrent);
         SmartDashboard.putNumber("Arm Power", currentArmPower);
+
+        SmartDashboard.putNumber("Shooter Speed", currentShooterSpeed);
+        SmartDashboard.putNumber("Shooter Power", currentShooterPower);
 
         SmartDashboard.putNumber("Gyro Angle", drive.getAngle());
         SmartDashboard.putNumber("Left Distance", currentLeftDistance);
@@ -352,8 +361,14 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopInit() {
+        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
+        arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
+        Log.info("MainCompbot", "TeleopInit has started. Setting arm state to ArmState.STARTING");
         scheduler.resume();
+        hopper.setMotorPowers(-0.8, -0.5, -0.3);
         arm.setState(ArmState.STARTING);
+        hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+        shooter.setSetpoint(5300);
     }
 
     @Override
@@ -376,7 +391,12 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void disabledInit() {
-        arm.setState(ArmState.STARTING);
+        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
+        arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
+        shooter.setSetpoint(0);
+        hopper.INTAKE_MOTOR.set(0);
+        hopper.setMotorPowers(0, 0, 0);
+        arm.setState(ArmState.STOWED);
         scheduler.pause();
     }
 

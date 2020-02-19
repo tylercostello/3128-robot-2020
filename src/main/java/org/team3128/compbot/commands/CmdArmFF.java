@@ -37,12 +37,11 @@ public class CmdArmFF extends Command {
     double sumAngle;
 
     public static int setpoint = 0;
-    public static int increment = 5;    
+    public static int increment = 5;
     public static int counter = 0;
     public static double sumOutput, sumBatteryVoltage, sumRPM, sumBusVoltage, startVoltage, currentTime, pastTime;
 
     int plateauCount = 0;
-
 
     public CmdArmFF(Arm arm) {
         this.arm = arm;
@@ -66,7 +65,7 @@ public class CmdArmFF extends Command {
         } else if (accumulator < -Constants.ArmConstants.ARM_SATURATION_LIMIT) {
             accumulator = -Constants.ArmConstants.ARM_SATURATION_LIMIT;
         }
-        
+
         double kP_term = Constants.ArmConstants.ARM_PID.kP * error;
         double kI_term = Constants.ArmConstants.ARM_PID.kI * accumulator;
         double kD_term = Constants.ArmConstants.ARM_PID.kD * (error - prevError) / Constants.MechanismConstants.DT;
@@ -91,21 +90,23 @@ public class CmdArmFF extends Command {
         currentTime = Timer.getFPGATimestamp();
         currentAngle = arm.getAngle();
 
-        if (Math.abs((previousAngle - currentAngle) / (pastTime - currentTime)) <= 0.001){
+        if (Math.abs((previousAngle - currentAngle) / (pastTime - currentTime)) <= 0.001) {
             counter += 1;
 
             sumOutput += output;
-            sumBatteryVoltage += RobotController.getBatteryVoltage(); 
+            sumBatteryVoltage += RobotController.getBatteryVoltage();
             sumAngle += currentAngle;
-            sumBusVoltage += arm.ARM_MOTOR_LEADER.getBusVoltage();
+            sumBusVoltage += arm.ARM_MOTOR_LEADER.getMotorOutputVoltage();
 
             if (counter >= 10) {
-                Log.info("Shooter", "Current Setpoint: " + setpoint + " Average Angle: " + (sumAngle/counter) + " Average Voltage Battery: " + (sumBatteryVoltage/counter) + " Average Voltage Bus: " + (sumBusVoltage/counter) + " Average Percent Output: " + (sumOutput/counter)); 
+                Log.info("Shooter", "Current Setpoint: " + setpoint + " Average Angle: " + (sumAngle / counter)
+                        + " Average Voltage Battery: " + (sumBatteryVoltage / counter) + " Average Voltage Bus: "
+                        + (sumBusVoltage / counter) + " Average Percent Output: " + (sumOutput / counter));
                 setpoint += increment;
                 counter = 0;
                 sumOutput = 0;
-                sumBatteryVoltage = 0; 
-                sumAngle = 0; 
+                sumBatteryVoltage = 0;
+                sumAngle = 0;
                 sumBusVoltage = 0;
             }
         }
@@ -117,7 +118,7 @@ public class CmdArmFF extends Command {
 
     @Override
     protected boolean isFinished() {
-        if (setpoint >= 85){
+        if (setpoint >= 85) {
             Log.info("Shooter", "Finished with automated loop");
             setpoint = 0;
             increment = 0;
