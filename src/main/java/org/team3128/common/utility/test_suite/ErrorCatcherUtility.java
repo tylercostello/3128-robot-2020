@@ -36,7 +36,7 @@ import org.team3128.common.drive.Drive;
  * Utility used to catch breaks in the CAN chain
  * 
  * 
- * author Tyler Costello, Daniel Wang, Jude T. Lifset
+ * @author Tyler Costello, Daniel Wang, Jude T. Lifset
  * 
  */
 public class ErrorCatcherUtility {
@@ -318,6 +318,6 @@ public class ErrorCatcherUtility {
         ErrorCatcherCAN();
         ErrorCatcherCAN();
         limelightCheck();
-        velocityTester();
+        //velocityTester();
     }
 }

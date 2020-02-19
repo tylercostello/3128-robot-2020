@@ -67,10 +67,10 @@ public class MainCompbot extends NarwhalRobot {
     private DriveCommandRunning driveCmdRunning;
 
     static FalconDrive drive = FalconDrive.getInstance();
-    Hopper hopper = Hopper.getInstance();
-    Arm arm = Arm.getInstance();
-    Shooter shooter = Shooter.getInstance();
-    Intake intake = Intake.getInstance();
+    static Hopper hopper = Hopper.getInstance();
+    static Arm arm = Arm.getInstance();
+    static Shooter shooter = Shooter.getInstance();
+    static Intake intake = Intake.getInstance();
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -112,11 +112,34 @@ public class MainCompbot extends NarwhalRobot {
     public Command povCommand;
 
     public static void setCanChain() {  
-        CanChain[0] = Constants.TestSuiteConstants.rightDriveLeader;
-        CanChain[1] = Constants.TestSuiteConstants.rightDriveFollower;
-        CanChain[2] = Constants.TestSuiteConstants.leftDriveFollower;
-        CanChain[3] = Constants.TestSuiteConstants.leftDriveLeader;
+        Constants.TestSuiteConstants.intake = new CanDevices(CanDevices.DeviceType.SPARK, Constants.IntakeConstants.INTAKE_MOTOR_ID , "Intake", intake.INTAKE_MOTOR);
+        Constants.TestSuiteConstants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID, "Right Drive Leader", drive.rightTalon);
+        Constants.TestSuiteConstants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID, "Right Drive Follower", drive.rightTalonSlave);
+        Constants.TestSuiteConstants.feeder = new CanDevices(CanDevices.DeviceType.SPARK,Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID, "Feeder", hopper.HOPPER_FEEDER_MOTOR);
+        Constants.TestSuiteConstants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "PDP", pdp);
+        Constants.TestSuiteConstants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.LEFT_DRIVE_FRONT_ID, "Left Drive Leader", drive.leftTalon);
+        Constants.TestSuiteConstants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID, "Left Drive Follower", drive.leftTalonSlave);
+        Constants.TestSuiteConstants.armLeader = new CanDevices(CanDevices.DeviceType.FALCON, Constants.ArmConstants.ARM_MOTOR_LEADER_ID, "Arm Leader", arm.ARM_MOTOR_LEADER);
+        Constants.TestSuiteConstants.armFollower = new CanDevices(CanDevices.DeviceType.FALCON, Constants.ArmConstants.ARM_MOTOR_FOLLOWER_ID, "Arm Follower", arm.ARM_MOTOR_FOLLOWER);
+        Constants.TestSuiteConstants.shooterLeft = new CanDevices(CanDevices.DeviceType.SPARK, Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID, "Shooter Left", shooter.LEFT_SHOOTER);
+        Constants.TestSuiteConstants.gatekeeper = new CanDevices(CanDevices.DeviceType.SPARK, Constants.HopperConstants.GATEKEEPER_MOTOR_ID, "Gatekeeper", hopper.GATEKEEPER_MOTOR);
+        Constants.TestSuiteConstants.shooterRight = new CanDevices(CanDevices.DeviceType.SPARK, Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID, "Shooter Right", shooter.RIGHT_SHOOTER);
+        Constants.TestSuiteConstants.corner = new CanDevices(CanDevices.DeviceType.SPARK, Constants.HopperConstants.CORNER_MOTOR_ID, "Corner", hopper.CORNER_MOTOR);
+        
+
+        CanChain[0] = Constants.TestSuiteConstants.intake;
+        CanChain[1] = Constants.TestSuiteConstants.rightDriveLeader;
+        CanChain[2] = Constants.TestSuiteConstants.rightDriveFollower;
+        CanChain[3] = Constants.TestSuiteConstants.feeder;
         CanChain[4] = Constants.TestSuiteConstants.PDP;
+        CanChain[5] = Constants.TestSuiteConstants.leftDriveLeader;
+        CanChain[6] = Constants.TestSuiteConstants.leftDriveFollower;
+        CanChain[7] = Constants.TestSuiteConstants.armLeader;
+        CanChain[8] = Constants.TestSuiteConstants.armFollower;
+        CanChain[9] = Constants.TestSuiteConstants.shooterLeft;
+        CanChain[10] = Constants.TestSuiteConstants.gatekeeper;
+        CanChain[11] = Constants.TestSuiteConstants.shooterRight;
+        CanChain[12] = Constants.TestSuiteConstants.corner;
     }
 
     @Override

@@ -12,7 +12,7 @@ import org.team3128.common.hardware.motor.LazyCANSparkMax;
 public class Intake extends Threaded {
 
     public static final Intake instance = new Intake();
-    LazyCANSparkMax INTAKE_MOTOR;
+    public LazyCANSparkMax INTAKE_MOTOR;
 
     public static Intake getInstance() {
         return instance;
