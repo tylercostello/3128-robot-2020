@@ -19,13 +19,11 @@ import org.team3128.common.game_elements.Ball;
 public class Hopper extends Threaded {
 
     public enum HopperState {
-        POS_0(new boolean[] { false, false, false, false }),
-        POS_1(new boolean[] { false, false, false, true }),
-        POS_2(new boolean[] { false, false, true, true }),
-        POS_3(new boolean[] { false, true, true, true }),
+        POS_0(new boolean[] { false, false, false, false }), POS_1(new boolean[] { false, false, false, true }),
+        POS_2(new boolean[] { false, false, true, true }), POS_3(new boolean[] { false, true, true, true }),
         POS_4(new boolean[] { true, true, true, true });
-        //POS_5(new boolean[] { true, true, true, true }),
-        //POS_6(new boolean[] { false, true, true, true });
+        // POS_5(new boolean[] { true, true, true, true }),
+        // POS_6(new boolean[] { false, true, true, true });
 
         public boolean[] hopperState;
 
@@ -35,10 +33,7 @@ public class Hopper extends Threaded {
     }
 
     public enum ActionState {
-        STANDBY,
-        INTAKING,
-        SHOOTING,
-        ORGANIZING;
+        STANDBY, INTAKING, SHOOTING, ORGANIZING;
 
         private ActionState() {
 
@@ -52,13 +47,13 @@ public class Hopper extends Threaded {
     boolean[] ballArray = { false, false, false, false };
     private static final Hopper instance = new Hopper();
 
-    //private boolean isMoving;
+    // private boolean isMoving;
     private boolean isShooting, isIntaking;
     private boolean empty0 = true;
     private boolean empty1 = true;
     private boolean isFeeding = false;
     private boolean isLoading = false;
-    //private boolean isOrganizing = false;
+    // private boolean isOrganizing = false;
     private boolean openTheGates = false;
     private double startPos = 0;
     private int ballCount;
@@ -66,7 +61,7 @@ public class Hopper extends Threaded {
     public ActionState actionState;
 
     private DigitalInput[] sensorPositions = { SENSOR_0, SENSOR_1 }; // top to bottom //0 = 1.5, 1 = 3, 2 = 4
-                                                                               // mathhh
+                                                                     // mathhh
 
     public static Hopper getInstance() {
         return instance;
@@ -76,7 +71,7 @@ public class Hopper extends Threaded {
         configMotors();
         configEncoders();
         configSensors();
-        ballCount = 0; //TODO: initial ball count
+        ballCount = 0; // TODO: initial ball count
     }
 
     @Override
@@ -91,7 +86,7 @@ public class Hopper extends Threaded {
 
             case SHOOTING:
                 loadShoot();
-            
+
             case ORGANIZING:
                 organize();
         }
@@ -139,7 +134,8 @@ public class Hopper extends Threaded {
     }
 
     public boolean isEmpty() {
-        return (getNumBalls() == 0);
+        return false;
+        // return (getNumBalls() == 0);
     }
 
     public boolean isFull() {
@@ -179,7 +175,7 @@ public class Hopper extends Threaded {
     }
 
     // public void setIsMoving(boolean isMoving) {
-    //     this.isMoving = isMoving;
+    // this.isMoving = isMoving;
     // }
 
     public int getFirstAvailablePos() {
@@ -205,7 +201,7 @@ public class Hopper extends Threaded {
     }
 
     // public void setIsOrganizing(boolean value) {
-    //     isOrganizing = value;
+    // isOrganizing = value;
     // }
 
     public void shoot() {
@@ -268,7 +264,8 @@ public class Hopper extends Threaded {
             setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
             isLoading = true;
         } else if (openTheGates && !isLoading) {
-            setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+            setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                    Constants.HopperConstants.BASE_POWER);
         }
         if (isLoading) {
             setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);

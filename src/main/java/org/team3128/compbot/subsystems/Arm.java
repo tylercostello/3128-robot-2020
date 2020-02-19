@@ -17,7 +17,7 @@ public class Arm extends Threaded {
     public enum ArmState {
         STOWED(0), // arm is all the way down
         INTAKE(0), // intaking balls
-        STARTING(30), // within frame perimeter
+        STARTING(45), // within frame perimeter
         FAR_RANGE(60), // far range shooting
         SHORT_RANGE(20); // short range shooting
 

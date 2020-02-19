@@ -66,7 +66,7 @@ public class Shooter extends Threaded {
     @Override
     public void update() {
         current = getRPM();
-        Log.info("Shooter", "Shooter RPM is " + String.valueOf(current));
+        // Log.info("Shooter", "Shooter RPM is " + String.valueOf(current));
         error = setpoint - current;
         accumulator += error * Constants.MechanismConstants.DT;
         if (accumulator > Constants.ShooterConstants.SHOOTER_SATURATION_LIMIT) {
@@ -112,7 +112,7 @@ public class Shooter extends Threaded {
     }
 
     public double getRPMFromDistance(double distance) {
-        return 0;
+        return 5300;
         // TODO: relationship between RPM and distance
     }
 

@@ -129,12 +129,12 @@ public class Constants extends RobotConstants {
         public static class VisionConstants {
                 public static final double BOTTOM_LIMELIGHT_HEIGHT = 6.15 * Length.in;
                 public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
-                public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 0 * Length.in;
+                public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
                 public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be
                                                              // allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(057, 0.032, 0.0, 0.00003);
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.005, 0.0, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
