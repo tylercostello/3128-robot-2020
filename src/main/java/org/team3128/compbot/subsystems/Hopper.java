@@ -276,9 +276,19 @@ public class Hopper extends Threaded {
                 isLoading = false;
             }
         }
+        if (SENSOR_1.get()) {
+            empty1 = false;
+        } else if (!empty1) {
+            empty1 = true;
+            ballCount++;
+            updateBallArray(addBall(getBallArray()));
+        }
     }
 
     public void organize() {
+        if (isEmpty()) {
+            setAction(ActionState.STANDBY);
+        }
         if (!SENSOR_1.get()) {
             empty1 = true;
             setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
