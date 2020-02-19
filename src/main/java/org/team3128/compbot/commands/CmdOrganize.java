@@ -64,7 +64,8 @@ public class CmdOrganize extends Command {
 
     @Override
     protected boolean isFinished() {
-        return hopper.SENSOR_2.get();// && behindFeeder;
+        //return hopper.SENSOR_2.get();// && behindFeeder;
+        return true; //TODO: this is bs now lol
     }
 
     @Override
