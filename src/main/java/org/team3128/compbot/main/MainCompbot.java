@@ -310,6 +310,10 @@ public class MainCompbot extends NarwhalRobot {
         currentShooterSpeed = shooter.getRPM();
         currentShooterPower = shooter.output;
 
+        SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
+        SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
+        SmartDashboard.putNumber("Corner Encoder", hopper.CORNER_ENCODER.getPosition());
+
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
@@ -368,6 +372,7 @@ public class MainCompbot extends NarwhalRobot {
         shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
+        hopper.setAction(ActionState.STANDBY);
         Log.info("MainCompbot", "TeleopInit has started. Setting arm state to ArmState.STARTING");
         scheduler.resume();
     }
@@ -392,6 +397,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void disabledInit() {
+        shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
         scheduler.pause();

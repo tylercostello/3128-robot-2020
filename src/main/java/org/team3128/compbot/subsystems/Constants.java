@@ -169,18 +169,16 @@ public class Constants extends RobotConstants {
                 public static final int CORNER_MOTOR_ID = 2;
                 public static final int GATEKEEPER_MOTOR_ID = 9;
 
-                public static final int SENSOR_0_ID = 1;
-                public static final int SENSOR_1_ID = 2;
-                public static final int SENSOR_2_ID = 3;
-                public static final int SENSOR_3_ID = 4;
-                public static final int SENSOR_4_ID = 5;
+                public static final int SENSOR_0_ID = 8;
+                public static final int SENSOR_1_ID = 9;
+                public static final int SENSOR_2_ID = 999;
 
                 public static final double DEBUG_MOTOR_POWER = 0.5;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
                 public static final double BASE_POWER = -0.5;
                 public static final double GATEKEEPER_POWER = 0.5;
-                public static final double BALL_SPACING = 7;
-                public static final double SHOOTER_SPACING = 2;
+                public static final double BALL_SPACING = -12;
+                public static final double SHOOTER_SPACING = 0;
         }
 
         public static class IntakeConstants {
