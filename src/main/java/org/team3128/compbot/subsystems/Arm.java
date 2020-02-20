@@ -18,6 +18,7 @@ public class Arm extends Threaded {
         STOWED(0), // arm is all the way down
         INTAKE(0), // intaking balls
         STARTING(45), // within frame perimeter
+        STARTING_DOWN(30),
         FAR_RANGE(60), // far range shooting
         SHORT_RANGE(20); // short range shooting
 
@@ -39,6 +40,7 @@ public class Arm extends Threaded {
     double prevError = 0;
     public ArmState ARM_STATE;
     boolean isZeroing = false;
+    public int plateauCount = 0;
 
     public static Arm getInstance() {
         return instance;
@@ -146,9 +148,19 @@ public class Arm extends Threaded {
             output = -1;
         }
 
+        if (Math.abs(error) < Constants.ArmConstants.ANGLE_THRESHOLD) {
+            plateauCount++;
+        } else {
+            plateauCount = 0;
+        }
+
         ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
 
         prevError = error;
+    }
+
+    public boolean isReady() {
+        return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD);
     }
 
 }

@@ -194,6 +194,8 @@ public class Constants extends RobotConstants {
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
                 public static final NeutralMode ARM_NEUTRAL_MODE_DEBUG = NeutralMode.Coast;
                 public static final double MAX_ARM_ANGLE = 80;
+                public static final double ANGLE_THRESHOLD = 5;
+                public static final double PLATEAU_THRESHOLD = 100;
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)
                                                                                      // rotations of the
                 // motor, we get 1 rotation of the arm (ask
