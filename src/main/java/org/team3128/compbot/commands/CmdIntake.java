@@ -88,7 +88,7 @@ public class CmdIntake extends Command {
             hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
             isGoing = true;
         }
-        if (isGoing && hopper.CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING < startPos) {
+        if (isGoing && hopper.CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[hopper.getNumBalls() - 1] < startPos) {
             hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
             isGoing = false;
         }
@@ -136,7 +136,7 @@ public class CmdIntake extends Command {
                 hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
                 isGoing = true;
             }
-            if (isGoing && hopper.CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING < startPos) {
+            if (isGoing && hopper.CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[hopper.getNumBalls() - 1] < startPos) {
                 hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
             }
             currentTime = Timer.getFPGATimestamp();

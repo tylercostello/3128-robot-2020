@@ -16,6 +16,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import org.team3128.common.game_elements.Ball;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Hopper extends Threaded {
 
     public enum HopperState {
@@ -59,6 +61,8 @@ public class Hopper extends Threaded {
     private boolean openTheGates = false;
     private double startPos = 0;
     private int ballCount;
+    private String debugString = "lalala";
+    private String arrayString = "";
 
     public ActionState actionState;
 
@@ -81,14 +85,18 @@ public class Hopper extends Threaded {
 
         switch (actionState) {
             case STANDBY:
-                if (!isFull()) {
+                if (!isFull() && !detectsBall(SENSOR_0)) {
                     standbyIntake();
+                } else {
+                    setMotorPowers(0, 0, 0);
                 }
                 break;
 
             case INTAKING:
-                if (!isFull()) {
+                if (!isFull() && !detectsBall(SENSOR_0)) {
                     standbyIntake();
+                } else {
+                    setMotorPowers(0, 0, 0);
                 }
                 break;
 
@@ -99,7 +107,28 @@ public class Hopper extends Threaded {
             case ORGANIZING:
                 organize();
                 break;
-            }
+        }
+        SmartDashboard.putString("Hopper isFeeding", "" + isFeeding);
+        //Log.info("Hopper", "actionState is " + actionState);
+        //Log.info("Hopper", "fullness is " + isFull()); 
+        arrayString = "";
+        for (boolean ele : getBallArray()) {
+            arrayString += String.valueOf(ele);
+            arrayString += ", ";
+        }
+        SmartDashboard.putString("Hopper array", arrayString);
+        SmartDashboard.putNumber("Hopper callBount", ballCount);
+        //SmartDashboard.putString("Hopper feeder sensor function", "" + detectsBall(SENSOR_1));
+        if (detectsBall(SENSOR_1)) {
+            empty1 = false;
+        } else {
+            empty1 = true;
+        }
+        if (detectsBall(SENSOR_0)) {
+            empty0 = false;
+        } else {
+            empty0 = true;
+        }
         //Log.info("Hopper", String.valueOf(actionState));
         //Log.info("Hopper", String.valueOf(detectsBall(SENSOR_1)));
     }
@@ -165,8 +194,8 @@ public class Hopper extends Threaded {
     private boolean[] addBall(boolean[] in_array) {
         boolean[] out_array = new boolean[in_array.length];
         // for (int i = 0; i < in_array.length; i++) {
+        boolean added = false;
         for (int i = in_array.length - 1; i >= 0; i--) {
-            boolean added = false;
             if (in_array[i]) {
                 out_array[i] = in_array[i];
             } else if (!added) {
@@ -238,8 +267,10 @@ public class Hopper extends Threaded {
             empty1 = false; //tell code the position isn't empty
             if (!isFeeding) { //if we aren't trying to move the intaken ball into the lowest position
                 setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER); //just move all the motors
+                debugString = "line 256";
             } else {
-                setMotorPowers(0, Constants.HopperConstants.BALL_SPACING, 0); //otherwise, only move the corner motor move the intaken ball into the lowest position
+                setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0); //otherwise, only move the corner motor move the intaken ball into the lowest position
+                debugString = "line 259";
             }
             Log.info("Hopper", "detects ball");
         } else if (!empty1) { //if there isn't a ball in the first position, but there was one in the last iteration
@@ -251,15 +282,16 @@ public class Hopper extends Threaded {
             startPos = CORNER_ENCODER.getPosition(); //record the current corner motor encoder position
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0); //only move the corner motor to move the ball into the lowest position
             isFeeding = true; //tell the code we are trying move this ball into the lowest position
-            Log.info("Hopper", "empty is false");
-        } else {
+            Log.info("Hopper", "empty is true");
+        } else if (!isFeeding) {
             setMotorPowers(0, 0, 0);
             Log.info("Hopper", "setting motor powers to 0");
-        }
-        if (isFeeding) { //if we are trying to move the ball into the lowest position
+        } else { //if we are trying to move the ball into the lowest position
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0); //only move the corner motor
-            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING) >= Math.abs(startPos)) { //if the ball gets to the right position
+            Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
+            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { //if the ball gets to the right position
                 isFeeding = false; //we're done
+                Log.info("Hopper", "reached end of offset");
             }
             Log.info("Hopper", "is feeding");
         }
@@ -280,15 +312,14 @@ public class Hopper extends Threaded {
             startPos = CORNER_ENCODER.getPosition(); //record current motor encoder position
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER); //continue moving all the balls forward for the set offset distance
             isLoading = true; //tell the code we are moving the balls forward for the set offset distance
-        } else if (openTheGates && !isLoading) { //if there is a ball in sensor position 0 and we aren't trying to move that ball forward for the offset distance and we are shooting the ball
-            setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
-                    Constants.HopperConstants.BASE_POWER); //move everything
-        }
-        if (isLoading) { //if we are trying to move the ball forward an offset
+        } else if (isLoading) { //if we are trying to move the ball forward an offset
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER); //shift everything the offset
             if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.SHOOTER_SPACING) >= Math.abs(startPos)) { //if the offset has been reached
                 isLoading = false; //stop
             }
+        } else if (openTheGates) { //if there is a ball in sensor position 0 and we aren't trying to move that ball forward for the offset distance and we are shooting the ball
+            setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                    Constants.HopperConstants.BASE_POWER); //move everything
         }
         if (detectsBall(SENSOR_1)) { //if there is a ball in sensor 1
             empty1 = false; //tell the code
