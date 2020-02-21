@@ -85,7 +85,7 @@ public class Hopper extends Threaded {
 
         switch (actionState) {
             case STANDBY:
-                if (!isFull() && !detectsBall(SENSOR_0)) {
+                if (!isFull() && !(detectsBall(SENSOR_0) && (ballCount >= 3))) {
                     standbyIntake();
                 } else {
                     setMotorPowers(0, 0, 0);
@@ -93,7 +93,7 @@ public class Hopper extends Threaded {
                 break;
 
             case INTAKING:
-                if (!isFull() && !detectsBall(SENSOR_0)) {
+                if (!isFull() && !(detectsBall(SENSOR_0) && (ballCount >= 3))) {
                     standbyIntake();
                 } else {
                     setMotorPowers(0, 0, 0);
