@@ -233,7 +233,7 @@ public class CmdAlignShoot extends Command {
             // break;
         }
 
-        if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady() && hopper.isReady()) {
+        if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
             // hopperShoot = new CmdShoot(hopper);
             // hopperShoot.start();
             hopper.shoot();
