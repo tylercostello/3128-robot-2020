@@ -260,7 +260,7 @@ public class Hopper extends Threaded {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
         } else {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
-            }
+        }
     }
 
     public void standbyIntake() { //run if we aren't saturated with balls and we are in INTAKING or STANDBY states
