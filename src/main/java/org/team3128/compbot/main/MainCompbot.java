@@ -79,8 +79,8 @@ public class MainCompbot extends NarwhalRobot {
     ThreadScheduler scheduler = new ThreadScheduler();
     Thread auto;
 
-    public Joystick joystick;
-    public ListenerManager lm;
+    public Joystick joystickRight, joystickLeft;
+    public ListenerManager listenerLeft, listenerRight;
     public Gyro gyro;
     public PowerDistributionPanel pdp;
 
@@ -128,9 +128,13 @@ public class MainCompbot extends NarwhalRobot {
         // gyro = new AnalogDevicesGyro();
         // //gyro.recalibrate();
 
-        joystick = new Joystick(1);
-        lm = new ListenerManager(joystick);
-        addListenerManager(lm);
+        joystickRight = new Joystick(1);
+        listenerRight = new ListenerManager(joystickRight);
+        addListenerManager(listenerRight);
+
+        joystickLeft = new Joystick(1);
+        listenerLeft = new ListenerManager(joystickLeft);
+        addListenerManager(listenerLeft);
 
         // initialization of limelights
 
@@ -166,58 +170,65 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void setupListeners() {
-        lm.nameControl(ControllerExtreme3D.TWIST, "MoveTurn");
-        lm.nameControl(ControllerExtreme3D.JOYY, "MoveForwards");
-        lm.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
-        lm.nameControl(new Button(3), "ClearTracker");
-        lm.nameControl(new Button(5), "runShooterFF");
-        lm.nameControl(new Button(6), "runArmFF");
-        lm.nameControl(new Button(7), "endVoltage");
+        listenerRight.nameControl(ControllerExtreme3D.TWIST, "MoveTurn");
+        listenerRight.nameControl(ControllerExtreme3D.JOYY, "MoveForwards");
+        listenerRight.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
+        listenerRight.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
+        //listenerRight.nameControl(new Button(3), "ClearTracker");
+        listenerRight.nameControl(new Button(3), "RezeroArm");
+        listenerRight.nameControl(new Button(4), "RezeroArm");
+        listenerRight.nameControl(new Button(5), "runShooterFF");
+        listenerRight.nameControl(new Button(6), "runArmFF");
+        //listenerRight.nameControl(new Button(7), "endVoltage");
+        listenerRight.nameControl(new Button(7), "EjectBalls");
+        listenerRight.nameControl(new Button(9), "PullUp");
+        listenerRight.nameControl(new Button(11), "PullDown");
+        listenerRight.nameControl(new Button(12), "EjectClimber");
 
-        lm.addMultiListener(() -> {
+        listenerRight.nameControl(new POV(0), "IntakePOV");
+
+        listenerRight.addMultiListener(() -> {
             if (true) {
-                double horiz = -0.7 * lm.getAxis("MoveTurn");
-                double vert = -1.0 * lm.getAxis("MoveForwards");
-                double throttle = -1.0 * lm.getAxis("Throttle");
+                double horiz = -0.7 * listenerRight.getAxis("MoveTurn");
+                double vert = -1.0 * listenerRight.getAxis("MoveForwards");
+                double throttle = -1.0 * listenerRight.getAxis("Throttle");
 
                 drive.arcadeDrive(horiz, vert, throttle, true);
             }
         }, "MoveTurn", "MoveForwards", "Throttle");
 
-        lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
-        lm.addButtonDownListener("AlignShoot", () -> {
+        listenerRight.addButtonDownListener("AlignShoot", () -> {
             triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning,
                     Constants.VisionConstants.TX_OFFSET, 5);
             triggerCommand.start();
             Log.info("MainCompbot.java", "[Vision Alignment] Started");
         });
-        lm.addButtonUpListener("AlignShoot", () -> {
+        listenerRight.addButtonUpListener("AlignShoot", () -> {
             triggerCommand.cancel();
             triggerCommand = null;
             Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
 
-        lm.addButtonDownListener("runArmFF", () -> {
+        listenerRight.addButtonDownListener("runArmFF", () -> {
             Log.info("Button6", "pressed");
             Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
             // armFFCommand = new CmdArmFF(arm);
             // armFFCommand.start();
         });
 
-        lm.addButtonDownListener("runShooterFF", () -> {
+        listenerRight.addButtonDownListener("runShooterFF", () -> {
             Log.info("Button5", "pressed");
             Log.info("Arm", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
             // shooterFFCommand = new CmdShooterFF(shooter);
             // shooterFFCommand.start();
         });
 
-        lm.addButtonDownListener("endVoltage", () -> {
+        listenerRight.addButtonDownListener("endVoltage", () -> {
             Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage()));
 
         });
 
-        lm.nameControl(new POV(0), "IntakePOV");
-        lm.addListener("IntakePOV", (POVValue pov) -> {
+        listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
                 case 8:
                 case 1:
