@@ -8,6 +8,8 @@ import java.security.GuardedObject;
 import java.util.Arrays;
 
 import org.team3128.compbot.subsystems.Constants;
+import org.team3128.compbot.subsystems.Arm;
+import org.team3128.compbot.subsystems.Arm.ArmState;
 import org.team3128.compbot.subsystems.Hopper;
 import org.team3128.compbot.subsystems.Hopper.HopperState;
 
@@ -19,130 +21,76 @@ import org.team3128.common.utility.Log;
 
 public class CmdIntake extends Command {
     Hopper hopper;
-    int topCount;
-    int middleCount;
-    int totalCount;
-    boolean empty0 = false;
-    boolean empty1 = false;
-    boolean empty2 = false;
+    Arm arm;
+    int armCount;
+    boolean empty = true;
+    //boolean empty1 = true;
     boolean broken = false;
     double currentTime;
     double brokenTime;
+    double startPos;
     int position = 0;
+    boolean isGoing = false;
     boolean[] updatedArray = new boolean[Constants.HopperConstants.CAPACITY];
 
     boolean inFocus = false;
     int focusPos = 0;
 
-    public CmdIntake(Hopper hopper) {
+    public CmdIntake(Hopper hopper, Arm arm) {
         this.hopper = hopper;
+        this.arm = arm;
     }
 
     @Override
     protected void initialize() {
         // nothing here
-        switch(hopper.getNumBalls()) {
-            case 0:
-                topCount = 0;
-                middleCount = 0;
-                totalCount = 0;
-                break;
-            case 1:
-                topCount = 1;
-                middleCount = 0;
-                totalCount = 1;
-                break;
-            case 2:
-                topCount = 2;
-                middleCount = 0;
-                totalCount = 2;
-                break;
-            case 3:
-                totalCount = 3;
-                if (Arrays.equals(hopper.getBallArray(), Hopper.HopperState.POS_3.hopperState)) {
-                    topCount = 2;
-                    middleCount = 1;
-                } else if (Arrays.equals(hopper.getBallArray(), Hopper.HopperState.POS_6.hopperState)){
-                    topCount = 1;
-                    middleCount = 2;
-                } else {
-                    Log.info("CmdIntake", "there are 3 balls in the shooter in a weird configuration");
-                }
-                break;
-            case 4:
-                topCount = 2;
-                middleCount = 2;
-                totalCount = 4;
-                break;
-            case 5:
-                topCount = 2;
-                middleCount = 2;
-                totalCount = 5;
-                break;
+        arm.setState(ArmState.INTAKE);
+        if (hopper.getNumBalls() == Constants.HopperConstants.CAPACITY) {
+            armCount = Constants.HopperConstants.CAPACITY - 1;
+        } else {
+            armCount = hopper.getNumBalls();
         }
     }
 
     @Override
     protected void execute() {
-        updateCount();
+        //updateCount();
         updatedArray = hopper.getBallArray();
         if (!hopper.isFull()) {
             hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+            //hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
         } else {
             hopper.INTAKE_MOTOR.set(0);
+            //hopper.setMotorPowers(0, 0, 0);
         }
-        switch(middleCount + topCount) {
-            case 0:
-                updatedArray = new boolean[] {false, false, false, false, false};
-                if (totalCount > (middleCount + topCount)) {
-                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                } else {
-                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                }
-                break;
-            case 1:
-                updatedArray = new boolean[] {true, false, false, false, false};
-                if (totalCount > (middleCount + topCount)) {
-                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                    //boolean[] updatedArray = {true, false, false, false, true};
-                } else if (topCount < (topCount + middleCount)) {
-                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                    //boolean[] updatedArray = {true, false, false, false, false};
-                } else {
-                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                }
-                break;
-            case 2:
-                updatedArray = new boolean[] {true, true, false, false, false};
-                if (topCount < 2) {
-                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
-                } else if (totalCount > (middleCount + topCount)) {
-                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                } else {
-                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                }
-                break;
-            case 3:
-                updatedArray = new boolean[] {true, true, false, true, false};
-                if (topCount < 2) {
-                    //Log.info("CmdIntake", "something screwed up; topCount should be 2 but it isn't");
-                    Log.info("CmdIntake", "this had better have happened only because we just shot 2 balls and then reorganized");
-                }
-                if (totalCount > (middleCount + topCount)) {
-                    hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                } else {
-                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                }
-                break;
-            case 4:
-                if (totalCount > (middleCount + topCount)) {
-                    hopper.setMotorPowers(0, 0, 0);
-                    updatedArray = new boolean[] {true, true, true, true, true};
-                } else{
-                    hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+
+        if (hopper.SENSOR_1.get()) {
+            hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+            empty = false;
+        } else if(!empty) {
+            empty = true;
+            armCount++;
+            switch (armCount) {
+                case 1:
+                    updatedArray = new boolean[] {false, false, false, true, false};
+                    break;
+                case 2:
+                    updatedArray = new boolean[] {false, false, true, true, false};
+                    break;
+                case 3:
+                    updatedArray = new boolean[] {false, true, true, true, false};
+                    break;
+                case 4:
                     updatedArray = new boolean[] {true, true, true, true, false};
-                }
-                break;
+                    break;
+            }
+            startPos = hopper.CORNER_ENCODER.getPosition();
+            hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+            isGoing = true;
+        }
+        if (isGoing && hopper.CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[hopper.getNumBalls() - 1] < startPos) {
+            hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+            isGoing = false;
         }
 
         hopper.updateBallArray(updatedArray);
@@ -163,81 +111,35 @@ public class CmdIntake extends Command {
         brokenTime = Timer.getFPGATimestamp();
         currentTime = brokenTime;
         hopper.INTAKE_MOTOR.set(0);
-        if (hopper.getNumBalls() == 5) {
-            hopper.setMotorPowers(0, 0, 0);
-        } else {
-            hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-        }
-        while(!broken) {
-            currentTime = Timer.getFPGATimestamp();
-            updateCount();
-            switch(middleCount + topCount) {
-                case 0:
-                    updatedArray = new boolean[] {false, false, false, false, false};
-                    if (totalCount > (middleCount + topCount)) {
-                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                    } else {
-                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                        if(currentTime - 250 > brokenTime) {
-                            broken = true;
-                        }
-                    }
-                    break;
-                case 1:
-                    updatedArray = new boolean[] {true, false, false, false, false};
-                    if (totalCount > (middleCount + topCount)) {
-                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                        //boolean[] updatedArray = {true, false, false, false, true};
-                    } else if (topCount < (topCount + middleCount)) {
-                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                        //boolean[] updatedArray = {true, false, false, false, false};
-                    } else {
-                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                        if(currentTime - 250 > brokenTime) {
-                            broken = true;
-                        }
-                    }
-                    break;
-                case 2:
-                    updatedArray = new boolean[] {true, true, false, false, false};
-                    if (topCount < 2) {
-                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
-                    } else if (totalCount > (middleCount + topCount)) {
-                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                    } else {
-                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                        if(currentTime - 250 > brokenTime) {
-                            broken = true;
-                        }
-                    }
-                    break;
-                case 3:
-                    updatedArray = new boolean[] {true, true, false, true, false};
-                    if (topCount < 2) {
-                        Log.info("CmdIntake", "something screwed up; topCount should be 2 but it isn't");
-                    }
-                    if (totalCount > (middleCount + topCount)) {
-                        hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
-                    } else {
-                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
-                        if(currentTime - 250 > brokenTime) {
-                            broken = true;
-                        }
-                    }
-                    break;
-                case 4:
-                    if (totalCount > (middleCount + topCount)) {
-                        hopper.setMotorPowers(0, 0, 0);
-                        updatedArray = new boolean[] {true, true, true, true, true};
-                    } else{
-                        hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+        while(brokenTime - 250 < currentTime) {
+            if (hopper.SENSOR_1.get()) {
+                hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+                empty = false;
+            } else if(!empty) {
+                empty = true;
+                armCount++;
+                switch (armCount) {
+                    case 1:
+                        updatedArray = new boolean[] {false, false, false, true, false};
+                        break;
+                    case 2:
+                        updatedArray = new boolean[] {false, false, true, true, false};
+                        break;
+                    case 3:
+                        updatedArray = new boolean[] {false, true, true, true, false};
+                        break;
+                    case 4:
                         updatedArray = new boolean[] {true, true, true, true, false};
-                    }
-                    if(currentTime - 250 > brokenTime) {
-                        broken = true;
-                    }
-                    break;
+                        break;
+                }
+                startPos = hopper.CORNER_ENCODER.getPosition();
+                hopper.setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+                isGoing = true;
             }
+            if (isGoing && hopper.CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[hopper.getNumBalls() - 1] < startPos) {
+                hopper.setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+            }
+            currentTime = Timer.getFPGATimestamp();
         }
         hopper.setMotorPowers(0, 0, 0);
     }
@@ -248,27 +150,12 @@ public class CmdIntake extends Command {
                // to the right position
     }
 
-    private void updateCount() {
-        if (!hopper.SENSOR_0.get()) {
-            empty0 = true;
-        } else if (empty0) {
-            totalCount++;
-            empty0 = false;
-        }
-        if (!hopper.SENSOR_1.get()) {
-            empty1 = true;
-        } else if (empty1) {
-            middleCount++;
-            totalCount++;
-            empty1 = false;
-        }
-        if (!hopper.SENSOR_2.get()) {
-            empty2 = true;
-        } else if (empty2) {
-            middleCount--;
-            topCount++;
-            totalCount++;
-            empty2 = false;
-        }
-    }
+    // private void updateCount() {
+    //     if (hopper.SENSOR_1.get()) {
+    //         empty = false;
+    //     } else if (!empty) {
+    //         armCount++;
+    //         empty = true;
+    //     }
+    // }
 }

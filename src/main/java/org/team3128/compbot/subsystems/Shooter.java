@@ -23,7 +23,7 @@ public class Shooter extends Threaded {
     static double setpoint = 0; // rotations per minute
     double current = 0;
     double error = 0;
-    double output = 0;
+    public double output = 0;
     double accumulator = 0;
     double prevError = 0;
 
@@ -32,6 +32,7 @@ public class Shooter extends Threaded {
     private Shooter() {
         configMotors();
         configEncoders();
+        setSetpoint(0);
     }
 
     private void configMotors() {
@@ -54,16 +55,18 @@ public class Shooter extends Threaded {
     }
 
     public static double getRPM() {
-        return SHOOTER_ENCODER.getVelocity();
+        return Constants.ShooterConstants.SHOOTER_GEARING * SHOOTER_ENCODER.getVelocity();
     }
 
     public void setSetpoint(double passedSetpoint) {
         setpoint = passedSetpoint;
+        Log.info("Shooter", "Set setpoint to" + String.valueOf(setpoint));
     }
 
     @Override
     public void update() {
         current = getRPM();
+        // Log.info("Shooter", "Shooter RPM is " + String.valueOf(current));
         error = setpoint - current;
         accumulator += error * Constants.MechanismConstants.DT;
         if (accumulator > Constants.ShooterConstants.SHOOTER_SATURATION_LIMIT) {
@@ -103,12 +106,13 @@ public class Shooter extends Threaded {
         RIGHT_SHOOTER.set(-output);
     }
 
-    private double shooterFeedForward(double desiredSetpoint) {
-        return 0; // TODO: add feedforward implementation for arm control
+    public double shooterFeedForward(double desiredSetpoint) {
+        double ff = (0.00211 * desiredSetpoint) + 0.051; // 0.041
+        return ff;
     }
 
     public double getRPMFromDistance(double distance) {
-        return 0;
+        return 5300;
         // TODO: relationship between RPM and distance
     }
 
