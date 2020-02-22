@@ -284,7 +284,11 @@ public class Hopper extends Threaded {
             isFeeding = true; //tell the code we are trying move this ball into the lowest position
             Log.info("Hopper", "empty is true");
         } else if (!isFeeding) {
-            setMotorPowers(0, 0, 0);
+            if (actionState == ActionState.INTAKING) {
+                setMotorPowers(0, 0, Constants.HopperConstants.BASE_POWER);
+            } else {
+                setMotorPowers(0, 0, 0);
+            }
             //Log.info("Hopper", "setting motor powers to 0");
         } else { //if we are trying to move the ball into the lowest position
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0); //only move the corner motor
