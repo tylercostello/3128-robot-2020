@@ -184,6 +184,11 @@ public class MainCompbot extends NarwhalRobot {
                errorCatcher.testEverything();
             }
         });
+        NarwhalDashboard.addButton("VelocityTester", (boolean down) -> {
+            if (down) {               
+               errorCatcher.VelocityTester();
+            }
+        });
     }
 
     @Override
