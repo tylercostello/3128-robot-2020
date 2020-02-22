@@ -32,6 +32,7 @@ import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.compbot.commands.*;
+import org.team3128.compbot.calibration.*;
 import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
@@ -66,6 +67,7 @@ public class MainCompbot extends NarwhalRobot {
     public Command triggerCommand;
     public Command armFFCommand;
     public Command shooterFFCommand;
+    public Command ejectBallsCommand;
     private DriveCommandRunning driveCmdRunning;
 
     FalconDrive drive = FalconDrive.getInstance();
@@ -73,6 +75,7 @@ public class MainCompbot extends NarwhalRobot {
     Arm arm = Arm.getInstance();
     Shooter shooter = Shooter.getInstance();
     Intake intake = Intake.getInstance();
+    Climber climber = Climber.getInstance();
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -117,6 +120,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
         scheduler.schedule(intake, executor);
+        scheduler.schedule(climber, executor);        
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
@@ -132,7 +136,7 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight = new ListenerManager(joystickRight);
         addListenerManager(listenerRight);
 
-        joystickLeft = new Joystick(1);
+        joystickLeft = new Joystick(0);
         listenerLeft = new ListenerManager(joystickLeft);
         addListenerManager(listenerLeft);
 
@@ -155,10 +159,6 @@ public class MainCompbot extends NarwhalRobot {
 
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
             if (down) {
-                // Janky fix
-
-                errorCatcher.testEverything();
-
                 errorCatcher.testEverything();
             }
         });
@@ -175,14 +175,14 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
         listenerRight.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
         //listenerRight.nameControl(new Button(3), "ClearTracker");
-        listenerRight.nameControl(new Button(3), "RezeroArm");
-        listenerRight.nameControl(new Button(4), "RezeroArm");
-        listenerRight.nameControl(new Button(5), "runShooterFF");
-        listenerRight.nameControl(new Button(6), "runArmFF");
+        listenerRight.nameControl(new Button(3), "RezeroArm1");
+        listenerRight.nameControl(new Button(4), "RezeroArm2");
+        //listenerRight.nameControl(new Button(5), "runShooterFF");
+        //listenerRight.nameControl(new Button(6), "runArmFF");
         //listenerRight.nameControl(new Button(7), "endVoltage");
         listenerRight.nameControl(new Button(7), "EjectBalls");
-        listenerRight.nameControl(new Button(9), "PullUp");
-        listenerRight.nameControl(new Button(11), "PullDown");
+        listenerRight.nameControl(new Button(9), "EngageClimberServos");
+        listenerRight.nameControl(new Button(11), "DisEngageClimberServos");
         listenerRight.nameControl(new Button(12), "EjectClimber");
 
         listenerRight.nameControl(new POV(0), "IntakePOV");
@@ -208,8 +208,35 @@ public class MainCompbot extends NarwhalRobot {
             triggerCommand = null;
             Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
-
-        listenerRight.addButtonDownListener("runArmFF", () -> {
+        listenerRight.addButtonDownListener("RezeroArm1", () -> {
+            Log.info("Button3", "pressed");
+            arm.setState(ArmState.STOWED);
+            
+        });
+        listenerRight.addButtonDownListener("RezeroArm2", () -> {
+            Log.info("Button4", "pressed");
+            arm.setState(ArmState.STOWED);
+        });
+        listenerRight.addButtonDownListener("EjectBalls", () -> {
+            Log.info("Button7", "pressed");
+            ejectBallsCommand = new CmdArmFF(arm);
+            ejectBallsCommand.start();
+        });
+        listenerRight.addButtonDownListener("EngageClimberServos", () -> {
+            Log.info("Button9", "pressed");
+            climber.engageClimber();
+            
+        });
+        listenerRight.addButtonDownListener("DisengageClimberServos", () -> {
+            Log.info("Button11", "pressed");
+            climber.disengageClimber();
+            
+        });
+        listenerRight.addButtonDownListener("EjectClimber", () -> {
+            Log.info("Button12", "pressed");
+            arm.setState(ArmState.CLIMBING);
+        });
+        /*listenerRight.addButtonDownListener("runArmFF", () -> {
             Log.info("Button6", "pressed");
             Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
             // armFFCommand = new CmdArmFF(arm);
@@ -226,12 +253,16 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addButtonDownListener("endVoltage", () -> {
             Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage()));
 
-        });
+        });*/
 
         listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
                 case 8:
                 case 1:
+                //cancels intaking if pushed forward (on accident)
+                hopper.setAction(Hopper.ActionState.STANDBY);
+
+                    break;
                 case 7:
                     // push all balls backwards to clear hopper
 

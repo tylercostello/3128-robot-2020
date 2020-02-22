@@ -30,6 +30,10 @@ public class Intake extends Threaded {
         INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
     }
 
+    public void turnOnBackwards() {
+        INTAKE_MOTOR.set(-Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+    }
+
     public void turnOff() {
         INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
     }
