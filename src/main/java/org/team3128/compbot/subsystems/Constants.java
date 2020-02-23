@@ -134,7 +134,7 @@ public class Constants extends RobotConstants {
                 public static final double TX_THRESHOLD = 1; // the maximum error in tx where the shooter will be
                                                              // allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.005, 0.0, 0.00003);
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.016, 0.0, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
@@ -158,10 +158,11 @@ public class Constants extends RobotConstants {
                                                                          // this
                                                                          // case, 1
                                                                          // volt)
-                public static final double RPM_THRESHOLD = 50; // the maximum difference between an RPM and the setpoint
-                                                               // for a
-                                                               // data point to be considered as a plataeu
-                public static final int PLATEAU_COUNT = 100; // 50 * 0.005s = 0.25 seconds of plateau required
+                public static final double RPM_THRESHOLD = 120; // the maximum difference between an RPM and the
+                                                                // setpoint
+                                                                // for a
+                                                                // data point to be considered as a plataeu
+                public static final int PLATEAU_COUNT = 50; // 50 * 0.005s = 0.25 seconds of plateau required
         }
 
         public static class HopperConstants {
@@ -173,13 +174,14 @@ public class Constants extends RobotConstants {
                 public static final int SENSOR_1_ID = 9;
                 public static final int SENSOR_2_ID = 999;
 
-                public static final double DEBUG_MOTOR_POWER = 0.5;
+                public static final double DEBUG_MOTOR_POWER = 0.4;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
-                public static final double BASE_POWER = -0.5;
+                public static final double BASE_POWER = -0.4;
                 public static final double FEEDER_REVERSE = 0.25;
-                //public static final double FEEDER_POWER = 0.5;
+                // public static final double FEEDER_POWER = 0.5;
                 public static final double GATEKEEPER_POWER = -0.75;
-                public static final double[] BALL_SPACING = {-25, -23, -22, -19};
+                public static final double INDEXER_POWER = -0.55;
+                public static final double[] BALL_SPACING = { -25, -23, -22, -19 };
                 public static final double SHOOTER_SPACING = 0;
         }
 
@@ -187,6 +189,7 @@ public class Constants extends RobotConstants {
                 public static final int INTAKE_MOTOR_ID = 5;
                 public static final double INTAKE_MOTOR_ON_VALUE = 0.7;
                 public static final double INTAKE_MOTOR_OFF_VALUE = 0;
+                public static final double INTAKE_MOTOR_REVERSE_VALUE = -0.5;
         }
 
         public static class ClimberConstants {

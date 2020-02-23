@@ -239,12 +239,13 @@ public class CmdAlignShoot extends Command {
         }
 
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
-        //if (shooter.isReady()) {
+            Log.info("AAAAAAAAAA", "AAAAAAAAAAAAAAAAH");
+            // if (shooter.isReady()) {
             // hopperShoot = new CmdShoot(hopper);
             // hopperShoot.start();
             hopper.shoot();
             Log.info("Hopper", "to shoot");
-            //numBallsShot++;
+            // numBallsShot++;
         } else {
             hopper.unShoot();
         }
@@ -252,11 +253,11 @@ public class CmdAlignShoot extends Command {
 
     @Override
     protected boolean isFinished() {
-        //if (hopper.isEmpty() || numBallsShot >= numBallsToShoot) {
-        //    return true;
-        //} else {
-        //    return false;
-        //}
+        // if (hopper.isEmpty() || numBallsShot >= numBallsToShoot) {
+        // return true;
+        // } else {
+        // return false;
+        // }
         return false;
     }
 

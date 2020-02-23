@@ -11,6 +11,7 @@ import org.team3128.common.hardware.motor.LazyCANSparkMax;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends Threaded {
 
@@ -59,12 +60,14 @@ public class Shooter extends Threaded {
     }
 
     public void setSetpoint(double passedSetpoint) {
+        plateauCount = 0;
         setpoint = passedSetpoint;
         Log.info("Shooter", "Set setpoint to" + String.valueOf(setpoint));
     }
 
     @Override
     public void update() {
+        SmartDashboard.putNumber("plataue count", plateauCount);
         current = getRPM();
         // Log.info("Shooter", "Shooter RPM is " + String.valueOf(current));
         error = setpoint - current;
@@ -86,24 +89,26 @@ public class Shooter extends Threaded {
 
         prevError = error;
 
-        if (Math.abs(error) <= Constants.ShooterConstants.RPM_THRESHOLD) {
+        if ((Math.abs(error) <= Constants.ShooterConstants.RPM_THRESHOLD) && (setpoint != 0)) {
             plateauCount++;
         } else {
             plateauCount = 0;
         }
 
         if (output > 1) {
-            //Log.info("SHOOTER",
-            //        "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
+            // Log.info("SHOOTER",
+            // "WARNING: Tried to set power above available voltage! Saturation limit SHOULD
+            // take care of this ");
             output = 1;
         } else if (output < -1) {
-            //Log.info("SHOOTER",
-            //        "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
+            // Log.info("SHOOTER",
+            // "WARNING: Tried to set power above available voltage! Saturation limit SHOULD
+            // take care of this ");
             output = -1;
         }
 
         LEFT_SHOOTER.set(output);
-        //RIGHT_SHOOTER.set(-output);
+        // RIGHT_SHOOTER.set(-output);
     }
 
     public double shooterFeedForward(double desiredSetpoint) {
@@ -116,7 +121,7 @@ public class Shooter extends Threaded {
     }
 
     public double getRPMFromDistance(double distance) {
-        return 3500;
+        return 1000;
         // TODO: relationship between RPM and distance
     }
 
