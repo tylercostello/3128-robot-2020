@@ -34,7 +34,6 @@ import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.compbot.commands.*;
 import org.team3128.compbot.calibration.*;
 import org.team3128.compbot.subsystems.*;
-import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.RobotTracker;
 import org.team3128.compbot.subsystems.Arm.ArmState;
@@ -120,7 +119,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
         scheduler.schedule(intake, executor);
-        scheduler.schedule(climber, executor);        
+        //scheduler.schedule(climber, executor);        
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
@@ -175,6 +174,7 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
         listenerRight.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
         //listenerRight.nameControl(new Button(3), "ClearTracker");
+        listenerRight.nameControl(new Button(2), "zeroCallBount");
         listenerRight.nameControl(new Button(3), "RezeroArm1");
         listenerRight.nameControl(new Button(4), "RezeroArm2");
         //listenerRight.nameControl(new Button(5), "runShooterFF");
@@ -188,7 +188,7 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(new POV(0), "IntakePOV");
 
         listenerRight.addMultiListener(() -> {
-            if (true) {
+            if (driveCmdRunning.isRunning) {
                 double horiz = -0.7 * listenerRight.getAxis("MoveTurn");
                 double vert = -1.0 * listenerRight.getAxis("MoveForwards");
                 double throttle = -1.0 * listenerRight.getAxis("Throttle");
@@ -227,7 +227,7 @@ public class MainCompbot extends NarwhalRobot {
             climber.engageClimber();
             
         });
-        listenerRight.addButtonDownListener("DisengageClimberServos", () -> {
+        listenerRight.addButtonDownListener("DisEngageClimberServos", () -> {
             Log.info("Button11", "pressed");
             climber.disengageClimber();
             
@@ -235,6 +235,10 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addButtonDownListener("EjectClimber", () -> {
             Log.info("Button12", "pressed");
             arm.setState(ArmState.CLIMBING);
+        });
+        listenerRight.addButtonDownListener("zeroCallBount", () -> {
+            hopper.setBallCount(0);
+            hopper.updateBallArray( new boolean[] {false, false, false, false} );
         });
         /*listenerRight.addButtonDownListener("runArmFF", () -> {
             Log.info("Button6", "pressed");
@@ -327,6 +331,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
+
         if (!arm.getLimitStatus()) {
             arm.ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
             arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
@@ -350,6 +355,9 @@ public class MainCompbot extends NarwhalRobot {
 
         currentShooterSpeed = shooter.getRPM();
         currentShooterPower = shooter.output;
+
+        SmartDashboard.putString("DriveCmdRunning", "" + driveCmdRunning.isRunning);
+        SmartDashboard.putString("ActionState", "" + hopper.actionState);
 
         SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
         SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
@@ -416,6 +424,7 @@ public class MainCompbot extends NarwhalRobot {
         hopper.setAction(ActionState.STANDBY);
         Log.info("MainCompbot", "TeleopInit has started. Setting arm state to ArmState.STARTING");
         scheduler.resume();
+        driveCmdRunning.isRunning = true;
     }
 
     @Override

@@ -93,26 +93,30 @@ public class Shooter extends Threaded {
         }
 
         if (output > 1) {
-            Log.info("SHOOTER",
-                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
+            //Log.info("SHOOTER",
+            //        "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
             output = 1;
         } else if (output < -1) {
-            Log.info("SHOOTER",
-                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
+            //Log.info("SHOOTER",
+            //        "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
             output = -1;
         }
 
         LEFT_SHOOTER.set(output);
-        RIGHT_SHOOTER.set(-output);
+        //RIGHT_SHOOTER.set(-output);
     }
 
     public double shooterFeedForward(double desiredSetpoint) {
-        double ff = (0.00211 * desiredSetpoint) + 0.051; // 0.041
-        return ff;
+        double ff = (0.00211 * desiredSetpoint) - 1; // 0.051
+        if (setpoint != 0) {
+            return ff;
+        } else {
+            return 0;
+        }
     }
 
     public double getRPMFromDistance(double distance) {
-        return 5300;
+        return 3500;
         // TODO: relationship between RPM and distance
     }
 

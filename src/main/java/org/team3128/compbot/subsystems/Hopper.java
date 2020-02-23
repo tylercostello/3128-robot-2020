@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 import org.team3128.common.generics.Threaded;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
+import org.team3128.common.hardware.motor.LazyVictorSPX;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.LinkedList;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import org.team3128.common.game_elements.Ball;
 
@@ -44,7 +46,8 @@ public class Hopper extends Threaded {
         }
     }
 
-    public LazyCANSparkMax INTAKE_MOTOR, HOPPER_FEEDER_MOTOR, CORNER_MOTOR, GATEKEEPER_MOTOR;
+    public LazyCANSparkMax INTAKE_MOTOR, CORNER_MOTOR, GATEKEEPER_MOTOR;
+    public LazyVictorSPX HOPPER_FEEDER_MOTOR;
     public CANEncoder HOPPER_FEEDER_ENCODER, CORNER_ENCODER;
     public DigitalInput SENSOR_0, SENSOR_1;
 
@@ -57,6 +60,7 @@ public class Hopper extends Threaded {
     private boolean empty1 = true;
     private boolean isFeeding = false;
     private boolean isLoading = false;
+    private boolean isReversing = false;
     // private boolean isOrganizing = false;
     private boolean openTheGates = false;
     private double startPos = 0;
@@ -89,6 +93,7 @@ public class Hopper extends Threaded {
                     standbyIntake();
                 } else {
                     setMotorPowers(0, 0, 0);
+                    isFeeding = false;
                 }
                 break;
 
@@ -97,6 +102,7 @@ public class Hopper extends Threaded {
                     standbyIntake();
                 } else {
                     setMotorPowers(0, 0, 0);
+                    isFeeding = false;
                 }
                 break;
 
@@ -136,14 +142,13 @@ public class Hopper extends Threaded {
 
     private void configMotors() {
         INTAKE_MOTOR = new LazyCANSparkMax(Constants.IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless);
-        HOPPER_FEEDER_MOTOR = new LazyCANSparkMax(Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID,
-                MotorType.kBrushless);
+        HOPPER_FEEDER_MOTOR = new LazyVictorSPX(Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID);
         CORNER_MOTOR = new LazyCANSparkMax(Constants.HopperConstants.CORNER_MOTOR_ID, MotorType.kBrushless);
         GATEKEEPER_MOTOR = new LazyCANSparkMax(Constants.HopperConstants.GATEKEEPER_MOTOR_ID, MotorType.kBrushless);
     }
 
     private void configEncoders() {
-        HOPPER_FEEDER_ENCODER = HOPPER_FEEDER_MOTOR.getEncoder();
+        //HOPPER_FEEDER_ENCODER = HOPPER_FEEDER_MOTOR.getEncoder();
         CORNER_ENCODER = CORNER_MOTOR.getEncoder();
     }
 
@@ -176,7 +181,8 @@ public class Hopper extends Threaded {
     }
 
     public boolean isEmpty() {
-        return (getNumBalls() == 0);
+        //return (getNumBalls() == 0);
+        return ballCount == 0;
         //return false;
     }
 
@@ -235,7 +241,7 @@ public class Hopper extends Threaded {
     public void setMotorPowers(double p_Gatekeeer, double p_Corner, double p_HopperFeeder) {
         GATEKEEPER_MOTOR.set(p_Gatekeeer);
         CORNER_MOTOR.set(p_Corner);
-        HOPPER_FEEDER_MOTOR.set(p_HopperFeeder);
+        HOPPER_FEEDER_MOTOR.set(ControlMode.PercentOutput, p_HopperFeeder);
     }
 
     public void gateKeep(boolean value) {
@@ -266,7 +272,7 @@ public class Hopper extends Threaded {
     public void standbyIntake() { //run if we aren't saturated with balls and we are in INTAKING or STANDBY states
 
         if (detectsBall(SENSOR_1)) { //if there is a ball in the first sensor position
-            empty1 = false; //tell code the position isn't empty
+            //empty1 = false; //tell code the position isn't empty
             if (!isFeeding) { //if we aren't trying to move the intaken ball into the lowest position
                 setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER); //just move all the motors
             } else {
@@ -274,14 +280,20 @@ public class Hopper extends Threaded {
             }
             Log.info("Hopper", "detects ball");
         } else if (!empty1) { //if there isn't a ball in the first position, but there was one in the last iteration
-            empty1 = true; //tell the code the position is empty
-            ballCount++; //iterate ballCount once because a ball has passed through our sensors
+            //empty1 = true; //tell the code the position is empty
+            if (!isReversing) {
+                ballCount++; //iterate ballCount once because a ball has passed through our sensors
+            } else {
+                isReversing = false;
+            }
 
             updateBallArray(addBall(getBallArray())); //also fix the array
 
             startPos = CORNER_ENCODER.getPosition(); //record the current corner motor encoder position
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0); //only move the corner motor to move the ball into the lowest position
+            //if (!isFull) {
             isFeeding = true; //tell the code we are trying move this ball into the lowest position
+            //}
             Log.info("Hopper", "empty is true");
         } else if (!isFeeding) {
             if (actionState == ActionState.INTAKING) {
@@ -291,7 +303,7 @@ public class Hopper extends Threaded {
             }
             //Log.info("Hopper", "setting motor powers to 0");
         } else { //if we are trying to move the ball into the lowest position
-            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0); //only move the corner motor
+            setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.FEEDER_REVERSE); //only move the corner motor
             Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
             if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { //if the ball gets to the right position
                 isFeeding = false; //we're done
@@ -307,6 +319,7 @@ public class Hopper extends Threaded {
                 ballCount--; //decrease ballCount by 1
                 updateBallArray(shift(getBallArray())); //fix array
                 openTheGates = false; //gatekeeper off
+                Log.info("Hopper", "stopping gatekeeper");
             }
             empty0 = true; //set to empty
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER); //shift all of the balls forward until there is a ball in Sensor position 0
@@ -316,21 +329,30 @@ public class Hopper extends Threaded {
             startPos = CORNER_ENCODER.getPosition(); //record current motor encoder position
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER); //continue moving all the balls forward for the set offset distance
             isLoading = true; //tell the code we are moving the balls forward for the set offset distance
+            Log.info("Hopper", "starting shooter loading");
         } else if (isLoading) { //if we are trying to move the ball forward an offset
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER); //shift everything the offset
             if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.SHOOTER_SPACING) >= Math.abs(startPos)) { //if the offset has been reached
                 isLoading = false; //stop
+                Log.info("Hopper", "ending loading");
             }
         } else if (openTheGates) { //if there is a ball in sensor position 0 and we aren't trying to move that ball forward for the offset distance and we are shooting the ball
             setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
                     Constants.HopperConstants.BASE_POWER); //move everything
             Log.info("Hopper", "opening the gates");
+        } else {
+            setMotorPowers(0, 0, 0);
+            Log.info("Hopper", "waiting to be ready to shoot");
         }
         if (detectsBall(SENSOR_1)) { //if there is a ball in sensor 1
             empty1 = false; //tell the code
         } else if (!empty1) { //if there is no ball in sensor 1 but there was in the prior iteration
             empty1 = true; //tell the code
-            ballCount++; //iterate ball count (a ball has moved into the hopper)
+            if (!isReversing) {
+                ballCount++; //iterate ball count (a ball has moved into the hopper)
+            } else {
+                isReversing = false;
+            }
             updateBallArray(addBall(getBallArray())); //fix array
         }
     }
@@ -338,13 +360,21 @@ public class Hopper extends Threaded {
     public void organize() {
         if (isEmpty()) {
             setAction(ActionState.STANDBY);
-        }
-        if (!detectsBall(SENSOR_1)) {
+            setMotorPowers(0, 0, 0);
+            Log.info("Hopper", "ending organize");
+        } else if (!detectsBall(SENSOR_1)) {
             empty1 = true;
+            isReversing = true;
             setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.BASE_POWER);
+            Log.info("Hopper", "organizing");
         } else if (empty1) {
             empty1 = false;
             setAction(ActionState.STANDBY);
+            Log.info("Hopper", "ending organize");
         }
+    }
+
+    public void setBallCount(int count) {
+        this.ballCount = count;
     }
 }
