@@ -187,7 +187,7 @@ public class Hopper extends Threaded {
     }
 
     public boolean isFull() {
-        return (getNumBalls() == Constants.HopperConstants.CAPACITY - 1);
+        return (ballCount == Constants.HopperConstants.CAPACITY - 1);
     }
 
     public boolean[] shift(boolean[] in_array) {
@@ -256,12 +256,19 @@ public class Hopper extends Threaded {
         gateKeep(true);
     }
 
+    public void unShoot() {
+        gateKeep(false);
+    }
+
     public boolean detectsBall(DigitalInput sensor) {
         return !sensor.get();
     }
 
     public void setAction(ActionState state) {
         this.actionState = state;
+        openTheGates = false;
+        isLoading = false;
+        isFeeding = false;
         if (state == ActionState.INTAKING) {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
         } else {
