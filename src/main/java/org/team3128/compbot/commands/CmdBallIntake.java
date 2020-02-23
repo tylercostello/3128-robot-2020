@@ -38,7 +38,7 @@ public class CmdBallIntake extends CommandGroup {
         );
         */
 
-        addSequential(new CmdIntake(hopper, arm));
+        //addSequential(new CmdIntake(hopper, arm));
     }
 
 }

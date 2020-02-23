@@ -131,7 +131,7 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
-                public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be
+                public static final double TX_THRESHOLD = 1; // the maximum error in tx where the shooter will be
                                                              // allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
                 public static final PIDConstants VISION_PID = new PIDConstants(0, 0.005, 0.0, 0.00003);
@@ -152,7 +152,7 @@ public class Constants extends RobotConstants {
                 public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
                 public static final double SHOOTER_GEARING = 1.5; // for every 1 rotation of the motor, the shooter does
                                                                   // {SHOOTER_GEARING} rotations
-                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.002, 0.02, 0.00000051);
+                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.006, 0.02, 0.00000051);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in
                                                                          // this
@@ -161,11 +161,11 @@ public class Constants extends RobotConstants {
                 public static final double RPM_THRESHOLD = 50; // the maximum difference between an RPM and the setpoint
                                                                // for a
                                                                // data point to be considered as a plataeu
-                public static final int PLATEAU_COUNT = 50; // 50 * 0.005s = 0.25 seconds of plateau required
+                public static final int PLATEAU_COUNT = 100; // 50 * 0.005s = 0.25 seconds of plateau required
         }
 
         public static class HopperConstants {
-                public static final int HOPPER_FEEDER_MOTOR_ID = 10;
+                public static final int HOPPER_FEEDER_MOTOR_ID = 6;
                 public static final int CORNER_MOTOR_ID = 2;
                 public static final int GATEKEEPER_MOTOR_ID = 9;
 
@@ -176,8 +176,10 @@ public class Constants extends RobotConstants {
                 public static final double DEBUG_MOTOR_POWER = 0.5;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
                 public static final double BASE_POWER = -0.5;
-                public static final double GATEKEEPER_POWER = -0.5;
-                public static final double[] BALL_SPACING = {-25, -26, -26, -19};
+                public static final double FEEDER_REVERSE = 0.25;
+                //public static final double FEEDER_POWER = 0.5;
+                public static final double GATEKEEPER_POWER = -0.75;
+                public static final double[] BALL_SPACING = {-25, -23, -22, -19};
                 public static final double SHOOTER_SPACING = 0;
         }
 

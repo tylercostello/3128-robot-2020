@@ -17,8 +17,10 @@ import org.team3128.common.utility.units.Angle;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.team3128.compbot.subsystems.Constants;
+import org.team3128.compbot.subsystems.Arm.ArmState;
 import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.subsystems.Hopper.ActionState;
 import org.team3128.compbot.commands.*;
@@ -88,6 +90,7 @@ public class CmdAlignShoot extends Command {
     protected void initialize() {
         limelight.setLEDMode(LEDMode.ON);
         cmdRunning.isRunning = false;
+        arm.setState(ArmState.STARTING);
         hopper.setAction(Hopper.ActionState.SHOOTING);
         Log.info("CmdAlignShoot", "initialized limelight, aren't I cool!");
     }
@@ -141,13 +144,13 @@ public class CmdAlignShoot extends Command {
 
             case FEEDBACK:
                 NarwhalDashboard.put("align_status", "feedback");
+                cmdRunning.isRunning = false;
                 if (!limelight.hasValidTarget()) {
                     Log.info("CmdAlignShoot", "No valid target.");
                     Log.info("CmdAlignShoot", "Returning to SEARCHING...");
 
                     aimState = HorizontalOffsetFeedbackDriveState.SEARCHING;
 
-                    cmdRunning.isRunning = false;
                 } else {
 
                     if (!gotDistance) {
@@ -194,6 +197,8 @@ public class CmdAlignShoot extends Command {
                     leftPower = RobotMath.clamp(-feedbackPower, -1, 1);
                     rightPower = RobotMath.clamp(feedbackPower, -1, 1);
 
+                    SmartDashboard.putNumber("Shooter Power", leftPower);
+
                     drive.setWheelPower(new DriveSignal(leftPower, rightPower));
 
                     previousTime = currentTime;
@@ -234,20 +239,22 @@ public class CmdAlignShoot extends Command {
         }
 
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
+        //if (shooter.isReady()) {
             // hopperShoot = new CmdShoot(hopper);
             // hopperShoot.start();
             hopper.shoot();
-            numBallsShot++;
+            //numBallsShot++;
         }
     }
 
     @Override
     protected boolean isFinished() {
-        if (hopper.isEmpty() || numBallsShot >= numBallsToShoot) {
-            return true;
-        } else {
-            return false;
-        }
+        //if (hopper.isEmpty() || numBallsShot >= numBallsToShoot) {
+        //    return true;
+        //} else {
+        //    return false;
+        //}
+        return false;
     }
 
     @Override
@@ -255,6 +262,7 @@ public class CmdAlignShoot extends Command {
         limelight.setLEDMode(LEDMode.OFF);
         drive.stopMovement();
         shooter.setSetpoint(0);
+        cmdRunning.isRunning = true;
 
         // NarwhalDashboard.put("align_status", "blind");
 
