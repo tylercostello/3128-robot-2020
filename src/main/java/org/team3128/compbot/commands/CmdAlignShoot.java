@@ -243,6 +243,7 @@ public class CmdAlignShoot extends Command {
             // hopperShoot = new CmdShoot(hopper);
             // hopperShoot.start();
             hopper.shoot();
+            Log.info("Hopper", "to shoot");
             //numBallsShot++;
         } else {
             hopper.unShoot();
