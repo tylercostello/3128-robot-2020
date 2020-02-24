@@ -238,7 +238,6 @@ public class MainCompbot extends NarwhalRobot {
         });
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
-            hopper.updateBallArray(new boolean[] { false, false, false, false });
         });
         /*
          * listenerRight.addButtonDownListener("runArmFF", () -> { Log.info("Button6",
@@ -261,18 +260,7 @@ public class MainCompbot extends NarwhalRobot {
             switch (pov.getDirectionValue()) {
                 case 8:
                 case 1:
-                    // cancels intaking if pushed forward (on accident)
-                    hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_REVERSE_VALUE);
-
-                    break;
-                case 7:
-                    // push all balls backwards to clear hopper
-
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    // start intake command
+                // start intake command
                     // povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, arm,
                     // driveCmdRunning,
                     // Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID,
@@ -286,6 +274,19 @@ public class MainCompbot extends NarwhalRobot {
                     }
 
                     break;
+                    
+                case 7:
+                    // push all balls backwards to clear hopper
+
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    // cancels intaking if pushed forward (on accident)
+                    hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_REVERSE_VALUE);
+
+                    break;
+                    
                 case 0:
                     // povCommand.cancel();
                     // povCommand = null;
@@ -326,6 +327,7 @@ public class MainCompbot extends NarwhalRobot {
     double currentArmCurrent;
     double currentShooterSpeed;
     double currentShooterPower;
+    double currentShooterSetpoint;
 
     @Override
     protected void updateDashboard() {
@@ -352,6 +354,7 @@ public class MainCompbot extends NarwhalRobot {
 
         currentShooterSpeed = shooter.getRPM();
         currentShooterPower = shooter.output;
+        currentShooterSetpoint = shooter.setpoint;
 
         SmartDashboard.putString("DriveCmdRunning", "" + driveCmdRunning.isRunning);
         SmartDashboard.putString("ActionState", "" + hopper.actionState);
@@ -404,6 +407,9 @@ public class MainCompbot extends NarwhalRobot {
 
         SmartDashboard.putNumber("Max Speed", maxSpeed);
         SmartDashboard.putNumber("Min Speed", minSpeed);
+        
+        SmartDashboard.putNumber("Shooter Setpoint", currentShooterSetpoint);
+        SmartDashboard.putNumber("BALL COUNT", hopper.ballCount);
 
         trackerCSV += "\n" + String.valueOf(Timer.getFPGATimestamp() - startTime) + ","
                 + String.valueOf(robotTracker.getOdometry().translationMat.getX()) + ","

@@ -55,7 +55,6 @@ public class Hopper extends Threaded {
 
     public static Arm arm = Arm.getInstance();
 
-    boolean[] ballArray = { false, false, false, false };
     private static final Hopper instance = new Hopper();
 
     // private boolean isMoving;
@@ -69,9 +68,8 @@ public class Hopper extends Threaded {
     // private boolean isOrganizing = false;
     private boolean openTheGates = false;
     private double startPos = 0;
-    private int ballCount;
-    private String debugString = "lalala";
-    private String arrayString = "";
+    public int ballCount;
+
 
     public int openTheGatesCounter = 0;
 
@@ -128,17 +126,6 @@ public class Hopper extends Threaded {
         }
 
         SmartDashboard.putString("Hopper isFeeding", "" + isFeeding);
-        // Log.info("Hopper", "actionState is " + actionState);
-        // Log.info("Hopper", "fullness is " + isFull());
-        arrayString = "";
-        for (boolean ele : getBallArray()) {
-            arrayString += String.valueOf(ele);
-            arrayString += ", ";
-        }
-        SmartDashboard.putString("Hopper array", arrayString);
-        SmartDashboard.putNumber("Hopper callBount", ballCount);
-        // SmartDashboard.putString("Hopper feeder sensor function", "" +
-        // detectsBall(SENSOR_1));
         if (detectsBall(SENSOR_1)) {
             empty1 = false;
         } else {
@@ -170,27 +157,9 @@ public class Hopper extends Threaded {
         SENSOR_1 = new DigitalInput(Constants.HopperConstants.SENSOR_1_ID);
     }
 
-    public void setBallOrder(boolean[] CurrBallArray) {
-        if (CurrBallArray.length == ballArray.length) {
-            for (int i = 0; i < ballArray.length; i++) {
-                ballArray[i] = CurrBallArray[i];
-            }
-        }
-    }
-
     public boolean isReady() {
         return true; // TODO: only return true if there is a ball ready to be shot AND the shoot
                      // method isn't currently in use.
-    }
-
-    public int getNumBalls() {
-        int ball_count = 0;
-        for (boolean ball : ballArray) {
-            if (ball) {
-                ball_count++;
-            }
-        }
-        return ball_count;
     }
 
     public boolean isEmpty() {
@@ -225,30 +194,6 @@ public class Hopper extends Threaded {
             }
         }
         return out_array;
-    }
-
-    public boolean[] getBallArray() {
-        return ballArray;
-    }
-
-    public void updateBallArray(boolean[] in_array) {
-        this.ballArray = in_array;
-    }
-
-    // public void setIsMoving(boolean isMoving) {
-    // this.isMoving = isMoving;
-    // }
-
-    public int getFirstAvailablePos() {
-        int tempCount = 0;
-        int record_holder_index = 0;
-        for (boolean ball : ballArray) {
-            if (ball) {
-                record_holder_index = tempCount;
-            }
-            tempCount++;
-        }
-        return record_holder_index + 1;
     }
 
     public void setMotorPowers(double p_Gatekeeer, double p_Corner, double p_HopperFeeder) {
@@ -323,8 +268,6 @@ public class Hopper extends Threaded {
                 Log.info("Hopper", "was reversing");
                 isReversing = false;
             }
-
-            updateBallArray(addBall(getBallArray())); // also fix the array
 
             startPos = CORNER_ENCODER.getPosition(); // record the current corner motor encoder position
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER); // only move the corner motor to move the ball
@@ -471,7 +414,7 @@ public class Hopper extends Threaded {
         } 
         if (ballCount > 0) {
             startTime = RobotController.getFPGATime();
-            while(!detectsBall(SENSOR_1) && (RobotController.getFPGATime() - 1500 <= startTime)) {
+            while(!detectsBall(SENSOR_1) && (RobotController.getFPGATime() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
                 isReversing = true;
                 setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, 0);
                 Log.info("Hopper", "Reversing balls");

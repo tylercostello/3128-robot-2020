@@ -36,7 +36,6 @@ public class CmdEjectBalls extends Command {
     @Override
     protected void initialize() {
         //nothing here
-        adjustBallCount = hopper.getNumBalls();
         startTime = Timer.getFPGATimestamp();
         hopper.setMotorPowers(-Constants.HopperConstants.GATEKEEPER_POWER, -Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.BASE_POWER);
         intake.turnOnBackwards();
@@ -61,7 +60,6 @@ public class CmdEjectBalls extends Command {
 
     @Override
     protected void end() {
-        hopper.setBallOrder(updatedArray);
     }
 
     @Override

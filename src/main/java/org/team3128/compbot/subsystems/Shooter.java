@@ -21,7 +21,7 @@ public class Shooter extends Threaded {
     public static CANEncoder SHOOTER_ENCODER;
 
     public static boolean DEBUG = true;
-    static double setpoint = 0; // rotations per minute
+    public static double setpoint = 0; // rotations per minute
     double current = 0;
     double error = 0;
     public double output = 0;
@@ -45,7 +45,7 @@ public class Shooter extends Threaded {
     }
 
     private void configEncoders() {
-        SHOOTER_ENCODER = LEFT_SHOOTER.getEncoder();
+        SHOOTER_ENCODER = RIGHT_SHOOTER.getEncoder();
         if (DEBUG) {
             Log.info("Shooter", "Config encoders");
         }
@@ -107,8 +107,8 @@ public class Shooter extends Threaded {
             output = -1;
         }
 
-        LEFT_SHOOTER.set(output);
-        // RIGHT_SHOOTER.set(-output);
+        //LEFT_SHOOTER.set(output);
+        RIGHT_SHOOTER.set(-output);
     }
 
     public double shooterFeedForward(double desiredSetpoint) {

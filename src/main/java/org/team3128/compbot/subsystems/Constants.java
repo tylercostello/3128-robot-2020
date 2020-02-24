@@ -176,13 +176,14 @@ public class Constants extends RobotConstants {
 
                 public static final double DEBUG_MOTOR_POWER = 0.4;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
-                public static final double BASE_POWER = -0.4;
+                public static final double BASE_POWER = -0.3;
                 public static final double FEEDER_REVERSE = 0.25;
                 // public static final double FEEDER_POWER = 0.5;
                 public static final double GATEKEEPER_POWER = -0.75;
-                public static final double INDEXER_POWER = -0.55;
-                public static final double[] BALL_SPACING = { -25, -23, -25, -50 };
+                public static final double INDEXER_POWER = -0.4;
+                public static final double[] BALL_SPACING = { -25, -20, -15, -26 };
                 public static final double SHOOTER_SPACING = 0;
+                public static final double REVERSE_TIMEOUT = 1500;
         }
 
         public static class IntakeConstants {
