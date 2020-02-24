@@ -1,4 +1,4 @@
-package org.team3128.compbot.commands;
+package org.team3128.compbot.calibration;
 
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.Shooter;

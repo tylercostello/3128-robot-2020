@@ -131,10 +131,10 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
-                public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be
+                public static final double TX_THRESHOLD = 1; // the maximum error in tx where the shooter will be
                                                              // allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.005, 0.0, 0.00003);
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.016, 0.0, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
@@ -152,41 +152,55 @@ public class Constants extends RobotConstants {
                 public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
                 public static final double SHOOTER_GEARING = 1.5; // for every 1 rotation of the motor, the shooter does
                                                                   // {SHOOTER_GEARING} rotations
-                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.002, 0.02, 0.00000051);
+                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.006, 0.02, 0.00000051);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in
                                                                          // this
                                                                          // case, 1
                                                                          // volt)
-                public static final double RPM_THRESHOLD = 50; // the maximum difference between an RPM and the setpoint
-                                                               // for a
-                                                               // data point to be considered as a plataeu
-                public static final int PLATEAU_COUNT = 50; // 50 * 0.005s = 0.25 seconds of plateau required
+                public static final double RPM_THRESHOLD = 120; // the maximum difference between an RPM and the
+                                                                // setpoint
+                                                                // for a
+                                                                // data point to be considered as a plataeu
+                public static final int PLATEAU_COUNT = 25; // 50 * 0.005s = 0.25 seconds of plateau required
         }
 
         public static class HopperConstants {
-                public static final int HOPPER_FEEDER_MOTOR_ID = 10;
+                public static final int HOPPER_FEEDER_MOTOR_ID = 6;
                 public static final int CORNER_MOTOR_ID = 2;
                 public static final int GATEKEEPER_MOTOR_ID = 9;
 
-                public static final int SENSOR_0_ID = 1;
-                public static final int SENSOR_1_ID = 2;
-                public static final int SENSOR_2_ID = 3;
-                public static final int SENSOR_3_ID = 4;
-                public static final int SENSOR_4_ID = 5;
+                public static final int SENSOR_0_ID = 8;
+                public static final int SENSOR_1_ID = 9;
+                public static final int SENSOR_2_ID = 999;
 
-                public static final double DEBUG_MOTOR_POWER = 0.5;
+                public static final double DEBUG_MOTOR_POWER = 0.4;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
-                public static final double BASE_POWER = -0.5;
-                public static final double GATEKEEPER_POWER = 0.5;
-                public static final double BALL_SPACING = 7;
-                public static final double SHOOTER_SPACING = 2;
+                public static final double BASE_POWER = -0.3;
+                public static final double FEEDER_REVERSE = 0.25;
+                // public static final double FEEDER_POWER = 0.5;
+                public static final double GATEKEEPER_POWER = -0.75;
+                public static final double INDEXER_POWER = -0.4;
+                public static final double[] BALL_SPACING = { -25, -20, -15, -26 };
+                public static final double SHOOTER_SPACING = 0;
+                public static final double REVERSE_TIMEOUT = 1500;
         }
 
         public static class IntakeConstants {
                 public static final int INTAKE_MOTOR_ID = 5;
                 public static final double INTAKE_MOTOR_ON_VALUE = 0.7;
                 public static final double INTAKE_MOTOR_OFF_VALUE = 0;
+                public static final double INTAKE_MOTOR_REVERSE_VALUE = -0.5;
+        }
+
+        public static class ClimberConstants {
+                public static final int LEFT_SERVO_ID = 0;
+                public static final int RIGHT_SERVO_ID = 1;
+                public static final double LEFT_DISENGAGE_ANGLE = 0;
+                public static final double RIGHT_DISENGAGE_ANGLE = 0;
+                public static final double LEFT_ENGAGE_ANGLE = 10;
+                public static final double RIGHT_ENGAGE_ANGLE = 10;
+
         }
 
         public static class ArmConstants {
@@ -196,6 +210,8 @@ public class Constants extends RobotConstants {
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
                 public static final NeutralMode ARM_NEUTRAL_MODE_DEBUG = NeutralMode.Coast;
                 public static final double MAX_ARM_ANGLE = 80;
+                public static final double ANGLE_THRESHOLD = 5;
+                public static final double PLATEAU_THRESHOLD = 100;
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)
                                                                                      // rotations of the
                 // motor, we get 1 rotation of the arm (ask

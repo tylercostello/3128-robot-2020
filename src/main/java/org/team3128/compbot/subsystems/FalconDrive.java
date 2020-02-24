@@ -68,12 +68,12 @@ public class FalconDrive extends Drive {
 
 		gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 
-		leftTalon = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID);
-		leftTalonSlave = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID);
+		rightTalon = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID);
+		rightTalonSlave = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID);
 		// leftTalonSlave2 = new LazyTalonFX(Constants.LEFT_DRIVE_BACK_ID);
 
-		rightTalon = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID);
-		rightTalonSlave = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID);
+		leftTalon = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID);
+		leftTalonSlave = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID);
 		// rightTalonSlave2 = new LazyTalonFX(Constants.RIGHT_DRIVE_BACK_ID);
 
 		leftTalon.setInverted(true);

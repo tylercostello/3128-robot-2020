@@ -14,13 +14,15 @@ import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.hardware.motor.LazyTalonFX;
 
 public class Arm extends Threaded {
-    public enum ArmState {
+    public static enum ArmState {
         STOWED(0), // arm is all the way down
         INTAKE(0), // intaking balls
-        STARTING_LOW(30), // for the first starting value
-        STARTING(45), // within frame perimeter
+        STARTING(50), // within frame perimeter
+        STARTING_DOWN(30), // arm is pushed to release the intake
         FAR_RANGE(60), // far range shooting
-        SHORT_RANGE(20); // short range shooting
+        SHORT_RANGE(20), // short range shooting
+        CLIMBING(90), // climbing
+        DEBUG(5);
 
         public double armAngle;
 
@@ -40,7 +42,7 @@ public class Arm extends Threaded {
     double prevError = 0;
     public ArmState ARM_STATE;
     boolean isZeroing = false;
-    int plateauCount = 0;
+    public int plateauCount = 0;
 
     public static Arm getInstance() {
         return instance;
@@ -153,15 +155,19 @@ public class Arm extends Threaded {
         }
 
         if (Math.abs(error) < Constants.ArmConstants.ANGLE_THRESHOLD) {
-            plateauCount ++;
+            plateauCount++;
         } else {
             plateauCount = 0;
         }
 
-        ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
+        // ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
 
         prevError = error;
 
+    }
+
+    public boolean isReady() {
+        return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD);
     }
 
 }

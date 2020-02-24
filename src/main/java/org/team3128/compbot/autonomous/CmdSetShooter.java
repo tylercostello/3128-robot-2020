@@ -2,36 +2,34 @@ package org.team3128.compbot.autonomous;
 
 import org.team3128.compbot.subsystems.Constants;
 import edu.wpi.first.wpilibj.command.Command;
-import org.team3128.compbot.subsystems.Arm.ArmState;
-import org.team3128.compbot.subsystems.Arm;
+import org.team3128.compbot.subsystems.Shooter;
 
-public class CmdSetArm extends Command {
+public class CmdSetShooter extends Command {
     
-    Arm arm;
-    ArmState armState;
+    Shooter shooter;
+    int setpoint;
     
-    public CmdSetArm(Arm arm, ArmState armState) {
-        this.arm = arm;
-        this.armState = armState;
+    public CmdSetShooter(Shooter shooter, int setpoint) {
+        this.shooter = shooter;
+        this.setpoint = setpoint;
     }
     
     @Override
     protected void initialize() {
-        arm.setState(armState);
+        shooter.setSetpoint(setpoint);
     }
     
     @Override
     protected void execute() {
-        
+
     }
     
     @Override
     protected boolean isFinished() {
-        if (arm.isReady()){
+        if (shooter.isReady()){
             return true;
         } else {
             return false;
         }
     }
-
 }

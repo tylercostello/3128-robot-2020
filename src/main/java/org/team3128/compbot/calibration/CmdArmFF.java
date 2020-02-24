@@ -1,4 +1,4 @@
-package org.team3128.compbot.commands;
+package org.team3128.compbot.calibration;
 
 import java.lang.invoke.WrongMethodTypeException;
 import java.security.GuardedObject;
