@@ -87,7 +87,7 @@ public class MainAthos extends NarwhalRobot {
     public double kF = Constants.K_AUTO_LEFT_F;
 
     public double startTime = 0;
-    public PowerDistributionPanel pdp;
+    public static PowerDistributionPanel pdp;
     public String trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
 
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
@@ -101,13 +101,21 @@ public class MainAthos extends NarwhalRobot {
     public static DigitalInput limitSwitch;
 
     public ErrorCatcherUtility errorCatcher;
+    public static CanDevices leftDriveLeader, rightDriveLeader, leftDriveFollower, rightDriveFollower, PDP;
     public static CanDevices[] CanChain = new CanDevices[42];
+    
     public static void setCanChain(){
-        CanChain[0] = Constants.rightDriveLeader;
-        CanChain[1] = Constants.rightDriveFollower;
-        CanChain[2] = Constants.leftDriveFollower;
-        CanChain[3] = Constants.leftDriveLeader;
-        CanChain[4] = Constants.PDP;
+        rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", NEODrive.rightSpark);
+        rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", NEODrive.rightSparkSlave);
+        leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", NEODrive.leftSpark);
+        leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", NEODrive.leftSparkSlave);
+        PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", pdp);
+
+        CanChain[0] = rightDriveLeader;
+        CanChain[1] = rightDriveFollower;
+        CanChain[2] = leftDriveFollower;
+        CanChain[3] = leftDriveLeader;
+        CanChain[4] = PDP;
     }
 
     @Override
@@ -173,11 +181,12 @@ public class MainAthos extends NarwhalRobot {
                 120 * Constants.inchesToMeters, 0.5, false);
          //Error Catcher (Auto Test Suite)
          pdp = new PowerDistributionPanel(0);
-         Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", null , null, NEODrive.rightSpark, null, null);
+        /* Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", null , null, NEODrive.rightSpark, null, null);
          Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", null, null , NEODrive.rightSparkSlave, null, null);
          Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", null , null, NEODrive.leftSpark, null, null);
          Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", null, null , NEODrive.leftSparkSlave, null, null);
-         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);
+         Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", null, null, null, null, pdp);*/
+
          setCanChain();
          errorCatcher = new ErrorCatcherUtility(CanChain,limelights,drive);
          

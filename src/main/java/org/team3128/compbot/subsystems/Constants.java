@@ -140,22 +140,34 @@ public class Constants extends RobotConstants {
         }
 
         public static class TestSuiteConstants {
-                public static CanDevices leftDriveLeader;
-                public static CanDevices leftDriveFollower;
+
+                public static CanDevices intake;
                 public static CanDevices rightDriveLeader;
                 public static CanDevices rightDriveFollower;
+                public static CanDevices feeder;
                 public static CanDevices PDP;
+                public static CanDevices leftDriveLeader;
+                public static CanDevices leftDriveFollower;
+                public static CanDevices armLeader;
+                public static CanDevices armFollower;
+                public static CanDevices shooterLeft;
+                public static CanDevices gatekeeper;
+                public static CanDevices shooterRight;
+                public static CanDevices corner;
+                
         }
 
         public static class ShooterConstants {
                 public static final int SHOOTER_MOTOR_LEFT_ID = 8;
                 public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
+
                 public static final double SHOOTER_GEARING = 1.5; // for every 1 rotation of the motor, the shooter does
                                                                   // {SHOOTER_GEARING} rotations
                 public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.006, 0.02, 0.00000051);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in
                                                                          // this
+
                                                                          // case, 1
                                                                          // volt)
                 public static final double RPM_THRESHOLD = 120; // the maximum difference between an RPM and the
@@ -166,6 +178,7 @@ public class Constants extends RobotConstants {
         }
 
         public static class HopperConstants {
+
                 public static final int HOPPER_FEEDER_MOTOR_ID = 6;
                 public static final int CORNER_MOTOR_ID = 2;
                 public static final int GATEKEEPER_MOTOR_ID = 9;
@@ -173,6 +186,7 @@ public class Constants extends RobotConstants {
                 public static final int SENSOR_0_ID = 8;
                 public static final int SENSOR_1_ID = 9;
                 public static final int SENSOR_2_ID = 999;
+
 
                 public static final double DEBUG_MOTOR_POWER = 0.4;
                 public static final int CAPACITY = 5; // num of balls that the hopper can store
@@ -188,10 +202,11 @@ public class Constants extends RobotConstants {
 
         public static class IntakeConstants {
                 public static final int INTAKE_MOTOR_ID = 5;
+
                 public static final double INTAKE_MOTOR_ON_VALUE = 0.7;
                 public static final double INTAKE_MOTOR_OFF_VALUE = 0;
                 public static final double INTAKE_MOTOR_REVERSE_VALUE = -0.5;
-        }
+        
 
         public static class ClimberConstants {
                 public static final int LEFT_SERVO_ID = 0;
@@ -201,17 +216,20 @@ public class Constants extends RobotConstants {
                 public static final double LEFT_ENGAGE_ANGLE = 10;
                 public static final double RIGHT_ENGAGE_ANGLE = 10;
 
+
         }
 
         public static class ArmConstants {
                 public static final int ARM_MOTOR_LEADER_ID = 5;
                 public static final int ARM_MOTOR_FOLLOWER_ID = 4;
                 public static final int ARM_LIMIT_SWITCH_ID = 0;
+
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
                 public static final NeutralMode ARM_NEUTRAL_MODE_DEBUG = NeutralMode.Coast;
                 public static final double MAX_ARM_ANGLE = 80;
                 public static final double ANGLE_THRESHOLD = 5;
                 public static final double PLATEAU_THRESHOLD = 100;
+
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)
                                                                                      // rotations of the
                 // motor, we get 1 rotation of the arm (ask
@@ -219,7 +237,9 @@ public class Constants extends RobotConstants {
                 public static final double ARM_LENGTH = 30; // TODO: ASK MECH AND CHANGE LATER
                 public static final double LIMELIGHT_ARM_LENGTH = 27; // TODO: ASK MECH AND CHANGE LATER
                 public static final double LIMELIGHT_ARM_ANGLE = 5; // TODO: ASK MECH AND CHANGE LATER
+
                 public static final PIDConstants ARM_PID = new PIDConstants(0, 0.15, 0, 0);
+
                 public static final double ARM_SATURATION_LIMIT = 2 / ARM_PID.kI; // set limit on integral accumulation
                 public static final double ZEROING_POWER = -0.2;
         }
