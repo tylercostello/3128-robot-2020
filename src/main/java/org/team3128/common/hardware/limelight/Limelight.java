@@ -6,6 +6,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 //import edu.wpi.first.networktables.TableEntryListener;
 
+import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
 
 /**
@@ -137,6 +138,7 @@ public class Limelight {
     }
 
     public void setLEDMode(LEDMode mode) {
+        Log.info("Limelight", "set LED mode to" + String.valueOf(mode));
         limelightTable.getEntry("ledMode").setNumber(mode.getLEDMode());
     }
 

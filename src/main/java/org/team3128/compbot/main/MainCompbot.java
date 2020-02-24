@@ -10,6 +10,7 @@ import org.team3128.common.control.trajectory.Trajectory;
 import org.team3128.common.control.trajectory.TrajectoryGenerator;
 import org.team3128.common.control.trajectory.constraint.TrajectoryConstraint;
 import org.team3128.common.drive.DriveCommandRunning;
+import org.team3128.common.hardware.limelight.LEDMode;
 import org.team3128.common.hardware.limelight.Limelight;
 import org.team3128.common.hardware.gyroscope.Gyro;
 import org.team3128.common.hardware.gyroscope.NavX;
@@ -31,10 +32,12 @@ import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.compbot.commands.*;
+import org.team3128.compbot.calibration.*;
 import org.team3128.compbot.subsystems.*;
-import org.team3128.compbot.commands.CmdIntake;
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.RobotTracker;
+import org.team3128.compbot.subsystems.Arm.ArmState;
+import org.team3128.compbot.subsystems.Hopper.ActionState;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -49,7 +52,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -64,21 +66,26 @@ public class MainCompbot extends NarwhalRobot {
     public Command triggerCommand;
     public Command armFFCommand;
     public Command shooterFFCommand;
+    public Command ejectBallsCommand;
     private DriveCommandRunning driveCmdRunning;
+
 
     static FalconDrive drive = FalconDrive.getInstance();
     static Hopper hopper = Hopper.getInstance();
     static Arm arm = Arm.getInstance();
     static Shooter shooter = Shooter.getInstance();
     static Intake intake = Intake.getInstance();
+    static Climber climber = Climber.getInstance();
+
+ 
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
     ThreadScheduler scheduler = new ThreadScheduler();
     Thread auto;
 
-    public Joystick joystick;
-    public ListenerManager lm;
+    public Joystick joystickRight, joystickLeft;
+    public ListenerManager listenerLeft, listenerRight;
     public Gyro gyro;
     public static PowerDistributionPanel pdp;
 
@@ -92,7 +99,7 @@ public class MainCompbot extends NarwhalRobot {
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
 
-    public Limelight topLimelight, ballLimelight;
+    public Limelight shooterLimelight, ballLimelight;
     public Limelight[] limelights;
     public boolean inPlace = false;
     public boolean inPlace2 = false;
@@ -149,10 +156,11 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
         scheduler.schedule(intake, executor);
+        // scheduler.schedule(climber, executor);
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
-        
+
         // // Instatiator if we're using the NavX
         // gyro = new NavX();
 
@@ -160,19 +168,25 @@ public class MainCompbot extends NarwhalRobot {
         // gyro = new AnalogDevicesGyro();
         // //gyro.recalibrate();
 
-        joystick = new Joystick(1);
-        lm = new ListenerManager(joystick);
-        addListenerManager(lm);
+        joystickRight = new Joystick(1);
+        listenerRight = new ListenerManager(joystickRight);
+        addListenerManager(listenerRight);
 
-        // initialization of limelights 
+        joystickLeft = new Joystick(0);
+        listenerLeft = new ListenerManager(joystickLeft);
+        addListenerManager(listenerLeft);
 
-        topLimelight = new Limelight("limelight-b", 26.0, 0, 0, 30);
-        ballLimelight = new Limelight("limelight-c", Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE, Constants.VisionConstants.BOTTOM_LIMELIGHT_HEIGHT, Constants.VisionConstants.BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT, 14.5 * Length.in);
+        // initialization of limelights
+
+        shooterLimelight = new Limelight("limelight-shooter", 26.0, 0, 0, 30);
+        ballLimelight = new Limelight("limelight-c", Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE,
+                Constants.VisionConstants.BOTTOM_LIMELIGHT_HEIGHT,
+                Constants.VisionConstants.BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT, 14.5 * Length.in);
         limelights = new Limelight[2];
 
         // initialization of auto test suite
 
-        limelights[0] = topLimelight;
+        limelights[0] = shooterLimelight;
         limelights[1] = ballLimelight;
 
         pdp = new PowerDistributionPanel(0);
@@ -180,6 +194,7 @@ public class MainCompbot extends NarwhalRobot {
         errorCatcher = new ErrorCatcherUtility(CanChain, limelights, drive);
 
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
+
             if (down) {               
                errorCatcher.testEverything();
             }
@@ -187,6 +202,7 @@ public class MainCompbot extends NarwhalRobot {
         NarwhalDashboard.addButton("VelocityTester", (boolean down) -> {
             if (down) {               
                errorCatcher.VelocityTester();
+
             }
         });
     }
@@ -197,86 +213,132 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void setupListeners() {
-        lm.nameControl(ControllerExtreme3D.TWIST, "MoveTurn");
-        lm.nameControl(ControllerExtreme3D.JOYY, "MoveForwards");
-        lm.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
-        lm.nameControl(new Button(3), "ClearTracker");
-        lm.nameControl(new Button(5), "startShooterFF");
-        lm.nameControl(new Button(6), "startArmFF");
-        lm.nameControl(new Button(7), "endVoltage");
+        listenerRight.nameControl(ControllerExtreme3D.TWIST, "MoveTurn");
+        listenerRight.nameControl(ControllerExtreme3D.JOYY, "MoveForwards");
+        listenerRight.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
+        listenerRight.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
+        // listenerRight.nameControl(new Button(3), "ClearTracker");
+        listenerRight.nameControl(new Button(2), "zeroCallBount");
+        listenerRight.nameControl(new Button(3), "RezeroArm1");
+        listenerRight.nameControl(new Button(4), "RezeroArm2");
+        // listenerRight.nameControl(new Button(5), "runShooterFF");
+        // listenerRight.nameControl(new Button(6), "runArmFF");
+        // listenerRight.nameControl(new Button(7), "endVoltage");
+        listenerRight.nameControl(new Button(7), "EjectBalls");
+        listenerRight.nameControl(new Button(9), "EngageClimberServos");
+        listenerRight.nameControl(new Button(11), "DisEngageClimberServos");
+        listenerRight.nameControl(new Button(12), "EjectClimber");
 
-        lm.addMultiListener(() -> {
-            if (!driveCmdRunning.isRunning) {
-                double horiz = -0.7 * lm.getAxis("MoveTurn");
-                double vert = -1.0 * lm.getAxis("MoveForwards");
-                double throttle = -1.0 * lm.getAxis("Throttle");
+        listenerRight.nameControl(new POV(0), "IntakePOV");
+
+        listenerRight.addMultiListener(() -> {
+            if (driveCmdRunning.isRunning) {
+                double horiz = -0.7 * listenerRight.getAxis("MoveTurn");
+                double vert = -1.0 * listenerRight.getAxis("MoveForwards");
+                double throttle = -1.0 * listenerRight.getAxis("Throttle");
 
                 drive.arcadeDrive(horiz, vert, throttle, true);
             }
         }, "MoveTurn", "MoveForwards", "Throttle");
 
-        lm.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
-        lm.addButtonDownListener("AlignShoot", () -> {
-            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, topLimelight, driveCmdRunning,
+        listenerRight.addButtonDownListener("AlignShoot", () -> {
+            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning,
                     Constants.VisionConstants.TX_OFFSET, 5);
             triggerCommand.start();
             Log.info("MainCompbot.java", "[Vision Alignment] Started");
         });
-        lm.addButtonUpListener("AlignShoot", () -> {
+        listenerRight.addButtonUpListener("AlignShoot", () -> {
             triggerCommand.cancel();
             triggerCommand = null;
             Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
-
-
-        lm.addButtonDownListener("runArmFF", () -> {
-            Log.info("Button5", "pressed");
-            Log.info("Shooter", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
-            armFFCommand = new CmdArmFF(arm);
-            armFFCommand.start();
-        });
-
-        lm.addButtonDownListener("runShooterFF", () -> {
-            Log.info("Button6", "pressed");
-            Log.info("Arm", "Start Voltage: " + String.valueOf(RobotController.getBatteryVoltage()));
-            shooterFFCommand = new CmdShooterFF(shooter);
-            shooterFFCommand.start();
-        });
-
-        lm.addButtonDownListener("endVoltage", () -> {
-            Log.info("Shooter", String.valueOf(RobotController.getBatteryVoltage())); 
+        listenerRight.addButtonDownListener("RezeroArm1", () -> {
+            Log.info("Button3", "pressed");
+            arm.setState(ArmState.STOWED);
 
         });
+        listenerRight.addButtonDownListener("RezeroArm2", () -> {
+            Log.info("Button4", "pressed");
+            arm.setState(ArmState.STOWED);
+        });
+        listenerRight.addButtonDownListener("EjectBalls", () -> {
+            Log.info("Button7", "pressed");
+            ejectBallsCommand = new CmdArmFF(arm);
+            ejectBallsCommand.start();
+        });
+        listenerRight.addButtonDownListener("EngageClimberServos", () -> {
+            Log.info("Button9", "pressed");
+            climber.engageClimber();
 
-        lm.nameControl(new POV(0), "IntakePOV");
-        lm.addListener("IntakePOV", (POVValue pov) -> {
+        });
+        listenerRight.addButtonDownListener("DisEngageClimberServos", () -> {
+            Log.info("Button11", "pressed");
+            climber.disengageClimber();
+
+        });
+        listenerRight.addButtonDownListener("EjectClimber", () -> {
+            Log.info("Button12", "pressed");
+            arm.setState(ArmState.CLIMBING);
+        });
+        listenerRight.addButtonDownListener("zeroCallBount", () -> {
+            hopper.setBallCount(0);
+        });
+        /*
+         * listenerRight.addButtonDownListener("runArmFF", () -> { Log.info("Button6",
+         * "pressed"); Log.info("Shooter", "Start Voltage: " +
+         * String.valueOf(RobotController.getBatteryVoltage())); // armFFCommand = new
+         * CmdArmFF(arm); // armFFCommand.start(); });
+         * 
+         * listenerRight.addButtonDownListener("runShooterFF", () -> {
+         * Log.info("Button5", "pressed"); Log.info("Arm", "Start Voltage: " +
+         * String.valueOf(RobotController.getBatteryVoltage())); // shooterFFCommand =
+         * new CmdShooterFF(shooter); // shooterFFCommand.start(); });
+         * 
+         * listenerRight.addButtonDownListener("endVoltage", () -> { Log.info("Shooter",
+         * String.valueOf(RobotController.getBatteryVoltage()));
+         * 
+         * });
+         */
+
+        listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
-            case 8:
-            case 1:
-            case 7:
-                // push all balls backwards to clear hopper
-
-                break;
-            case 3:
-            case 4:
-            case 5:
+                case 8:
+                case 1:
                 // start intake command
-                povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, driveCmdRunning, Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID, Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
-                // driveCmdRunning,
-                if (arm.ARM_STATE == Arm.ArmState.STOWED) {
-                    povCommand.start();
-                } else {
-                    arm.zero();
-                }
+                    // povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, arm,
+                    // driveCmdRunning,
+                    // Constants.VisionConstants.BALL_PID, Constants.VisionConstants.BLIND_BALL_PID,
+                    // Constants.GameConstants.BALL_HEIGHT, Constants.VisionConstants.TX_OFFSET);
+                    // driveCmdRunning,
+                    if (arm.ARM_STATE == Arm.ArmState.INTAKE) {
+                        // povCommand.start();
+                        hopper.setAction(Hopper.ActionState.INTAKING);
+                    } else {
+                        arm.setState(Arm.ArmState.INTAKE);
+                    }
 
-                break;
-            case 0:
-                povCommand.cancel();
-                povCommand = null;
+                    break;
+                    
+                case 7:
+                    // push all balls backwards to clear hopper
 
-                break;
-            default:
-                break;
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    // cancels intaking if pushed forward (on accident)
+                    hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_REVERSE_VALUE);
+
+                    break;
+                    
+                case 0:
+                    // povCommand.cancel();
+                    // povCommand = null;
+                    hopper.setAction(Hopper.ActionState.STANDBY);
+
+                    break;
+                default:
+                    break;
             }
         });
 
@@ -300,9 +362,24 @@ public class MainCompbot extends NarwhalRobot {
     double currentRightDistance;
     double currentSpeed;
     double currentDistance;
+    String currentArmLimitSwitch;
+    double currentArmAngle;
+    double currentArmPos;
+    double currentArmVoltage;
+    double currentArmPower;
+    double currentBatteryVoltage;
+    double currentArmCurrent;
+    double currentShooterSpeed;
+    double currentShooterPower;
+    double currentShooterSetpoint;
 
     @Override
     protected void updateDashboard() {
+        if (!arm.getLimitStatus()) {
+            arm.ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
+            arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
+        }
+
         currentLeftSpeed = drive.getLeftSpeed();
         currentLeftDistance = drive.getLeftDistance();
         currentRightSpeed = drive.getRightSpeed();
@@ -311,8 +388,39 @@ public class MainCompbot extends NarwhalRobot {
         currentSpeed = drive.getSpeed();
         currentDistance = drive.getDistance();
 
+        currentArmLimitSwitch = String.valueOf(arm.getLimitStatus());
+        currentArmAngle = arm.getAngle();
+        currentArmPos = arm.ARM_MOTOR_LEADER.getSelectedSensorPosition(0);
+
+        currentArmVoltage = arm.ARM_MOTOR_LEADER.getMotorOutputVoltage();
+        currentArmPower = arm.output;
+        currentArmCurrent = arm.ARM_MOTOR_LEADER.getStatorCurrent();
+
+        currentShooterSpeed = shooter.getRPM();
+        currentShooterPower = shooter.output;
+        currentShooterSetpoint = shooter.setpoint;
+
+        SmartDashboard.putString("DriveCmdRunning", "" + driveCmdRunning.isRunning);
+        SmartDashboard.putString("ActionState", "" + hopper.actionState);
+
+        SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
+        SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
+        SmartDashboard.putNumber("Corner Encoder", hopper.CORNER_ENCODER.getPosition());
+
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
+
+        SmartDashboard.putNumber("voltage", RobotController.getBatteryVoltage());
+
+        SmartDashboard.putString("Arm Limit Switch", currentArmLimitSwitch);
+        SmartDashboard.putNumber("Arm Angle", currentArmAngle);
+        SmartDashboard.putNumber("Arm Position", currentArmPos);
+        SmartDashboard.putNumber("Arm Voltage", currentArmVoltage);
+        SmartDashboard.putNumber("Arm Current", currentArmCurrent);
+        SmartDashboard.putNumber("Arm Power", currentArmPower);
+
+        SmartDashboard.putNumber("Shooter Speed", currentShooterSpeed);
+        SmartDashboard.putNumber("Shooter Power", currentShooterPower);
 
         SmartDashboard.putNumber("Gyro Angle", drive.getAngle());
         SmartDashboard.putNumber("Left Distance", currentLeftDistance);
@@ -343,6 +451,9 @@ public class MainCompbot extends NarwhalRobot {
 
         SmartDashboard.putNumber("Max Speed", maxSpeed);
         SmartDashboard.putNumber("Min Speed", minSpeed);
+        
+        SmartDashboard.putNumber("Shooter Setpoint", currentShooterSetpoint);
+        SmartDashboard.putNumber("BALL COUNT", hopper.ballCount);
 
         trackerCSV += "\n" + String.valueOf(Timer.getFPGATimestamp() - startTime) + ","
                 + String.valueOf(robotTracker.getOdometry().translationMat.getX()) + ","
@@ -354,7 +465,13 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopInit() {
+        shooterLimelight.setLEDMode(LEDMode.OFF);
+        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
+        arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
+        hopper.setAction(ActionState.STANDBY);
+        Log.info("MainCompbot", "TeleopInit has started. Setting arm state to ArmState.STARTING");
         scheduler.resume();
+        driveCmdRunning.isRunning = true;
     }
 
     @Override
@@ -377,6 +494,9 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void disabledInit() {
+        shooterLimelight.setLEDMode(LEDMode.OFF);
+        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
+        arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
         scheduler.pause();
     }
 

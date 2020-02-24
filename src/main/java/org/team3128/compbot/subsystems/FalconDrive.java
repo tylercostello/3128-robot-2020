@@ -68,18 +68,18 @@ public class FalconDrive extends Drive {
 
 		gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 
-		leftTalon = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID);
-		leftTalonSlave = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID);
+		rightTalon = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID);
+		rightTalonSlave = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID);
 		// leftTalonSlave2 = new LazyTalonFX(Constants.LEFT_DRIVE_BACK_ID);
 
-		rightTalon = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID);
-		rightTalonSlave = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID);
+		leftTalon = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID);
+		leftTalonSlave = new LazyTalonFX(Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID);
 		// rightTalonSlave2 = new LazyTalonFX(Constants.RIGHT_DRIVE_BACK_ID);
 
-		leftTalon.setInverted(false);
-		rightTalon.setInverted(true);
-		leftTalonSlave.setInverted(false);
-		rightTalonSlave.setInverted(true);
+		leftTalon.setInverted(true);
+		rightTalon.setInverted(false);
+		leftTalonSlave.setInverted(true);
+		rightTalonSlave.setInverted(false);
 		// leftTalonSlave2.setInverted(false);
 		// rightTalonSlave2.setInverted(false);
 
@@ -308,8 +308,8 @@ public class FalconDrive extends Drive {
 		String tempStr = "pwrL=" + String.valueOf(pwrL) + ", pwrR=" + String.valueOf(pwrR) + ", spdL="
 				+ String.valueOf(spdL) + ", spdR=" + String.valueOf(spdR);
 		Log.info("FalconDrive", tempStr);
-		// setWheelPower(new DriveSignal(pwrL, pwrR));
-		setWheelVelocity(new DriveSignal(spdL, spdR));
+		setWheelPower(new DriveSignal(pwrL, pwrR));
+		// setWheelVelocity(new DriveSignal(spdL, spdR));
 	}
 
 	@Override
@@ -324,14 +324,14 @@ public class FalconDrive extends Drive {
 			snapDriveState = driveState;
 		}
 		switch (snapDriveState) {
-		case TELEOP:
-			break;
-		case RAMSETECONTROL:
-			updateRamseteController(false);
-			break;
-		case TURN:
-			updateTurn();
-			break;
+			case TELEOP:
+				break;
+			case RAMSETECONTROL:
+				updateRamseteController(false);
+				break;
+			case TURN:
+				updateTurn();
+				break;
 		}
 	}
 
