@@ -162,7 +162,7 @@ public class Constants extends RobotConstants {
                                                                 // setpoint
                                                                 // for a
                                                                 // data point to be considered as a plataeu
-                public static final int PLATEAU_COUNT = 50; // 50 * 0.005s = 0.25 seconds of plateau required
+                public static final int PLATEAU_COUNT = 25; // 50 * 0.005s = 0.25 seconds of plateau required
         }
 
         public static class HopperConstants {
@@ -181,7 +181,7 @@ public class Constants extends RobotConstants {
                 // public static final double FEEDER_POWER = 0.5;
                 public static final double GATEKEEPER_POWER = -0.75;
                 public static final double INDEXER_POWER = -0.55;
-                public static final double[] BALL_SPACING = { -25, -23, -22, -19 };
+                public static final double[] BALL_SPACING = { -25, -23, -25, -50 };
                 public static final double SHOOTER_SPACING = 0;
         }
 
