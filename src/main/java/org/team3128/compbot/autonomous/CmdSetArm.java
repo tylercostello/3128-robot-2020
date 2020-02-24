@@ -28,14 +28,14 @@ public class CmdSetArm extends Command {
             arm.setState(state);
         }
         */
-        if (Math.abs(state.armAngle - arm.getAngle()) > 2) {
+        if (Math.abs(state.armAngle - arm.getAngle()) > 3) {
             Log.info("CmdSetArm", "Arm angle is off from set arm angle state, fixing");
             arm.update();
         }
     }
 
     protected boolean isFinished() {
-        if (state.armAngle - arm.getAngle() < 2) {
+        if (state.armAngle - arm.getAngle() < 3) {
             return true;
         } 
         else {

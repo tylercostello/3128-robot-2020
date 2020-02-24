@@ -162,7 +162,6 @@ public class Arm extends Threaded {
 
         prevError = error;
 
-        
     }
 
 }
