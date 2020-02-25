@@ -197,7 +197,8 @@ public class Constants extends RobotConstants {
                 public static final double INDEXER_POWER = -0.4;
                 public static final double[] BALL_SPACING = { -25, -20, -15, -26 };
                 public static final double SHOOTER_SPACING = 0;
-                public static final double REVERSE_TIMEOUT = 1500;
+                public static final double REVERSE_TIMEOUT = 1500; 
+                public static final int JAM_COUNT_THRESHOLD = 100; //how many loop counts of a detected jam needed to actually reverse the intake motor: 100 loop counts * 1/200hz = 0.5 seconds
         }
 
         public static class IntakeConstants {

@@ -72,6 +72,7 @@ public class Hopper extends Threaded {
 
 
     public int openTheGatesCounter = 0;
+    public int jamCount = 0;
 
     public ActionState actionState;
 
@@ -91,10 +92,6 @@ public class Hopper extends Threaded {
 
     @Override
     public void update() {
-
-        // if(INTAKE_MOTOR.getAppliedOutput() == Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE) {
-        //     if(INTAKE_MOTOR.getEncoder())
-        // }
 
         SmartDashboard.putBoolean("gatekeep", openTheGates);
         SmartDashboard.putNumber("openTheGatesCounter", openTheGatesCounter);
@@ -232,7 +229,16 @@ public class Hopper extends Threaded {
         isLoading = false;
         isFeeding = false;
         if (state == ActionState.INTAKING) {
-            INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+            if(INTAKE_MOTOR.getEncoder().getVelocity() <= 0) {
+                Log.info("Hopper", "Jam Detected");
+                if(jamCount <= Constants.HopperConstants.JAM_COUNT_THRESHOLD) {
+                    INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_REVERSE_VALUE);
+                    jamCount++;
+                }
+            } else {
+                jamCount = 0;
+                INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
+            }
         } else {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
         }
