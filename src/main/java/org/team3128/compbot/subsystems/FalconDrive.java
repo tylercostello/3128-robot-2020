@@ -68,6 +68,8 @@ public class FalconDrive extends Drive {
 
 		gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 
+		//left and right are flipped because the driver wanted to flip the direction of driving.
+
 		rightTalon = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID);
 		rightTalonSlave = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID);
 		// leftTalonSlave2 = new LazyTalonFX(Constants.LEFT_DRIVE_BACK_ID);

@@ -195,10 +195,9 @@ public class Constants extends RobotConstants {
                 // public static final double FEEDER_POWER = 0.5;
                 public static final double GATEKEEPER_POWER = -0.75;
                 public static final double INDEXER_POWER = -0.4;
-                public static final double[] BALL_SPACING = { -25, -20, -15, -26 };
-                public static final double SHOOTER_SPACING = 0;
-                public static final double REVERSE_TIMEOUT = 1500; 
-                public static final int JAM_COUNT_THRESHOLD = 100; //how many loop counts of a detected jam needed to actually reverse the intake motor: 100 loop counts * 1/200hz = 0.5 seconds
+                public static final double[] BALL_SPACING = { -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
+                public static final double REVERSE_TIMEOUT = 1500; //timeout for how long to run the corner motors back (in case the sensor gets triggered)
+                public static final int JAM_COUNT_THRESHOLD = 100; //how long to reverse the intake after a jam is detected: 100 loop counts * 1/200hz = 0.5 seconds
         }
 
         public static class IntakeConstants {
@@ -212,10 +211,10 @@ public class Constants extends RobotConstants {
         public static class ClimberConstants {
                 public static final int LEFT_SERVO_ID = 0;
                 public static final int RIGHT_SERVO_ID = 1;
-                public static final double LEFT_DISENGAGE_ANGLE = 0;
-                public static final double RIGHT_DISENGAGE_ANGLE = 0;
-                public static final double LEFT_ENGAGE_ANGLE = 10;
-                public static final double RIGHT_ENGAGE_ANGLE = 10;
+                public static final double LEFT_DISENGAGE_ANGLE = 0; //servo disengage angle
+                public static final double RIGHT_DISENGAGE_ANGLE = 0; // ^^^
+                public static final double LEFT_ENGAGE_ANGLE = 10; // ^^^
+                public static final double RIGHT_ENGAGE_ANGLE = 10; // ^^^
 
 
         }
