@@ -207,7 +207,7 @@ public class Constants extends RobotConstants {
                 public static final double INTAKE_MOTOR_OFF_VALUE = 0;
                 public static final double INTAKE_MOTOR_REVERSE_VALUE = -0.5;
         
-
+        }
         public static class ClimberConstants {
                 public static final int LEFT_SERVO_ID = 0;
                 public static final int RIGHT_SERVO_ID = 1;
