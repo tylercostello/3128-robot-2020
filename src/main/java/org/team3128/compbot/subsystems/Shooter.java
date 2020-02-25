@@ -45,7 +45,7 @@ public class Shooter extends Threaded {
     }
 
     private void configEncoders() {
-        SHOOTER_ENCODER = RIGHT_SHOOTER.getEncoder();
+        SHOOTER_ENCODER = LEFT_SHOOTER.getEncoder();
         if (DEBUG) {
             Log.info("Shooter", "Config encoders");
         }
@@ -107,12 +107,12 @@ public class Shooter extends Threaded {
             output = -1;
         }
 
-        //LEFT_SHOOTER.set(output);
+        LEFT_SHOOTER.set(output);
         RIGHT_SHOOTER.set(-output);
     }
 
     public double shooterFeedForward(double desiredSetpoint) {
-        double ff = (0.00211 * desiredSetpoint) - 1; // 0.051
+        double ff = (0.00211 * desiredSetpoint) - 2; // 0.051
         if (setpoint != 0) {
             return ff;
         } else {

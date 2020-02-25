@@ -92,6 +92,10 @@ public class Hopper extends Threaded {
     @Override
     public void update() {
 
+        // if(INTAKE_MOTOR.getAppliedOutput() == Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE) {
+        //     if(INTAKE_MOTOR.getEncoder())
+        // }
+
         SmartDashboard.putBoolean("gatekeep", openTheGates);
         SmartDashboard.putNumber("openTheGatesCounter", openTheGatesCounter);
         SmartDashboard.putBoolean("SENSOR_0_DETECT", detectsBall(SENSOR_0));

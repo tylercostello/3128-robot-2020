@@ -134,7 +134,7 @@ public class Constants extends RobotConstants {
                 public static final double TX_THRESHOLD = 1; // the maximum error in tx where the shooter will be
                                                              // allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.016, 0.0, 0.00003);
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.014, 0.0, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
@@ -152,13 +152,13 @@ public class Constants extends RobotConstants {
                 public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
                 public static final double SHOOTER_GEARING = 1.5; // for every 1 rotation of the motor, the shooter does
                                                                   // {SHOOTER_GEARING} rotations
-                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.006, 0.02, 0.00000051);
+                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.005, 0.009, 0.0000051);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in
                                                                          // this
                                                                          // case, 1
                                                                          // volt)
-                public static final double RPM_THRESHOLD = 120; // the maximum difference between an RPM and the
+                public static final double RPM_THRESHOLD = 100; // the maximum difference between an RPM and the
                                                                 // setpoint
                                                                 // for a
                                                                 // data point to be considered as a plataeu

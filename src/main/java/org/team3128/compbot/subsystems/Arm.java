@@ -156,7 +156,7 @@ public class Arm extends Threaded {
             plateauCount = 0;
         }
 
-        // ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
+        ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
 
         prevError = error;
     }
