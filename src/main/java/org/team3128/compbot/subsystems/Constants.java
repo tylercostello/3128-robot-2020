@@ -184,7 +184,7 @@ public class Constants extends RobotConstants {
                 public static final PIDConstants ARM_PID = new PIDConstants(0, 0.15, 0, 0);
 
                 public static final double ARM_SATURATION_LIMIT = 2 / ARM_PID.kI; // set limit on integral accumulation
-                public static final double ZEROING_POWER = -0.2;
+                public static final double ZEROING_POWER = -0.1;
         }
 
 }

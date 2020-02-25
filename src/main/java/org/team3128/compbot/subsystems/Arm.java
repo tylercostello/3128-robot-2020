@@ -103,11 +103,12 @@ public class Arm extends Threaded {
     }
 
     public boolean getLimitStatus() {
-        return LIMIT_SWITCH.get();
+        return !LIMIT_SWITCH.get();
     }
 
     @Override
-    public void update() {
+    public void update() { 
+        
         if (setpoint > Constants.ArmConstants.MAX_ARM_ANGLE) {
             setpoint = Constants.ArmConstants.MAX_ARM_ANGLE;
         }
@@ -116,14 +117,16 @@ public class Arm extends Threaded {
             setpoint = 0;
         }
 
-        if (!getLimitStatus()) {
+
+        if (getLimitStatus()) {
             ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
             ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
         }
-
+        
         if (ARM_STATE.armAngle != setpoint) {
             Log.info("ARM", "Setpoint override (setpoint has been set without using ArmState)");
         }
+        
         current = getAngle();
         error = setpoint - current;
         accumulator += error * Constants.MechanismConstants.DT;
@@ -155,6 +158,16 @@ public class Arm extends Threaded {
         } else {
             plateauCount = 0;
         }
+
+
+        if((setpoint == 0) && isReady() && !getLimitStatus()) {
+            output = Constants.ArmConstants.ZEROING_POWER;
+            Log.info("Arm", "Using ZEROING_POWER to finish zeroing the arm.");
+        } else if((setpoint == 0) && isReady() && getLimitStatus()) {
+            output = 0;
+            Log.info("Arm", "In zero position, setting output to 0.");
+        }
+
 
         ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
 
