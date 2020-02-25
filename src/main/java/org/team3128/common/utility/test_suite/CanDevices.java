@@ -37,7 +37,7 @@ public class CanDevices{
     public LazyTalonFX falcon;
     
 
-    public CanDevices(DeviceType type, int id, String name, LazyTalonSRX talon, VictorSPX victor, LazyCANSparkMax spark, LazyTalonFX falcon, PowerDistributionPanel pdp){
+   /* public CanDevices(DeviceType type, int id, String name, LazyTalonSRX talon, VictorSPX victor, LazyCANSparkMax spark, LazyTalonFX falcon, PowerDistributionPanel pdp){
         this.type = type;
         this.id = id;
         this.name = name;
@@ -47,7 +47,38 @@ public class CanDevices{
         this.falcon = falcon;
         this.pdp = pdp;
 
+    }*/
+    public CanDevices(DeviceType type, int id, String name, LazyTalonSRX talon){
+        this.type = type;
+        this.id = id;
+        this.name = name;
+        this.talon = talon;
     }
+    public CanDevices(DeviceType type, int id, String name, VictorSPX victor){
+        this.type = type;
+        this.id = id;
+        this.name = name;
+        this.victor = victor;
+    }
+    public CanDevices(DeviceType type, int id, String name, LazyCANSparkMax spark){
+        this.type = type;
+        this.id = id;
+        this.name = name;
+        this.spark = spark;
+    }
+    public CanDevices(DeviceType type, int id, String name, LazyTalonFX falcon){
+        this.type = type;
+        this.id = id;
+        this.name = name;
+        this.falcon = falcon;
+    }
+    public CanDevices(DeviceType type, int id, String name, PowerDistributionPanel pdp){
+        this.type = type;
+        this.id = id;
+        this.name = name;
+        this.pdp = pdp;
+    }
+    
 
    
 
