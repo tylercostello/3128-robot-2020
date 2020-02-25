@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Shooter extends Threaded {
 
     public static final Shooter instance = new Shooter();
-    public static LazyCANSparkMax LEFT_SHOOTER;
-    public static LazyCANSparkMax RIGHT_SHOOTER;
+    public LazyCANSparkMax LEFT_SHOOTER;
+    public LazyCANSparkMax RIGHT_SHOOTER;
     public static CANEncoder SHOOTER_ENCODER;
 
     public static boolean DEBUG = true;

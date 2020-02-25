@@ -119,19 +119,19 @@ public class MainCompbot extends NarwhalRobot {
     public Command povCommand;
 
     public static void setCanChain() {  
-        Constants.TestSuiteConstants.intake = new CanDevices(CanDevices.DeviceType.SPARK, Constants.IntakeConstants.INTAKE_MOTOR_ID , "Intake", intake.INTAKE_MOTOR);
-        Constants.TestSuiteConstants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID, "Right Drive Leader", drive.rightTalon);
-        Constants.TestSuiteConstants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID, "Right Drive Follower", drive.rightTalonSlave);
-        Constants.TestSuiteConstants.feeder = new CanDevices(CanDevices.DeviceType.SPARK,Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID, "Feeder", hopper.HOPPER_FEEDER_MOTOR);
-        Constants.TestSuiteConstants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "PDP", pdp);
-        Constants.TestSuiteConstants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.LEFT_DRIVE_FRONT_ID, "Left Drive Leader", drive.leftTalon);
-        Constants.TestSuiteConstants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.FALCON, Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID, "Left Drive Follower", drive.leftTalonSlave);
-        Constants.TestSuiteConstants.armLeader = new CanDevices(CanDevices.DeviceType.FALCON, Constants.ArmConstants.ARM_MOTOR_LEADER_ID, "Arm Leader", arm.ARM_MOTOR_LEADER);
-        Constants.TestSuiteConstants.armFollower = new CanDevices(CanDevices.DeviceType.FALCON, Constants.ArmConstants.ARM_MOTOR_FOLLOWER_ID, "Arm Follower", arm.ARM_MOTOR_FOLLOWER);
-        Constants.TestSuiteConstants.shooterLeft = new CanDevices(CanDevices.DeviceType.SPARK, Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID, "Shooter Left", shooter.LEFT_SHOOTER);
-        Constants.TestSuiteConstants.gatekeeper = new CanDevices(CanDevices.DeviceType.SPARK, Constants.HopperConstants.GATEKEEPER_MOTOR_ID, "Gatekeeper", hopper.GATEKEEPER_MOTOR);
-        Constants.TestSuiteConstants.shooterRight = new CanDevices(CanDevices.DeviceType.SPARK, Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID, "Shooter Right", shooter.RIGHT_SHOOTER);
-        Constants.TestSuiteConstants.corner = new CanDevices(CanDevices.DeviceType.SPARK, Constants.HopperConstants.CORNER_MOTOR_ID, "Corner", hopper.CORNER_MOTOR);
+        Constants.TestSuiteConstants.intake = new CanDevices(Constants.IntakeConstants.INTAKE_MOTOR_ID , "Intake", intake.INTAKE_MOTOR);
+        Constants.TestSuiteConstants.rightDriveLeader = new CanDevices(Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID, "Right Drive Leader", drive.rightTalon);
+        Constants.TestSuiteConstants.rightDriveFollower = new CanDevices(Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID, "Right Drive Follower", drive.rightTalonSlave);
+        Constants.TestSuiteConstants.feeder = new CanDevices(Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID, "Feeder", hopper.HOPPER_FEEDER_MOTOR);
+        Constants.TestSuiteConstants.PDP = new CanDevices(0, "PDP", pdp);
+        Constants.TestSuiteConstants.leftDriveLeader = new CanDevices(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID, "Left Drive Leader", drive.leftTalon);
+        Constants.TestSuiteConstants.leftDriveFollower = new CanDevices(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID, "Left Drive Follower", drive.leftTalonSlave);
+        Constants.TestSuiteConstants.armLeader = new CanDevices(Constants.ArmConstants.ARM_MOTOR_LEADER_ID, "Arm Leader", arm.ARM_MOTOR_LEADER);
+        Constants.TestSuiteConstants.armFollower = new CanDevices(Constants.ArmConstants.ARM_MOTOR_FOLLOWER_ID, "Arm Follower", arm.ARM_MOTOR_FOLLOWER);
+        Constants.TestSuiteConstants.shooterLeft = new CanDevices(Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID, "Shooter Left", shooter.LEFT_SHOOTER);
+        Constants.TestSuiteConstants.gatekeeper = new CanDevices(Constants.HopperConstants.GATEKEEPER_MOTOR_ID, "Gatekeeper", hopper.GATEKEEPER_MOTOR);
+        Constants.TestSuiteConstants.shooterRight = new CanDevices(Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID, "Shooter Right", shooter.RIGHT_SHOOTER);
+        Constants.TestSuiteConstants.corner = new CanDevices(Constants.HopperConstants.CORNER_MOTOR_ID, "Corner", hopper.CORNER_MOTOR);
         
 
         CanChain[0] = Constants.TestSuiteConstants.intake;
@@ -476,20 +476,6 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void autonomousInit() {
-        waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(0)));
-        waypoints.add(new Pose2D(0 * Constants.MechanismConstants.inchesToMeters,
-                70 * Constants.MechanismConstants.inchesToMeters, Rotation2D.fromDegrees(-45)));
-
-        trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
-                120 * Constants.MechanismConstants.inchesToMeters, 0.5, false);
-
-        trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
-        Log.info("MainCompbot", "going into autonomousinit");
-        scheduler.resume();
-        robotTracker.resetOdometry();
-        drive.setAutoTrajectory(trajectory, false);
-        drive.startTrajectory();
-        startTime = Timer.getFPGATimestamp();
     }
 
     @Override
