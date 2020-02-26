@@ -105,11 +105,11 @@ public class MainAthos extends NarwhalRobot {
     public static CanDevices[] CanChain = new CanDevices[42];
     
     public static void setCanChain(){
-        rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", NEODrive.rightSpark);
-        rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", NEODrive.rightSparkSlave);
-        leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", NEODrive.leftSpark);
-        leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", NEODrive.leftSparkSlave);
-        PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", pdp);
+        // rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", NEODrive.rightSpark);
+        // rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", NEODrive.rightSparkSlave);
+        // leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", NEODrive.leftSpark);
+        // leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", NEODrive.leftSparkSlave);
+        // PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", pdp);
 
         CanChain[0] = rightDriveLeader;
         CanChain[1] = rightDriveFollower;

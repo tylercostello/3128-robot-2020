@@ -201,11 +201,11 @@ public class MainAramis extends NarwhalRobot {
         driveCmdRunning = new DriveCommandRunning();
 
         //Error Catcher (Auto Test Suite)
-        Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 13, "Left Drive Leader", leftDriveLeader);
-        Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 5, "Left Drive Follower", leftDriveFollower);
-        Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 15, "Right Drive Leader", rightDriveLeader);
-        Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 6, "Right Drive Follower", rightDriveFollower);
-        Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel",  pdp);
+        // Constants.leftDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 13, "Left Drive Leader", leftDriveLeader);
+        // Constants.leftDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 5, "Left Drive Follower", leftDriveFollower);
+        // Constants.rightDriveLeader = new CanDevices(CanDevices.DeviceType.TALON, 15, "Right Drive Leader", rightDriveLeader);
+        // Constants.rightDriveFollower = new CanDevices(CanDevices.DeviceType.VICTOR, 6, "Right Drive Follower", rightDriveFollower);
+        // Constants.PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel",  pdp);
         //errorCatcher = new ErrorCatcherUtility(CanChain);
         setCanChain();
 

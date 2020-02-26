@@ -58,7 +58,6 @@ public class Hopper extends Threaded {
     private static final Hopper instance = new Hopper();
 
     // private boolean isMoving;
-    private boolean isShooting, isIntaking;
     private boolean empty0 = true;
     private boolean empty1 = true;
     private boolean isFeeding = false;
@@ -73,6 +72,7 @@ public class Hopper extends Threaded {
 
     public int openTheGatesCounter = 0;
     public int jamCount = 0;
+    public int plateauCount = 0;
 
     public ActionState actionState;
 
@@ -137,8 +137,6 @@ public class Hopper extends Threaded {
         } else {
             empty0 = true;
         }
-        // Log.info("Hopper", String.valueOf(actionState));
-        // Log.info("Hopper", String.valueOf(detectsBall(SENSOR_1)));
     }
 
     private void configMotors() {
@@ -149,7 +147,6 @@ public class Hopper extends Threaded {
     }
 
     private void configEncoders() {
-        // HOPPER_FEEDER_ENCODER = HOPPER_FEEDER_MOTOR.getEncoder();
         CORNER_ENCODER = CORNER_MOTOR.getEncoder();
     }
 
@@ -164,9 +161,7 @@ public class Hopper extends Threaded {
     }
 
     public boolean isEmpty() {
-        // return (getNumBalls() == 0);
         return ballCount <= 0;
-        // return false;
     }
 
     public boolean isFull() {
@@ -179,21 +174,6 @@ public class Hopper extends Threaded {
             out_array[i] = in_array[i + 1];
         }
         out_array[in_array.length - 1] = false;
-        return out_array;
-    }
-
-    private boolean[] addBall(boolean[] in_array) {
-        boolean[] out_array = new boolean[in_array.length];
-        // for (int i = 0; i < in_array.length; i++) {
-        boolean added = false;
-        for (int i = in_array.length - 1; i >= 0; i--) {
-            if (in_array[i]) {
-                out_array[i] = in_array[i];
-            } else if (!added) {
-                out_array[i] = true;
-                added = true;
-            }
-        }
         return out_array;
     }
 
@@ -229,16 +209,7 @@ public class Hopper extends Threaded {
         isLoading = false;
         isFeeding = false;
         if (state == ActionState.INTAKING) {
-            if(INTAKE_MOTOR.getEncoder().getVelocity() <= 0) {
-                Log.info("Hopper", "Jam Detected");
-                if(jamCount <= Constants.HopperConstants.JAM_COUNT_THRESHOLD) {
-                    INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_REVERSE_VALUE);
-                    jamCount++;
-                }
-            } else {
-                jamCount = 0;
-                INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
-            }
+            INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
         } else {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
         }
@@ -283,12 +254,14 @@ public class Hopper extends Threaded {
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER); // only move the corner motor to move the ball
                                                                         // into the lowest position
             // if (!isFull) {
+            Log.info("Hopper", "setting isFeeding to true");
             isFeeding = true; // tell the code we are trying move this ball into the lowest position
             // }
         } else if (!isFeeding) {
             if (actionState == ActionState.INTAKING) {
                 setMotorPowers(0, 0, Constants.HopperConstants.INDEXER_POWER);
             } else {
+                Log.info("Hopper", "alarm alarm alarm alarm alarm alarm alarm alarm");
                 setMotorPowers(0, 0, 0);
             }
         } 
@@ -374,8 +347,7 @@ public class Hopper extends Threaded {
             setMotorPowers(0, 0, 0);
             setAction(ActionState.STANDBY);
             Log.info("Hopper", "ending organize because hopper is empty");
-        } 
-        if (ballCount > 0) {
+        } else {
             startTime = RobotController.getFPGATime();
             while(!detectsBall(SENSOR_1) && (RobotController.getFPGATime() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
                 isReversing = true;
@@ -386,11 +358,6 @@ public class Hopper extends Threaded {
 
         setMotorPowers(0, 0, 0);
         setAction(ActionState.STANDBY);
-        // else if (empty1) {
-        //     empty1 = false;
-        //     setAction(ActionState.STANDBY);
-        //     Log.info("Hopper", "ending organize");
-        // }
     }
 
     public void setBallCount(int count) {
