@@ -24,7 +24,7 @@ public class CmdShooterFF extends Command {
     public static int setpoint = 250;
     public static int increment = 250;
     public static int counter = 0;
-    public static double sumOutput, sumBatteryVoltage, sumRPM, sumBusVoltage, startVoltage, voltageBattery,
+    public double sumOutput, sumBatteryVoltage, sumRPM, sumBusVoltage, startVoltage, voltageBattery,
             voltageMotor, currentTime, pastTime;
 
     int plateauCount = 0;
@@ -75,7 +75,7 @@ public class CmdShooterFF extends Command {
         shooter.setSetpoint(setpoint);
 
         voltageBattery = RobotController.getBatteryVoltage();
-        voltageMotor = Shooter.LEFT_SHOOTER.getBusVoltage();
+        voltageMotor = shooter.LEFT_SHOOTER.getBusVoltage();
 
         currentTime = Timer.getFPGATimestamp();
 
