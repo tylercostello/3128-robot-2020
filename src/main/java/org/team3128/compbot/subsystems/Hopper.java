@@ -288,6 +288,19 @@ public class Hopper extends Threaded {
             while (detectsBall(SENSOR_0)) {
                 setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
                         Constants.HopperConstants.INDEXER_POWER);
+                if (!detectsBall(SENSOR_1) && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
+                    empty1 = true; //tell the code the position is empty
+                    Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
+                    if (!isReversing) {
+                        ballCount++; // iterate ballCount once because a ball has passed through our sensors
+                        Log.info("Hopper", "iterating ballCount");
+                    } else {
+                        Log.info("Hopper", "was reversing");
+                        isReversing = false;
+                    }
+                } else if(detectsBall(SENSOR_0)) {
+                    empty1 = false;
+                }
             }
             ballCount--;
             reloading:
