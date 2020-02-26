@@ -221,7 +221,7 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(new Button(2), "zeroCallBount");
         listenerRight.nameControl(new Button(3), "RezeroArm1");
         listenerRight.nameControl(new Button(4), "RezeroArm2");
-        // listenerRight.nameControl(new Button(5), "runShooterFF");
+        listenerRight.nameControl(new Button(5), "runShooterFF");
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
         listenerRight.nameControl(new Button(7), "EjectBalls");
@@ -283,22 +283,30 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
         });
-        /*
-         * listenerRight.addButtonDownListener("runArmFF", () -> { Log.info("Button6",
-         * "pressed"); Log.info("Shooter", "Start Voltage: " +
-         * String.valueOf(RobotController.getBatteryVoltage())); // armFFCommand = new
-         * CmdArmFF(arm); // armFFCommand.start(); });
-         * 
-         * listenerRight.addButtonDownListener("runShooterFF", () -> {
-         * Log.info("Button5", "pressed"); Log.info("Arm", "Start Voltage: " +
-         * String.valueOf(RobotController.getBatteryVoltage())); // shooterFFCommand =
-         * new CmdShooterFF(shooter); // shooterFFCommand.start(); });
-         * 
-         * listenerRight.addButtonDownListener("endVoltage", () -> { Log.info("Shooter",
-         * String.valueOf(RobotController.getBatteryVoltage()));
-         * 
-         * });
-         */
+        listenerRight.addButtonDownListener("runShooterFF", () -> {
+            Log.info("Button5", "pressed");
+            Log.info("Shooter", "Start Voltage: " +
+            String.valueOf(RobotController.getBatteryVoltage()));
+            shooterFFCommand = new CmdShooterFF(shooter);
+            shooterFFCommand.start(); 
+        });
+        listenerRight.addButtonUpListener("runShooterFF", () -> {
+            Log.info("Button5", "released");
+            Log.info("Button5", "stopping cmdShooterFF");
+            shooterFFCommand.cancel();
+            shooterFFCommand = null;
+        });
+        
+        // listenerRight.addButtonDownListener("runShooterFF", () -> {
+        // Log.info("Button5", "pressed"); Log.info("Arm", "Start Voltage: " +
+        // String.valueOf(RobotController.getBatteryVoltage())); // shooterFFCommand =
+        // new CmdShooterFF(shooter); // shooterFFCommand.start(); });
+        
+        // listenerRight.addButtonDownListener("endVoltage", () -> { Log.info("Shooter",
+        // String.valueOf(RobotController.getBatteryVoltage()));
+        
+        // });
+         
 
         listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
@@ -375,7 +383,11 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
-        if (!arm.getLimitStatus()) {
+
+        SmartDashboard.putString("ARM STATE", String.valueOf(arm.ARM_STATE));
+        SmartDashboard.putNumber("ARM SETPOINT", arm.setpoint);
+        SmartDashboard.putNumber("Intake Motor vel", hopper.INTAKE_MOTOR.getEncoder().getVelocity());
+        if (arm.getLimitStatus()) {
             arm.ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
             arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
         }

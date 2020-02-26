@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Shooter extends Threaded {
 
     public static final Shooter instance = new Shooter();
-    public LazyCANSparkMax LEFT_SHOOTER;
-    public LazyCANSparkMax RIGHT_SHOOTER;
+    public static LazyCANSparkMax LEFT_SHOOTER;
+    public static LazyCANSparkMax RIGHT_SHOOTER;
     public static CANEncoder SHOOTER_ENCODER;
 
     public static boolean DEBUG = true;
@@ -105,6 +105,10 @@ public class Shooter extends Threaded {
             // "WARNING: Tried to set power above available voltage! Saturation limit SHOULD
             // take care of this ");
             output = -1;
+        }
+
+        if(setpoint == 0) {
+            output = 0;
         }
 
         LEFT_SHOOTER.set(output);

@@ -80,13 +80,14 @@ public class Constants extends RobotConstants {
         }
 
         public static class VisionConstants {
-                public static final double BOTTOM_LIMELIGHT_HEIGHT = 6.15 * Length.in;
-                public static final double BOTTOM_LIMELIGHT_ANGLE = 26.0 * Angle.DEGREES;
+                public static final double BOTTOM_LIMELIGHT_HEIGHT = 28.85 * Length.in;
+                public static final double PIVOT_HEIGHT = 16.0;
+                public static final double BOTTOM_LIMELIGHT_ANGLE = 30.0 * Angle.DEGREES;
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
                 public static final double TX_THRESHOLD = 1; // the maximum error in tx where the shooter will be allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.014, 0.0, 0.00003);
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.012, 0.0, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
@@ -114,7 +115,7 @@ public class Constants extends RobotConstants {
                 public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
 
                 public static final double SHOOTER_GEARING = 1.5; // for every 1 rotation of the motor, the shooter does {SHOOTER_GEARING} rotations
-                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.005, 0.009, 0.0000051);
+                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.0065, 0.01, 0.0000051);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in this case, 1 volt)
                 public static final double RPM_THRESHOLD = 100; // the maximum difference between an RPM and the setpoint for a data point to be considered as a plataeu
@@ -138,9 +139,10 @@ public class Constants extends RobotConstants {
                 public static final double FEEDER_REVERSE = 0.25;
                 public static final double GATEKEEPER_POWER = -0.75;
                 public static final double INDEXER_POWER = -0.4;
-                public static final double[] BALL_SPACING = { -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
+                public static final double[] BALL_SPACING = {-25, -25, -25, -25};//{ -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
                 public static final double REVERSE_TIMEOUT = 1500; //timeout for how long to run the corner motors back (in case the sensor gets triggered)
-                public static final int JAM_COUNT_THRESHOLD = 100; //how long to reverse the intake after a jam is detected: 100 loop counts * 1/200hz = 0.5 seconds
+                public static final int JAM_COUNT_THRESHOLD = 100; //how long the motor has to be stopped in order for it to be considered a jam: 100 loop counts * 1/200hz = 0.5 seconds
+                public static final int JAM_REVERSE_COUNT_THRESHOLD = 100; //how long to reverse the intake after a jam is detected: 100 loop counts * 1/200hz = 0.5 seconds
         }
 
         public static class IntakeConstants {
@@ -177,14 +179,14 @@ public class Constants extends RobotConstants {
                                                                                      // rotations of the
                 // motor, we get 1 rotation of the arm (ask
                 // mech for this)
-                public static final double ARM_LENGTH = 30; // TODO: ASK MECH AND CHANGE LATER
-                public static final double LIMELIGHT_ARM_LENGTH = 27; // TODO: ASK MECH AND CHANGE LATER
-                public static final double LIMELIGHT_ARM_ANGLE = 5; // TODO: ASK MECH AND CHANGE LATER
+                public static final double ARM_LENGTH = 30; 
+                public static final double LIMELIGHT_ARM_LENGTH = 19;
+                public static final double LIMELIGHT_ARM_ANGLE = 40.26;
 
                 public static final PIDConstants ARM_PID = new PIDConstants(0, 0.15, 0, 0);
 
                 public static final double ARM_SATURATION_LIMIT = 2 / ARM_PID.kI; // set limit on integral accumulation
-                public static final double ZEROING_POWER = -0.1;
+                public static final double ZEROING_POWER = -0.2;
         }
 
 }

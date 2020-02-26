@@ -34,7 +34,7 @@ public class Arm extends Threaded {
     public static final Arm instance = new Arm();
     public LazyTalonFX ARM_MOTOR_LEADER, ARM_MOTOR_FOLLOWER;
     public DigitalInput LIMIT_SWITCH;
-    double setpoint;
+    public double setpoint;
     double current = 0;
     double error = 0;
     public double output = 0;
@@ -162,10 +162,10 @@ public class Arm extends Threaded {
 
         if((setpoint == 0) && isReady() && !getLimitStatus()) {
             output = Constants.ArmConstants.ZEROING_POWER;
-            Log.info("Arm", "Using ZEROING_POWER to finish zeroing the arm.");
+            // Log.info("Arm", "Using ZEROING_POWER to finish zeroing the arm.");
         } else if((setpoint == 0) && isReady() && getLimitStatus()) {
             output = 0;
-            Log.info("Arm", "In zero position, setting output to 0.");
+            // Log.info("Arm", "In zero position, setting output to 0.");
         }
 
 
