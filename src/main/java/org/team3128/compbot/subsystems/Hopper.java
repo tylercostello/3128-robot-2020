@@ -348,6 +348,8 @@ public class Hopper extends Threaded {
             setMotorPowers(0, 0, 0);
         } else if (SENSOR_0_STATE && openTheGates) {
             while (SENSOR_0_STATE) {
+                SENSOR_0_STATE = detectsBall0();
+                SENSOR_1_STATE = detectsBall1();
                 setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
                         Constants.HopperConstants.INDEXER_POWER);
                 if (!SENSOR_1_STATE && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
@@ -372,6 +374,8 @@ public class Hopper extends Threaded {
             ballCount--;
             reloading:
             while (!SENSOR_0_STATE) {
+                SENSOR_0_STATE = detectsBall0();
+                SENSOR_1_STATE = detectsBall1();
                 if(actionState == ActionState.SHOOTING) {
                     setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
                 } else {
@@ -401,6 +405,8 @@ public class Hopper extends Threaded {
         } else if(openTheGates && !SENSOR_0_STATE){
             loading:
             while (!SENSOR_0_STATE) {
+                SENSOR_0_STATE = detectsBall0();
+                SENSOR_1_STATE = detectsBall1();
                 if(actionState == ActionState.SHOOTING) {
                     setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
                 } else {
@@ -442,6 +448,7 @@ public class Hopper extends Threaded {
             startTime = RobotController.getFPGATime();
             while(!SENSOR_1_STATE && (RobotController.getFPGATime() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
                 //isReversing = true;
+                SENSOR_1_STATE = detectsBall1();
                 setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, 0);
                 Log.info("Hopper", "Reversing balls");
             }
