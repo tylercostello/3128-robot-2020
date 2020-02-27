@@ -271,12 +271,14 @@ public class Hopper extends Threaded {
                                                                                                                // the
                                                                                                                // corner
                                                                                                                // motor
-            Log.info("Hopper", "TETSTUFSLKHFKLFDHL" + CORNER_ENCODER.getPosition());
-            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math
-                    .abs(startPos)) { // if the ball gets to the right position
+            Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
+            Log.info("Hopper", "asekhf alk galrg aleirug aegiuw aweitu aweiu t");
+            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { // if the ball gets to the right position
+                Log.info("Hopper", "jajajajajajajajajajajajajajajajajajajaj");
                 isFeeding = false; // we're done
                 Log.info("Hopper", "reached end of offset");
             }
+            Log.info("Hopper", "asdkjgahsdlkgjahsdglkjahsdgjasdg");
             Log.info("Hopper", "is feeding");
         }
     }
@@ -293,9 +295,9 @@ public class Hopper extends Threaded {
                     Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
                     if (!isReversing) {
                         ballCount++; // iterate ballCount once because a ball has passed through our sensors
-                        Log.info("Hopper", "iterating ballCount");
+                        Log.info("Hopper", "iterating ballCount 1");
                     } else {
-                        Log.info("Hopper", "was reversing 1");
+                        Log.info("Hopper", "was reversing");
                         isReversing = false;
                     }
                 } else if(detectsBall(SENSOR_1)) {
