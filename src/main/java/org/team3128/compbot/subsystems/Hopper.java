@@ -261,7 +261,7 @@ public class Hopper extends Threaded {
             if (actionState == ActionState.INTAKING) {
                 setMotorPowers(0, 0, Constants.HopperConstants.INDEXER_POWER);
             } else {
-                Log.info("Hopper", "alarm alarm alarm alarm alarm alarm alarm alarm");
+                //Log.info("Hopper", "alarm alarm alarm alarm alarm alarm alarm alarm");
                 setMotorPowers(0, 0, 0);
             }
         } 

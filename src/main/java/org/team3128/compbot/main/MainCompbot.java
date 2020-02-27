@@ -117,6 +117,7 @@ public class MainCompbot extends NarwhalRobot {
     public static CanDevices[] CanChain = new CanDevices[42];
 
     public Command povCommand;
+    public Command shooterFF;
 
     public static void setCanChain() {  
         Constants.TestSuiteConstants.intake = new CanDevices(Constants.IntakeConstants.INTAKE_MOTOR_ID , "Intake", intake.INTAKE_MOTOR);
@@ -229,7 +230,15 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(new Button(11), "DisEngageClimberServos");
         listenerRight.nameControl(new Button(12), "EjectClimber");
 
+        //listenerRight.nameControl(new Button(10), "ShooterFF");
         listenerRight.nameControl(new POV(0), "IntakePOV");
+
+        
+        /*listenerRight.addButtonDownListener("ShooterFF", () -> {
+            shooterFF = new CmdShooterFF(shooter);
+            shooterFF.start();
+            Log.info("MainCompbot.java", "Shooter FF Starting");
+        });*/
 
         listenerRight.addMultiListener(() -> {
             if (driveCmdRunning.isRunning) {
