@@ -367,16 +367,21 @@ public class Hopper extends Threaded {
             setMotorPowers(0, 0, 0);
             setAction(ActionState.STANDBY);
             Log.info("Hopper", "ending organize because hopper is empty");
+            setMotorPowers(0, 0, 0);
         } else {
             startTime = RobotController.getFPGATime();
             while(!detectsBall(SENSOR_1) && (RobotController.getFPGATime() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
-                isReversing = true;
+                //isReversing = true;
                 setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, 0);
                 Log.info("Hopper", "Reversing balls");
             }
+            setMotorPowers(0, 0, 0);
+            if(detectsBall(SENSOR_1)) {
+                isReversing = true;
+            }
         }
 
-        setMotorPowers(0, 0, 0);
+        //setMotorPowers(0, 0, 0);
         setAction(ActionState.STANDBY);
     }
 
