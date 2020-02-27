@@ -271,7 +271,7 @@ public class Hopper extends Threaded {
                                                                                                                // the
                                                                                                                // corner
                                                                                                                // motor
-            Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
+            Log.info("Hopper", "TETSTUFSLKHFKLFDHL" + CORNER_ENCODER.getPosition());
             if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math
                     .abs(startPos)) { // if the ball gets to the right position
                 isFeeding = false; // we're done

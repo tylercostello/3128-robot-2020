@@ -85,9 +85,9 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_ANGLE = 30.0 * Angle.DEGREES;
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
-                public static final double TX_THRESHOLD = 1; // the maximum error in tx where the shooter will be allowed to shoot
+                public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.012, 0.0, 0.00003);
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.015, 0.0, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
@@ -115,10 +115,10 @@ public class Constants extends RobotConstants {
                 public static final int SHOOTER_MOTOR_RIGHT_ID = 7;
 
                 public static final double SHOOTER_GEARING = 1.5; // for every 1 rotation of the motor, the shooter does {SHOOTER_GEARING} rotations
-                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.0065, 0.01, 0.0000051);
+                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.0000065, 0, 0);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in this case, 1 volt)
-                public static final double RPM_THRESHOLD = 100; // the maximum difference between an RPM and the setpoint for a data point to be considered as a plataeu
+                public static final double RPM_THRESHOLD = 50; // the maximum difference between an RPM and the setpoint for a data point to be considered as a plataeu
                 public static final int PLATEAU_COUNT = 25; // 50 * 0.005s = 0.25 seconds of plateau required
         }
 

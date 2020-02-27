@@ -126,7 +126,7 @@ public class Shooter extends Threaded {
     }
 
     public double getRPMFromDistance(double distance) {
-        return 4000;
+        return 5500;
         // TODO: relationship between RPM and distance
     }
 
