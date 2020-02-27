@@ -273,11 +273,20 @@ public class Hopper extends Threaded {
                                                                                                                // motor
             Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
             Log.info("Hopper", "asekhf alk galrg aleirug aegiuw aweitu aweiu t");
-            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { // if the ball gets to the right position
-                Log.info("Hopper", "jajajajajajajajajajajajajajajajajajajaj");
-                isFeeding = false; // we're done
-                Log.info("Hopper", "reached end of offset");
+            if (ballCount > 0 && ballCount <= 4) {
+                if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { // if the ball gets to the right position
+                    Log.info("Hopper", "jajajajajajajajajajajajajajajajajajajaj");
+                    isFeeding = false; // we're done
+                    Log.info("Hopper", "reached end of offset");
+                }
+            } else {
+                Log.info("Hopper", "something was super wrong; your ballCount is " + ballCount);
+                if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[0]) >= Math.abs(startPos)) { // if the ball gets to the right position
+                    isFeeding = false; // we're done
+                    Log.info("Hopper", "reached end of offset");
+                }
             }
+            
             Log.info("Hopper", "asdkjgahsdlkgjahsdglkjahsdgjasdg");
             Log.info("Hopper", "is feeding");
         }
