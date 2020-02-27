@@ -19,6 +19,7 @@ public class Arm extends Threaded {
         INTAKE(0), // intaking balls
         STARTING(50), // within frame perimeter
         STARTING_DOWN(30), // arm is pushed to release the intake
+        LOADING_STATION(46),
         FAR_RANGE(60), // far range shooting
         SHORT_RANGE(20), // short range shooting
         CLIMBING(90), // climbing

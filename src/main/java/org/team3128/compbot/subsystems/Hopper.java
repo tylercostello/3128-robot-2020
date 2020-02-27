@@ -132,8 +132,8 @@ public class Hopper extends Threaded {
                 break;
 
             case ORGANIZING:
-                arm.setState(ArmState.STOWED);
                 organize();
+                arm.setState(ArmState.STOWED);
                 break;
         }
 

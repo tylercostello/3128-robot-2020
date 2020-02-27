@@ -220,8 +220,8 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
         // listenerRight.nameControl(new Button(3), "ClearTracker");
         listenerRight.nameControl(new Button(2), "zeroCallBount");
-        listenerRight.nameControl(new Button(3), "RezeroArm1");
-        listenerRight.nameControl(new Button(4), "RezeroArm2");
+        listenerRight.nameControl(new Button(3), "loadingStation");
+        listenerRight.nameControl(new Button(4), "RezeroArm");
         listenerRight.nameControl(new Button(5), "runShooterFF");
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
@@ -261,12 +261,12 @@ public class MainCompbot extends NarwhalRobot {
             triggerCommand = null;
             Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
-        listenerRight.addButtonDownListener("RezeroArm1", () -> {
+        listenerRight.addButtonDownListener("loadingStation", () -> {
             Log.info("Button3", "pressed");
-            arm.setState(ArmState.STOWED);
+            arm.setState(ArmState.LOADING_STATION);
 
         });
-        listenerRight.addButtonDownListener("RezeroArm2", () -> {
+        listenerRight.addButtonDownListener("RezeroArm", () -> {
             Log.info("Button4", "pressed");
             arm.setState(ArmState.STOWED);
         });
