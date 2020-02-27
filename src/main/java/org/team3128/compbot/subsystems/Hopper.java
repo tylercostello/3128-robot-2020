@@ -244,7 +244,7 @@ public class Hopper extends Threaded {
             Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
             if (!isReversing) {
                 ballCount++; // iterate ballCount once because a ball has passed through our sensors
-                Log.info("Hopper", "iterating ballCount");
+                Log.info("Hopper", "iterating ballCount 0");
             } else {
                 Log.info("Hopper", "was reversing");
                 isReversing = false;
@@ -272,8 +272,7 @@ public class Hopper extends Threaded {
                                                                                                                // corner
                                                                                                                // motor
             Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
-            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math
-                    .abs(startPos)) { // if the ball gets to the right position
+            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { // if the ball gets to the right position
                 isFeeding = false; // we're done
                 Log.info("Hopper", "reached end of offset");
             }
@@ -295,10 +294,10 @@ public class Hopper extends Threaded {
                         ballCount++; // iterate ballCount once because a ball has passed through our sensors
                         Log.info("Hopper", "iterating ballCount");
                     } else {
-                        Log.info("Hopper", "was reversing");
+                        Log.info("Hopper", "was reversing 1");
                         isReversing = false;
                     }
-                } else if(detectsBall(SENSOR_0)) {
+                } else if(detectsBall(SENSOR_1)) {
                     empty1 = false;
                 }
             }
@@ -316,12 +315,12 @@ public class Hopper extends Threaded {
                     Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
                     if (!isReversing) {
                         ballCount++; // iterate ballCount once because a ball has passed through our sensors
-                        Log.info("Hopper", "iterating ballCount");
+                        Log.info("Hopper", "iterating ballCount 2");
                     } else {
                         Log.info("Hopper", "was reversing");
                         isReversing = false;
                     }
-                } else if(detectsBall(SENSOR_0)) {
+                } else if(detectsBall(SENSOR_1)) {
                     empty1 = false;
                 }
             }
@@ -340,12 +339,12 @@ public class Hopper extends Threaded {
                     Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
                     if (!isReversing) {
                         ballCount++; // iterate ballCount once because a ball has passed through our sensors
-                        Log.info("Hopper", "iterating ballCount");
+                        Log.info("Hopper", "iterating ballCount 3");
                     } else {
                         Log.info("Hopper", "was reversing");
                         isReversing = false;
                     }
-                } else if(detectsBall(SENSOR_0)) {
+                } else if(detectsBall(SENSOR_1)) {
                     empty1 = false;
                 }
             }
