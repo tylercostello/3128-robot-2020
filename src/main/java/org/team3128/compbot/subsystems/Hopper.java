@@ -223,7 +223,7 @@ public class Hopper extends Threaded {
                 setMotorPowers(0, 0, 0);
             } else {
                 setMotorPowers(0, 0, 0);
-                Log.info("Hopper", "Handling more than 3 balls");
+                // Log.info("Hopper", "Handling more than 3 balls");
             }
         } else if (detectsBall(SENSOR_1)) { // if there is a ball in the first sensor position
             // empty1 = false; //tell code the position isn't empty
