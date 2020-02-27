@@ -333,7 +333,7 @@ public class Hopper extends Threaded {
                         Log.info("Hopper", "was reversing");
                         isReversing = false;
                     }
-                } else if(detectsBall(SENSOR_1)) {
+                }
                 if(detectsBall(SENSOR_1)) {
                     Log.info("Hopper", "setting empty1 to false 2");
                     empty1 = false;
