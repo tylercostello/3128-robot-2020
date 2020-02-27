@@ -43,7 +43,7 @@ public class CmdEjectBalls extends Command {
 
     @Override
     protected void execute() {
-        if (hopper.detectsBall(hopper.SENSOR_1)){
+        if (hopper.SENSOR_1_STATE){
             adjustBallCount--;
         }
         timeCounter++;

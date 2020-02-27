@@ -393,6 +393,8 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void updateDashboard() {
 
+        Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
+
         SmartDashboard.putString("ARM STATE", String.valueOf(arm.ARM_STATE));
         SmartDashboard.putNumber("ARM SETPOINT", arm.setpoint);
         SmartDashboard.putNumber("Intake Motor vel", hopper.INTAKE_MOTOR.getEncoder().getVelocity());
