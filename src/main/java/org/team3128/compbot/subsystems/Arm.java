@@ -161,10 +161,10 @@ public class Arm extends Threaded {
         }
 
 
-        if((setpoint == 0) && isReady() && !getLimitStatus()) {
+        if((setpoint == 0) && !getLimitStatus()) {
             output = Constants.ArmConstants.ZEROING_POWER;
             // Log.info("Arm", "Using ZEROING_POWER to finish zeroing the arm.");
-        } else if((setpoint == 0) && isReady() && getLimitStatus()) {
+        } else if((setpoint == 0) && getLimitStatus()) {
             output = 0;
             // Log.info("Arm", "In zero position, setting output to 0.");
         }

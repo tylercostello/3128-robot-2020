@@ -86,7 +86,7 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
                 public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be allowed to shoot
-                public static final double TX_OFFSET = -1.5; // to offset alignment in either direction
+                public static final double TX_OFFSET = -2.5; // to offset alignment in either direction
                 public static final PIDConstants VISION_PID = new PIDConstants(0, 0.0135, 0.02, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
@@ -148,9 +148,9 @@ public class Constants extends RobotConstants {
         public static class IntakeConstants {
                 public static final int INTAKE_MOTOR_ID = 5;
 
-                public static final double INTAKE_MOTOR_ON_VALUE = 0.4;
+                public static final double INTAKE_MOTOR_ON_VALUE = -0.7;
                 public static final double INTAKE_MOTOR_OFF_VALUE = 0;
-                public static final double INTAKE_MOTOR_REVERSE_VALUE = -0.4; //for clearing jams
+                public static final double INTAKE_MOTOR_REVERSE_VALUE = 0.4; //for clearing jams
         }
         
         public static class ClimberConstants {
@@ -167,13 +167,13 @@ public class Constants extends RobotConstants {
         public static class ArmConstants {
                 public static final int ARM_MOTOR_LEADER_ID = 5;
                 public static final int ARM_MOTOR_FOLLOWER_ID = 4;
-                public static final int ARM_LIMIT_SWITCH_ID = 0;
+                public static final int ARM_LIMIT_SWITCH_ID = 1;
 
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
                 public static final NeutralMode ARM_NEUTRAL_MODE_DEBUG = NeutralMode.Coast;
                 public static final double MAX_ARM_ANGLE = 80;
                 public static final double ANGLE_THRESHOLD = 5;
-                public static final double PLATEAU_THRESHOLD = 100;
+                public static final double PLATEAU_THRESHOLD = 50;
 
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)
                                                                                      // rotations of the
@@ -186,7 +186,7 @@ public class Constants extends RobotConstants {
                 public static final PIDConstants ARM_PID = new PIDConstants(0, 0.15, 0, 0);
 
                 public static final double ARM_SATURATION_LIMIT = 2 / ARM_PID.kI; // set limit on integral accumulation
-                public static final double ZEROING_POWER = -0.2;
+                public static final double ZEROING_POWER = -0.35;
         }
 
 }

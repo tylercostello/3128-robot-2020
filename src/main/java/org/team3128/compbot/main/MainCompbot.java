@@ -74,7 +74,6 @@ public class MainCompbot extends NarwhalRobot {
     static Hopper hopper = Hopper.getInstance();
     static Arm arm = Arm.getInstance();
     static Shooter shooter = Shooter.getInstance();
-    static Intake intake = Intake.getInstance();
     static Climber climber = Climber.getInstance();
 
  
@@ -120,7 +119,7 @@ public class MainCompbot extends NarwhalRobot {
     public Command shooterFF;
 
     public static void setCanChain() {  
-        Constants.TestSuiteConstants.intake = new CanDevices(Constants.IntakeConstants.INTAKE_MOTOR_ID , "Intake", intake.INTAKE_MOTOR);
+        Constants.TestSuiteConstants.intake = new CanDevices(Constants.IntakeConstants.INTAKE_MOTOR_ID , "Intake", hopper.INTAKE_MOTOR);
         Constants.TestSuiteConstants.rightDriveLeader = new CanDevices(Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID, "Right Drive Leader", drive.rightTalon);
         Constants.TestSuiteConstants.rightDriveFollower = new CanDevices(Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID, "Right Drive Follower", drive.rightTalonSlave);
         Constants.TestSuiteConstants.feeder = new CanDevices(Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID, "Feeder", hopper.HOPPER_FEEDER_MOTOR);
@@ -156,7 +155,6 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        scheduler.schedule(intake, executor);
         // scheduler.schedule(climber, executor);
         scheduler.schedule(robotTracker, executor);
 
@@ -397,7 +395,6 @@ public class MainCompbot extends NarwhalRobot {
 
         SmartDashboard.putString("ARM STATE", String.valueOf(arm.ARM_STATE));
         SmartDashboard.putNumber("ARM SETPOINT", arm.setpoint);
-        SmartDashboard.putNumber("Intake Motor vel", hopper.INTAKE_MOTOR.getEncoder().getVelocity());
         if (arm.getLimitStatus()) {
             arm.ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
             arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
