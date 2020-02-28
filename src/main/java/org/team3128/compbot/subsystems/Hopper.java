@@ -465,4 +465,8 @@ public class Hopper extends Threaded {
     public void setBallCount(int count) {
         this.ballCount = count;
     }
+
+    public int getBallCount() {
+        return this.ballCount;
+    }
 }

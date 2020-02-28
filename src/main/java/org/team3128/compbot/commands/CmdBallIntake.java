@@ -26,18 +26,18 @@ public class CmdBallIntake extends CommandGroup {
     
     public CmdBallIntake(Gyro gyro, Limelight ballLimelight, Hopper hopper, Arm arm, DriveCommandRunning cmdRunning, PIDConstants visionPID, PIDConstants blindPID, double targetHeight, double offset) {
         
-        /*addParallel(//new CmdRunInParallel(
+        addParallel(
             new CmdBallPursuit(
                 gyro, ballLimelight, cmdRunning, targetHeight * Length.cm,
                 visionPID, offset, 2.5 * Length.ft, 0.6666666666666666666666 * Length.ft,
                 blindPID, 42 * Angle.DEGREES)//,
                 //new CmdStreamUpdate(bottomLimelight, topLimelight, useBottom)
         );
+        
         addParallel(
-            new CmdIntake(hopper)
+            new CmdIntake(hopper, arm)
         );
-        */
-
+        
         //addSequential(new CmdIntake(hopper, arm));
     }
 
