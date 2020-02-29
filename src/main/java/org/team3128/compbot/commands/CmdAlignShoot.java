@@ -111,25 +111,25 @@ public class CmdAlignShoot extends Command {
                     Log.info("CmdAlignShoot", "Switching to FEEDBACK...");
                     LimelightData initData = limelight.getValues(Constants.VisionConstants.SAMPLE_RATE);
 
-                    double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE;
+                    double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE + Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE;
 
-                    double limelight_height = Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle); // TODO:
                                                                                                                         // add
-                                                                                                                        // limelight
-                                                                                                                        // height
-                                                                                                                        // to
-                                                                                                                        // this
-                                                                                                                        // (when
-                                                                                                                        // stowed)
+                    double limelight_height = Constants.VisionConstants.PIVOT_HEIGHT + (Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle));
 
                     double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
                             / (RobotMath.tan(initData.ty()));
 
                     effective_distance = distance / RobotMath.cos(initData.tx());
 
+                    SmartDashboard.putNumber("effective_distance", effective_distance);
+                    SmartDashboard.putNumber("curLLANgle", currLLAngle);
+                    SmartDashboard.putNumber("liemlight_height", limelight_height);
+                    SmartDashboard.putNumber("ty", initData.ty());
+
                     desiredRPM = shooter.getRPMFromDistance(effective_distance);
 
                     shooter.setSetpoint(desiredRPM);
+
                     currentHorizontalOffset = limelight.getValue(LimelightKey.HORIZONTAL_OFFSET, 5);
 
                     previousTime = RobotController.getFPGATime();
@@ -156,17 +156,9 @@ public class CmdAlignShoot extends Command {
                     if (!gotDistance) {
                         LimelightData initData = limelight.getValues(Constants.VisionConstants.SAMPLE_RATE);
 
-                        double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE;
+                        double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE + Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE;
 
-                        double limelight_height = Constants.ArmConstants.LIMELIGHT_ARM_LENGTH
-                                * RobotMath.sin(currLLAngle); // TODO:
-                                                              // add
-                                                              // limelight
-                                                              // height
-                                                              // to
-                                                              // this
-                                                              // (when
-                                                              // stowed)
+                        double limelight_height = Constants.VisionConstants.PIVOT_HEIGHT + (Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle));
 
                         double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
                                 / (RobotMath.tan(initData.ty()));
@@ -176,6 +168,12 @@ public class CmdAlignShoot extends Command {
                         desiredRPM = shooter.getRPMFromDistance(effective_distance);
 
                         shooter.setSetpoint(desiredRPM);
+
+                        SmartDashboard.putNumber("effective_distance", effective_distance);
+                        SmartDashboard.putNumber("curLLANgle", currLLAngle);
+                        SmartDashboard.putNumber("liemlight_height", limelight_height);
+                        SmartDashboard.putNumber("ty", initData.ty());
+
 
                         gotDistance = true;
                     }
@@ -239,13 +237,9 @@ public class CmdAlignShoot extends Command {
         }
 
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
-            Log.info("AAAAAAAAAA", "AAAAAAAAAAAAAAAAH");
-            // if (shooter.isReady()) {
-            // hopperShoot = new CmdShoot(hopper);
-            // hopperShoot.start();
+            Log.info("CmdAlignShoot", "Trying to shoot ball");
             hopper.shoot();
-            Log.info("Hopper", "to shoot");
-            // numBallsShot++;
+            SmartDashboard.putNumber("Actual RPM Shooter", shooter.getRPM());
         } else {
             hopper.unShoot();
         }
@@ -253,12 +247,11 @@ public class CmdAlignShoot extends Command {
 
     @Override
     protected boolean isFinished() {
-        // if (hopper.isEmpty() || numBallsShot >= numBallsToShoot) {
-        // return true;
-        // } else {
-        // return false;
-        // }
+        if (hopper.isEmpty() || numBallsShot >= numBallsToShoot) {
+        return true;
+        } else {
         return false;
+        }
     }
 
     @Override
@@ -268,8 +261,6 @@ public class CmdAlignShoot extends Command {
         shooter.setSetpoint(0);
         cmdRunning.isRunning = true;
 
-        // NarwhalDashboard.put("align_status", "blind");
-
         Log.info("CmdAlignShoot", "Command Finished.");
         hopper.setAction(Hopper.ActionState.ORGANIZING);
     }
@@ -277,13 +268,5 @@ public class CmdAlignShoot extends Command {
     @Override
     protected void interrupted() {
         end();
-        // drive.stopMovement();
-        // limelight.setLEDMode(LEDMode.OFF);
-
-        // // NarwhalDashboard.put("align_status", "blind");
-
-        // cmdRunning.isRunning = false;
-
-        // Log.info("CmdAlignShoot", "Command Finished.");
     }
 }

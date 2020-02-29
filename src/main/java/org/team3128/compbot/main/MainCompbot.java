@@ -69,12 +69,14 @@ public class MainCompbot extends NarwhalRobot {
     public Command ejectBallsCommand;
     private DriveCommandRunning driveCmdRunning;
 
-    FalconDrive drive = FalconDrive.getInstance();
-    Hopper hopper = Hopper.getInstance();
-    Arm arm = Arm.getInstance();
-    Shooter shooter = Shooter.getInstance();
-    Intake intake = Intake.getInstance();
-    Climber climber = Climber.getInstance();
+
+    static FalconDrive drive = FalconDrive.getInstance();
+    static Hopper hopper = Hopper.getInstance();
+    static Arm arm = Arm.getInstance();
+    static Shooter shooter = Shooter.getInstance();
+    static Climber climber = Climber.getInstance();
+
+ 
     RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -84,7 +86,7 @@ public class MainCompbot extends NarwhalRobot {
     public Joystick joystickRight, joystickLeft;
     public ListenerManager listenerLeft, listenerRight;
     public Gyro gyro;
-    public PowerDistributionPanel pdp;
+    public static PowerDistributionPanel pdp;
 
     public NetworkTable table;
     public NetworkTable limelightTable;
@@ -98,18 +100,53 @@ public class MainCompbot extends NarwhalRobot {
 
     public Limelight shooterLimelight, ballLimelight;
     public Limelight[] limelights;
+    public boolean inPlace = false;
+    public boolean inPlace2 = false;
+
+    public int countBalls = 0;
+    public int countBalls2 = 0;
+    public static CanDevices leftDriveLeader;
+    public static CanDevices leftDriveFollower;
+    public static CanDevices rightDriveLeader;
+    public static CanDevices rightDriveFollower;
+    public static CanDevices PDP;
+
 
     public ErrorCatcherUtility errorCatcher;
     public static CanDevices[] CanChain = new CanDevices[42];
 
     public Command povCommand;
+    public Command shooterFF;
 
-    public static void setCanChain() {
-        CanChain[0] = Constants.TestSuiteConstants.rightDriveLeader;
-        CanChain[1] = Constants.TestSuiteConstants.rightDriveFollower;
-        CanChain[2] = Constants.TestSuiteConstants.leftDriveFollower;
-        CanChain[3] = Constants.TestSuiteConstants.leftDriveLeader;
+    public static void setCanChain() {  
+        Constants.TestSuiteConstants.intake = new CanDevices(Constants.IntakeConstants.INTAKE_MOTOR_ID , "Intake", hopper.INTAKE_MOTOR);
+        Constants.TestSuiteConstants.rightDriveLeader = new CanDevices(Constants.DriveConstants.RIGHT_DRIVE_FRONT_ID, "Right Drive Leader", drive.rightTalon);
+        Constants.TestSuiteConstants.rightDriveFollower = new CanDevices(Constants.DriveConstants.RIGHT_DRIVE_MIDDLE_ID, "Right Drive Follower", drive.rightTalonSlave);
+        Constants.TestSuiteConstants.feeder = new CanDevices(Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID, "Feeder", hopper.HOPPER_FEEDER_MOTOR);
+        Constants.TestSuiteConstants.PDP = new CanDevices(0, "PDP", pdp);
+        Constants.TestSuiteConstants.leftDriveLeader = new CanDevices(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID, "Left Drive Leader", drive.leftTalon);
+        Constants.TestSuiteConstants.leftDriveFollower = new CanDevices(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID, "Left Drive Follower", drive.leftTalonSlave);
+        Constants.TestSuiteConstants.armLeader = new CanDevices(Constants.ArmConstants.ARM_MOTOR_LEADER_ID, "Arm Leader", arm.ARM_MOTOR_LEADER);
+        Constants.TestSuiteConstants.armFollower = new CanDevices(Constants.ArmConstants.ARM_MOTOR_FOLLOWER_ID, "Arm Follower", arm.ARM_MOTOR_FOLLOWER);
+        Constants.TestSuiteConstants.shooterLeft = new CanDevices(Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID, "Shooter Left", shooter.LEFT_SHOOTER);
+        Constants.TestSuiteConstants.gatekeeper = new CanDevices(Constants.HopperConstants.GATEKEEPER_MOTOR_ID, "Gatekeeper", hopper.GATEKEEPER_MOTOR);
+        Constants.TestSuiteConstants.shooterRight = new CanDevices(Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID, "Shooter Right", shooter.RIGHT_SHOOTER);
+        Constants.TestSuiteConstants.corner = new CanDevices(Constants.HopperConstants.CORNER_MOTOR_ID, "Corner", hopper.CORNER_MOTOR);
+        
+
+        CanChain[0] = Constants.TestSuiteConstants.intake;
+        CanChain[1] = Constants.TestSuiteConstants.rightDriveLeader;
+        CanChain[2] = Constants.TestSuiteConstants.rightDriveFollower;
+        CanChain[3] = Constants.TestSuiteConstants.feeder;
         CanChain[4] = Constants.TestSuiteConstants.PDP;
+        CanChain[5] = Constants.TestSuiteConstants.leftDriveLeader;
+        CanChain[6] = Constants.TestSuiteConstants.leftDriveFollower;
+        CanChain[7] = Constants.TestSuiteConstants.armLeader;
+        CanChain[8] = Constants.TestSuiteConstants.armFollower;
+        CanChain[9] = Constants.TestSuiteConstants.shooterLeft;
+        CanChain[10] = Constants.TestSuiteConstants.gatekeeper;
+        CanChain[11] = Constants.TestSuiteConstants.shooterRight;
+        CanChain[12] = Constants.TestSuiteConstants.corner;
     }
 
     @Override
@@ -118,7 +155,6 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        scheduler.schedule(intake, executor);
         // scheduler.schedule(climber, executor);
         scheduler.schedule(robotTracker, executor);
 
@@ -157,8 +193,15 @@ public class MainCompbot extends NarwhalRobot {
         errorCatcher = new ErrorCatcherUtility(CanChain, limelights, drive);
 
         NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
-            if (down) {
-                errorCatcher.testEverything();
+
+            if (down) {               
+               errorCatcher.testEverything();
+            }
+        });
+        NarwhalDashboard.addButton("VelocityTester", (boolean down) -> {
+            if (down) {               
+               errorCatcher.velocityTester();
+
             }
         });
     }
@@ -175,9 +218,9 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(ControllerExtreme3D.TRIGGER, "AlignShoot");
         // listenerRight.nameControl(new Button(3), "ClearTracker");
         listenerRight.nameControl(new Button(2), "zeroCallBount");
-        listenerRight.nameControl(new Button(3), "RezeroArm1");
-        listenerRight.nameControl(new Button(4), "RezeroArm2");
-        // listenerRight.nameControl(new Button(5), "runShooterFF");
+        listenerRight.nameControl(new Button(3), "loadingStation");
+        listenerRight.nameControl(new Button(4), "RezeroArm");
+        listenerRight.nameControl(new Button(5), "runShooterFF");
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
         listenerRight.nameControl(new Button(7), "EjectBalls");
@@ -185,7 +228,15 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(new Button(11), "DisEngageClimberServos");
         listenerRight.nameControl(new Button(12), "EjectClimber");
 
+        //listenerRight.nameControl(new Button(10), "ShooterFF");
         listenerRight.nameControl(new POV(0), "IntakePOV");
+
+        
+        /*listenerRight.addButtonDownListener("ShooterFF", () -> {
+            shooterFF = new CmdShooterFF(shooter);
+            shooterFF.start();
+            Log.info("MainCompbot.java", "Shooter FF Starting");
+        });*/
 
         listenerRight.addMultiListener(() -> {
             if (driveCmdRunning.isRunning) {
@@ -208,12 +259,12 @@ public class MainCompbot extends NarwhalRobot {
             triggerCommand = null;
             Log.info("MainCompbot.java", "[Vision Alignment] Stopped");
         });
-        listenerRight.addButtonDownListener("RezeroArm1", () -> {
+        listenerRight.addButtonDownListener("loadingStation", () -> {
             Log.info("Button3", "pressed");
-            arm.setState(ArmState.STOWED);
+            arm.setState(ArmState.LOADING_STATION);
 
         });
-        listenerRight.addButtonDownListener("RezeroArm2", () -> {
+        listenerRight.addButtonDownListener("RezeroArm", () -> {
             Log.info("Button4", "pressed");
             arm.setState(ArmState.STOWED);
         });
@@ -239,22 +290,30 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
         });
-        /*
-         * listenerRight.addButtonDownListener("runArmFF", () -> { Log.info("Button6",
-         * "pressed"); Log.info("Shooter", "Start Voltage: " +
-         * String.valueOf(RobotController.getBatteryVoltage())); // armFFCommand = new
-         * CmdArmFF(arm); // armFFCommand.start(); });
-         * 
-         * listenerRight.addButtonDownListener("runShooterFF", () -> {
-         * Log.info("Button5", "pressed"); Log.info("Arm", "Start Voltage: " +
-         * String.valueOf(RobotController.getBatteryVoltage())); // shooterFFCommand =
-         * new CmdShooterFF(shooter); // shooterFFCommand.start(); });
-         * 
-         * listenerRight.addButtonDownListener("endVoltage", () -> { Log.info("Shooter",
-         * String.valueOf(RobotController.getBatteryVoltage()));
-         * 
-         * });
-         */
+        listenerRight.addButtonDownListener("runShooterFF", () -> {
+            Log.info("Button5", "pressed");
+            Log.info("Shooter", "Start Voltage: " +
+            String.valueOf(RobotController.getBatteryVoltage()));
+            shooterFFCommand = new CmdShooterFF(shooter);
+            shooterFFCommand.start(); 
+        });
+        listenerRight.addButtonUpListener("runShooterFF", () -> {
+            Log.info("Button5", "released");
+            Log.info("Button5", "stopping cmdShooterFF");
+            shooterFFCommand.cancel();
+            shooterFFCommand = null;
+        });
+        
+        // listenerRight.addButtonDownListener("runShooterFF", () -> {
+        // Log.info("Button5", "pressed"); Log.info("Arm", "Start Voltage: " +
+        // String.valueOf(RobotController.getBatteryVoltage())); // shooterFFCommand =
+        // new CmdShooterFF(shooter); // shooterFFCommand.start(); });
+        
+        // listenerRight.addButtonDownListener("endVoltage", () -> { Log.info("Shooter",
+        // String.valueOf(RobotController.getBatteryVoltage()));
+        
+        // });
+         
 
         listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
@@ -331,7 +390,12 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
-        if (!arm.getLimitStatus()) {
+
+        Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
+
+        SmartDashboard.putString("ARM STATE", String.valueOf(arm.ARM_STATE));
+        SmartDashboard.putNumber("ARM SETPOINT", arm.setpoint);
+        if (arm.getLimitStatus()) {
             arm.ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
             arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
         }
@@ -432,20 +496,6 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void autonomousInit() {
-        waypoints.add(new Pose2D(0, 0, Rotation2D.fromDegrees(0)));
-        waypoints.add(new Pose2D(0 * Constants.MechanismConstants.inchesToMeters,
-                70 * Constants.MechanismConstants.inchesToMeters, Rotation2D.fromDegrees(-45)));
-
-        trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
-                120 * Constants.MechanismConstants.inchesToMeters, 0.5, false);
-
-        trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
-        Log.info("MainCompbot", "going into autonomousinit");
-        scheduler.resume();
-        robotTracker.resetOdometry();
-        drive.setAutoTrajectory(trajectory, false);
-        drive.startTrajectory();
-        startTime = Timer.getFPGATimestamp();
     }
 
     @Override
