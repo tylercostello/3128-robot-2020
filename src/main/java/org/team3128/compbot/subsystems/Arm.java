@@ -19,6 +19,7 @@ public class Arm extends Threaded {
         INTAKE(0), // intaking balls
         STARTING(50), // within frame perimeter
         STARTING_DOWN(30), // arm is pushed to release the intake
+        LOADING_STATION(46),
         FAR_RANGE(60), // far range shooting
         SHORT_RANGE(20), // short range shooting
         CLIMBING(90), // climbing
@@ -160,10 +161,10 @@ public class Arm extends Threaded {
         }
 
 
-        if((setpoint == 0) && isReady() && !getLimitStatus()) {
+        if((setpoint == 0) && !getLimitStatus()) {
             output = Constants.ArmConstants.ZEROING_POWER;
             // Log.info("Arm", "Using ZEROING_POWER to finish zeroing the arm.");
-        } else if((setpoint == 0) && isReady() && getLimitStatus()) {
+        } else if((setpoint == 0) && getLimitStatus()) {
             output = 0;
             // Log.info("Arm", "In zero position, setting output to 0.");
         }
