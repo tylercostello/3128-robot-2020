@@ -106,7 +106,7 @@ public class Arm extends Threaded {
         return LIMIT_SWITCH.get();
     }
 
-    public boolean isReady () {
+    public boolean isReady() {
         return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD); 
     }
 
