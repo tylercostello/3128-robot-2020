@@ -180,8 +180,4 @@ public class Arm extends Threaded {
 
     }
 
-    public boolean isReady() {
-        return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD);
-    }
-
 }
