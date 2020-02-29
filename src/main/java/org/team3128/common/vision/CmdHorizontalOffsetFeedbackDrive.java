@@ -26,7 +26,7 @@ public class CmdHorizontalOffsetFeedbackDrive extends Command {
     NEODrive drive;
     Gyro gyro;
 
-    //DriveCalibrationUtility dcu;
+    DriveCalibrationUtility dcu;
 
     Limelight txLimelight;
     Limelight distanceLimelight;

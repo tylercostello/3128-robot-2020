@@ -16,7 +16,6 @@ import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.vision.CmdHorizontalOffsetFeedbackDrive;
-import org.team3128.athos.autonomous.deprecated.CmdAutoBall;
 import org.team3128.athos.subsystems.Constants;
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
@@ -250,26 +249,6 @@ public class MainAthos extends NarwhalRobot {
         });
         lm.addButtonUpListener("AlignToTarget", () -> {
             Log.info("MainAthos.java", "[Vision Alignment] Not created yet, would've ended");
-        });
-
-        lm.nameControl(new Button(7), "AlignToBall");
-
-        lm.addButtonDownListener("AlignToBall", () -> {
-            // TODO: Add current implementation of vision alignment
-            Log.info("MainAthos.java", "Starting vision alignment to ball");
-
-            visionPID = new PIDConstants(0, 0.02, 0.0, 0.00001);
-            blindPID = new PIDConstants(0.1, 0, 0, 0);
-
-            CmdAutoBall alignCommand = new CmdAutoBall(ballLimelight, gyro, visionPID, blindPID, cmdDriveRunning);
-            alignCommand.start();
-
-        });
-        lm.addButtonUpListener("AlignToBall", () -> {
-            Log.info("MainAthos.java", "Ending vision alignment to ball");
-
-            alignCommand.cancel();
-            alignCommand = null;
         });
 
         lm.addButtonDownListener("ResetGyro", () -> {
