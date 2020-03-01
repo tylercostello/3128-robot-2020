@@ -6,6 +6,7 @@ import org.team3128.common.control.trajectory.constraint.TrajectoryConstraint;
 import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.drive.Drive;
+import org.team3128.common.drive.DriveSignal;
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.common.utility.Log;
 
@@ -53,7 +54,12 @@ public class CmdAutoTrajectory extends Command {
        }
     }
 
-    @Override public void interrupted() { 
+    @Override public void end() {
+        drive.setWheelPower(new DriveSignal(0, 0));
+    }
+
+    @Override public void interrupted() {
+        end();
         Log.info("CmdAutoTrajectory", "Interrupted.");
     }
 
