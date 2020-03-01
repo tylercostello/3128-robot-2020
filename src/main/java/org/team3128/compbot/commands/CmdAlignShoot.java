@@ -239,7 +239,7 @@ public class CmdAlignShoot extends Command {
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
             Log.info("CmdAlignShoot", "Trying to shoot ball");
             hopper.shoot();
-            SmartDashboard.putNumber("Actual RPM Shooter", shooter.getRPM());
+            //SmartDashboard.putNumber("Actual RPM Shooter", shooter.getRPM());
         } else {
             hopper.unShoot();
         }

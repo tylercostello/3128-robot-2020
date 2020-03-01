@@ -28,7 +28,7 @@ public class CmdAutoTrajectory extends Command {
         this.drive = drive;
         this.timeoutMs = timeoutMs;
 
-        for(Pose2D ele:inputWaypoints) {
+        for(Pose2D ele : inputWaypoints) {
             waypoints.add(ele);
         }
     }
@@ -46,12 +46,9 @@ public class CmdAutoTrajectory extends Command {
 
     @Override protected synchronized boolean isFinished() {
         timeCurrent = Timer.getFPGATimestamp();
-        if ((timeCurrent - timeInitial) >= timeExpected) {
+        if ((timeCurrent - timeInitial) >= Math.min(timeExpected, timeoutMs)) {
            return true;
-        } else if ((timeCurrent - timeInitial) >= timeoutMs) {
-            return true;
-        } 
-        else {
+        } else {
            return false;
        }
     }

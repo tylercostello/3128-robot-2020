@@ -331,7 +331,7 @@ public class Hopper extends Threaded {
                                                                                                                // the
                                                                                                                // corner
                                                                                                                // motor
-            Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
+            //////Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
             if (ballCount > 0 && ballCount <= 4) {
                 if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { // if the ball gets to the right position
                     isFeeding = false; // we're done
@@ -344,7 +344,7 @@ public class Hopper extends Threaded {
                     Log.info("Hopper", "reached end of offset");
                 }
             }
-            Log.info("Hopper", "is feeding");
+            //////Log.info("Hopper", "is feeding");
         }
     }
 
@@ -362,6 +362,7 @@ public class Hopper extends Threaded {
                 if (shootingReversingIndexer) {
                     setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
                         -Constants.HopperConstants.INDEXER_POWER);
+                    Log.info("Hopper", "Hopper is trying to hold 4th and 5th ball from entering the robot!");
                 } else if (!shootingReversingIndexer) {
                     setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
                         Constants.HopperConstants.INDEXER_POWER);
@@ -380,10 +381,10 @@ public class Hopper extends Threaded {
                     }
                 }
                 if(SENSOR_1_STATE) {
-                    Log.info("Hopper", "setting empty1 to false 1");
+                    //////Log.info("Hopper", "setting empty1 to false 1");
                     empty1 = false;
                 } else {
-                    Log.info("Hopper", "setting empty1 to true 1");
+                    //////Log.info("Hopper", "setting empty1 to true 1");
                     empty1 = true;
                 }
             }
@@ -422,10 +423,10 @@ public class Hopper extends Threaded {
                     }
                 }
                 if(SENSOR_1_STATE) {
-                    Log.info("Hopper", "setting empty1 to false 2");
+                    //////Log.info("Hopper", "setting empty1 to false 2");
                     empty1 = false;
                 } else {
-                    Log.info("Hopper", "setting empty1 to true 2");
+                    //////Log.info("Hopper", "setting empty1 to true 2");
                     empty1 = true;
                 }
             }
@@ -465,10 +466,10 @@ public class Hopper extends Threaded {
                     }
                 }
                 if(SENSOR_1_STATE) {
-                    Log.info("Hopper", "setting empty1 to false 3");
+                    //////Log.info("Hopper", "setting empty1 to false 3");
                     empty1 = false;
                 } else {
-                    Log.info("Hopper", "setting empty1 to true 3");
+                    //////Log.info("Hopper", "setting empty1 to true 3");
                     empty1 = true;
                 }
             }

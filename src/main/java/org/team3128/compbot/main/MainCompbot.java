@@ -240,7 +240,7 @@ public class MainCompbot extends NarwhalRobot {
 
         listenerRight.addMultiListener(() -> {
             if (driveCmdRunning.isRunning) {
-                double horiz = -0.7 * listenerRight.getAxis("MoveTurn");
+                double horiz = -0.5 * listenerRight.getAxis("MoveTurn"); //0.7
                 double vert = -1.0 * listenerRight.getAxis("MoveForwards");
                 double throttle = -1.0 * listenerRight.getAxis("Throttle");
 
@@ -391,7 +391,7 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void updateDashboard() {
 
-        Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
+        //Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
 
         SmartDashboard.putString("ARM STATE", String.valueOf(arm.ARM_STATE));
         SmartDashboard.putNumber("ARM SETPOINT", arm.setpoint);

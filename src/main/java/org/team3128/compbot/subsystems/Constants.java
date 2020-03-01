@@ -86,7 +86,7 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
                 public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be allowed to shoot
-                public static final double TX_OFFSET = -2.5; // to offset alignment in either direction
+                public static final double TX_OFFSET = -1; // to offset alignment in either direction
                 public static final PIDConstants VISION_PID = new PIDConstants(0, 0.0135, 0.02, 0.00003);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
@@ -139,7 +139,7 @@ public class Constants extends RobotConstants {
                 public static final double FEEDER_REVERSE = 0.25;
                 public static final double GATEKEEPER_POWER = -0.75;
                 public static final double INDEXER_POWER = -0.4;
-                public static final double[] BALL_SPACING = {-25, -27.5, -8, -25};//{ -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
+                public static final double[] BALL_SPACING = {-29/*25*/, -32/*-27.5*/, -8, -25};//{ -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
                 public static final double REVERSE_TIMEOUT = 1500; //timeout for how long to run the corner motors back (in case the sensor gets triggered)
                 public static final int JAM_COUNT_THRESHOLD = 100; //how long the motor has to be stopped in order for it to be considered a jam: 100 loop counts * 1/200hz = 0.5 seconds
                 public static final int JAM_REVERSE_COUNT_THRESHOLD = 100; //how long to reverse the intake after a jam is detected: 100 loop counts * 1/200hz = 0.5 seconds
@@ -148,7 +148,7 @@ public class Constants extends RobotConstants {
         public static class IntakeConstants {
                 public static final int INTAKE_MOTOR_ID = 5;
 
-                public static final double INTAKE_MOTOR_ON_VALUE = -0.7;
+                public static final double INTAKE_MOTOR_ON_VALUE = -0.35;
                 public static final double INTAKE_MOTOR_OFF_VALUE = 0;
                 public static final double INTAKE_MOTOR_REVERSE_VALUE = 0.4; //for clearing jams
         }
@@ -167,7 +167,7 @@ public class Constants extends RobotConstants {
         public static class ArmConstants {
                 public static final int ARM_MOTOR_LEADER_ID = 5;
                 public static final int ARM_MOTOR_FOLLOWER_ID = 4;
-                public static final int ARM_LIMIT_SWITCH_ID = 1;
+                public static final int ARM_LIMIT_SWITCH_ID = 0;
 
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
                 public static final NeutralMode ARM_NEUTRAL_MODE_DEBUG = NeutralMode.Coast;
@@ -183,7 +183,7 @@ public class Constants extends RobotConstants {
                 public static final double LIMELIGHT_ARM_LENGTH = 19;
                 public static final double LIMELIGHT_ARM_ANGLE = 40.26;
 
-                public static final PIDConstants ARM_PID = new PIDConstants(0, 0.15, 0, 0);
+                public static final PIDConstants ARM_PID = new PIDConstants(0, 0.15, 0.01, 0);
 
                 public static final double ARM_SATURATION_LIMIT = 2 / ARM_PID.kI; // set limit on integral accumulation
                 public static final double ZEROING_POWER = -0.35;

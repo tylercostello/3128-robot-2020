@@ -43,7 +43,7 @@ public class CmdIntake extends Command {
     @Override
     protected boolean isFinished() {
         if ((hopper.getBallCount() - startingBallCount) == 1) { // this logic is flawed if there are already three balls in the hopper
-                                                              // but, hopefully, this will only be run when the hopper is empty with our autos
+                                                                // but, hopefully, this will only be run when the hopper is empty with our autos
             return true;
         }
         return false;
