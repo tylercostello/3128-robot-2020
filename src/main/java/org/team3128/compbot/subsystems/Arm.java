@@ -88,7 +88,7 @@ public class Arm extends Threaded {
     public double getAngle() {
         return (((getEncoderPos() / Constants.MechanismConstants.ENCODER_RESOLUTION_PER_ROTATION)
                 / Constants.ArmConstants.ARM_GEARING) * 360) % 360; // TODO: account for
-        // possible negative
+                                                                    // possible negative
     }
 
     public void zero() {
@@ -105,6 +105,10 @@ public class Arm extends Threaded {
 
     public boolean getLimitStatus() {
         return !LIMIT_SWITCH.get();
+    }
+
+    public boolean isReady() {
+        return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD); 
     }
 
     @Override
@@ -173,10 +177,7 @@ public class Arm extends Threaded {
         ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
 
         prevError = error;
-    }
 
-    public boolean isReady() {
-        return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD);
     }
 
 }
