@@ -155,7 +155,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        // scheduler.schedule(climber, executor);
+        scheduler.schedule(climber, executor);
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
@@ -224,12 +224,15 @@ public class MainCompbot extends NarwhalRobot {
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
         listenerRight.nameControl(new Button(7), "EjectBalls");
-        listenerRight.nameControl(new Button(9), "EngageClimberServos");
-        listenerRight.nameControl(new Button(11), "DisEngageClimberServos");
-        listenerRight.nameControl(new Button(12), "EjectClimber");
+        
 
         //listenerRight.nameControl(new Button(10), "ShooterFF");
         listenerRight.nameControl(new POV(0), "IntakePOV");
+
+        listenerLeft.nameControl(ControllerExtreme3D.TRIGGER, "Climb");
+        listenerLeft.nameControl(new POV(0), "BalancePOV");
+        listenerLeft.nameControl(new Button(3), "EjectClimber");
+
 
         
         /*listenerRight.addButtonDownListener("ShooterFF", () -> {
@@ -273,20 +276,6 @@ public class MainCompbot extends NarwhalRobot {
             ejectBallsCommand = new CmdArmFF(arm);
             ejectBallsCommand.start();
         });
-        listenerRight.addButtonDownListener("EngageClimberServos", () -> {
-            Log.info("Button9", "pressed");
-            climber.engageClimber();
-
-        });
-        listenerRight.addButtonDownListener("DisEngageClimberServos", () -> {
-            Log.info("Button11", "pressed");
-            climber.disengageClimber();
-
-        });
-        listenerRight.addButtonDownListener("EjectClimber", () -> {
-            Log.info("Button12", "pressed");
-            arm.setState(ArmState.CLIMBING);
-        });
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
         });
@@ -318,6 +307,7 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
                 case 8:
+                case 7:
                 case 1:
                 // start intake command
                     // povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, arm,
@@ -334,10 +324,6 @@ public class MainCompbot extends NarwhalRobot {
 
                     break;
                     
-                case 7:
-                    // push all balls backwards to clear hopper
-
-                    break;
                 case 3:
                 case 4:
                 case 5:
@@ -357,6 +343,37 @@ public class MainCompbot extends NarwhalRobot {
             }
         });
 
+        listenerLeft.addButtonDownListener("Climb", () -> {
+            Log.info("Trigger", "pressed");
+            climber.climb(Constants.ClimberConstants.CLIMB_POWER);
+        });
+        listenerLeft.addButtonUpListener("Climb", () -> {
+            Log.info("Trigger", "released");
+            climber.climb(0.0);
+        });
+        listenerLeft.addButtonDownListener("EjectClimber", () -> {
+            Log.info("Button3", "pressed");
+            arm.setState(ArmState.CLIMBING);
+            climber.setIsClimbing(true);
+        });
+        listenerRight.addListener("IntakePOV", (POVValue pov) -> {
+            switch (pov.getDirectionValue()) {
+                
+                case 1: 
+                case 2:
+                case 3:
+                    climber.balance(-Constants.ClimberConstants.MOVE_POWER);
+                    break;
+                case 5:
+                case 6:
+                case 7: 
+                    climber.balance(Constants.ClimberConstants.MOVE_POWER);
+                    break;
+                default:
+                    climber.balance(0.0);
+                    break;
+            }
+        });
     }
 
     @Override
