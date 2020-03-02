@@ -154,14 +154,10 @@ public class Constants extends RobotConstants {
         }
         
         public static class ClimberConstants {
-                public static final int LEFT_SERVO_ID = 0;
-                public static final int RIGHT_SERVO_ID = 1;
-                public static final double LEFT_DISENGAGE_ANGLE = 0; //servo disengage angle
-                public static final double RIGHT_DISENGAGE_ANGLE = 0; // ^^^
-                public static final double LEFT_ENGAGE_ANGLE = 10; // ^^^
-                public static final double RIGHT_ENGAGE_ANGLE = 10; // ^^^
-
-
+                public static final int ENGAGE_MOTOR_ID = 11;
+                public static final int MOVE_MOTOR_ID = 12;
+                public static final double MOVE_POWER = 0.2;
+                public static final double CLIMB_POWER = 0.5;
         }
 
         public static class ArmConstants {
