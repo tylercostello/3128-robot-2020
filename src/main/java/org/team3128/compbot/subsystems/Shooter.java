@@ -145,7 +145,7 @@ public class Shooter extends Threaded {
         }
     }
 
-    public double getRPMFromDistance(double distance) {
+    public double getRPMFromDistance() {
         return stateTracker.getState().targetShooterState.shooterRPM;
     }
 

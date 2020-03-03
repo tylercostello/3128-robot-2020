@@ -23,6 +23,7 @@ import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.Arm.ArmState;
 import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.subsystems.Hopper.ActionState;
+
 import org.team3128.compbot.commands.*;
 
 public class CmdAlignShoot extends Command {
@@ -54,6 +55,8 @@ public class CmdAlignShoot extends Command {
 
     private double desiredRPM;
     private double effective_distance;
+
+    private StateTracker stateTracker = StateTracker.getInstance();
 
     private Command hopperShoot, organize;
 
@@ -90,7 +93,7 @@ public class CmdAlignShoot extends Command {
     protected void initialize() {
         limelight.setLEDMode(LEDMode.ON);
         cmdRunning.isRunning = false;
-        arm.setState(ArmState.STARTING);
+        arm.setState(stateTracker.getState().targetArmState);
         hopper.setAction(Hopper.ActionState.SHOOTING);
         Log.info("CmdAlignShoot", "initialized limelight, aren't I cool!");
     }
@@ -111,22 +114,22 @@ public class CmdAlignShoot extends Command {
                     Log.info("CmdAlignShoot", "Switching to FEEDBACK...");
                     LimelightData initData = limelight.getValues(Constants.VisionConstants.SAMPLE_RATE);
 
-                    double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE + Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE;
+                    // double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE + Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE;
 
-                                                                                                                        // add
-                    double limelight_height = Constants.VisionConstants.PIVOT_HEIGHT + (Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle));
+                    //                                                                                                     // add
+                    // double limelight_height = Constants.VisionConstants.PIVOT_HEIGHT + (Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle));
 
-                    double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
-                            / (RobotMath.tan(initData.ty()));
+                    // double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
+                    //         / (RobotMath.tan(initData.ty()));
 
-                    effective_distance = distance / RobotMath.cos(initData.tx());
+                    // effective_distance = distance / RobotMath.cos(initData.tx());
 
-                    SmartDashboard.putNumber("effective_distance", effective_distance);
-                    SmartDashboard.putNumber("curLLANgle", currLLAngle);
-                    SmartDashboard.putNumber("liemlight_height", limelight_height);
+                    // SmartDashboard.putNumber("effective_distance", effective_distance);
+                    // SmartDashboard.putNumber("curLLANgle", currLLAngle);
+                    // SmartDashboard.putNumber("liemlight_height", limelight_height);
                     SmartDashboard.putNumber("ty", initData.ty());
 
-                    desiredRPM = shooter.getRPMFromDistance(effective_distance);
+                    desiredRPM = shooter.getRPMFromDistance();
 
                     shooter.setSetpoint(desiredRPM);
 
@@ -156,22 +159,22 @@ public class CmdAlignShoot extends Command {
                     if (!gotDistance) {
                         LimelightData initData = limelight.getValues(Constants.VisionConstants.SAMPLE_RATE);
 
-                        double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE + Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE;
+                        // double currLLAngle = arm.getAngle() + Constants.ArmConstants.LIMELIGHT_ARM_ANGLE + Constants.VisionConstants.BOTTOM_LIMELIGHT_ANGLE;
 
-                        double limelight_height = Constants.VisionConstants.PIVOT_HEIGHT + (Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle));
+                        // double limelight_height = Constants.VisionConstants.PIVOT_HEIGHT + (Constants.ArmConstants.LIMELIGHT_ARM_LENGTH * RobotMath.sin(currLLAngle));
 
-                        double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
-                                / (RobotMath.tan(initData.ty()));
+                        // double distance = (Constants.GameConstants.SHOOTER_TARGET_HEIGHT - limelight_height)
+                        //         / (RobotMath.tan(initData.ty()));
 
-                        effective_distance = distance / RobotMath.cos(initData.tx());
+                        // effective_distance = distance / RobotMath.cos(initData.tx());
 
-                        desiredRPM = shooter.getRPMFromDistance(effective_distance);
+                        desiredRPM = shooter.getRPMFromDistance();
 
                         shooter.setSetpoint(desiredRPM);
 
-                        SmartDashboard.putNumber("effective_distance", effective_distance);
-                        SmartDashboard.putNumber("curLLANgle", currLLAngle);
-                        SmartDashboard.putNumber("liemlight_height", limelight_height);
+                        // SmartDashboard.putNumber("effective_distance", effective_distance);
+                        // SmartDashboard.putNumber("curLLANgle", currLLAngle);
+                        // SmartDashboard.putNumber("liemlight_height", limelight_height);
                         SmartDashboard.putNumber("ty", initData.ty());
 
 
@@ -239,7 +242,6 @@ public class CmdAlignShoot extends Command {
         if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
             Log.info("CmdAlignShoot", "Trying to shoot ball");
             hopper.shoot();
-            //SmartDashboard.putNumber("Actual RPM Shooter", shooter.getRPM());
         } else {
             hopper.unShoot();
         }
