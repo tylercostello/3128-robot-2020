@@ -232,6 +232,9 @@ public class MainCompbot extends NarwhalRobot {
         listenerLeft.nameControl(ControllerExtreme3D.TRIGGER, "Climb");
         listenerLeft.nameControl(new POV(0), "BalancePOV");
         listenerLeft.nameControl(new Button(3), "EjectClimber");
+        listenerLeft.nameControl(new Button(9), "IncrementBallCount");
+        listenerLeft.nameControl(new Button(10), "DecrementBallCount");
+        listenerLeft.nameControl(new Button(12), "EmergencyReset");
 
 
         
@@ -356,6 +359,21 @@ public class MainCompbot extends NarwhalRobot {
             arm.setState(ArmState.CLIMBING);
             climber.setIsClimbing(true);
         });
+        listenerLeft.addButtonDownListener("IncrementBallCount", () -> {
+            Log.info("Button9", "pressed");
+            hopper.setBallCount(hopper.ballCount + 1);
+        });
+        listenerLeft.addButtonDownListener("DecrementBallCount", () -> {
+            Log.info("Button10", "pressed");
+            hopper.setBallCount(hopper.ballCount - 1);
+        });
+        listenerLeft.addButtonDownListener("EmergencyReset", () -> {
+            hopper.setBallCount(0);
+            arm.setState(ArmState.STOWED);
+            hopper.setAction(ActionState.STANDBY);
+            climber.setIsClimbing(false);
+            shooter.setSetpoint(0);
+        });
         listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
                 
@@ -407,6 +425,8 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
+        NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
+        NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
         //Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
 
@@ -443,9 +463,6 @@ public class MainCompbot extends NarwhalRobot {
         SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
         SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
         SmartDashboard.putNumber("Corner Encoder", hopper.CORNER_ENCODER.getPosition());
-
-        NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
-        NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
         SmartDashboard.putNumber("voltage", RobotController.getBatteryVoltage());
 
