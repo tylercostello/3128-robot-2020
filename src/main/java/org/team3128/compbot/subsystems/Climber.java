@@ -18,6 +18,7 @@ public class Climber extends Threaded {
 
     public static final Climber instance = new Climber();
     public LazyVictorSPX LEFT_MOTOR, RIGHT_MOTOR;
+    public boolean isClimbing = false;
 
     public static Climber getInstance() {
         return instance;
@@ -33,8 +34,17 @@ public class Climber extends Threaded {
     }
 
     public void setPower(double power){
-        LEFT_MOTOR.set(ControlMode.PercentOutput, power);
-        RIGHT_MOTOR.set(ControlMode.PercentOutput, -power);
+        if (isClimbing) {
+            LEFT_MOTOR.set(ControlMode.PercentOutput, power);
+            RIGHT_MOTOR.set(ControlMode.PercentOutput, -power);
+        } else {
+            LEFT_MOTOR.set(ControlMode.PercentOutput, 0);
+            RIGHT_MOTOR.set(ControlMode.PercentOutput, 0);
+        }
+    }
+
+    public void setIsClimbing(boolean value) {
+        isClimbing = value;
     }
 
     @Override

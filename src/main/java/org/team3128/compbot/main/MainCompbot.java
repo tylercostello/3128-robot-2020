@@ -378,6 +378,7 @@ public class MainCompbot extends NarwhalRobot {
         listenerLeft.addButtonDownListener("EjectClimber", () -> {
             Log.info("Button3/4", "pressed");
             arm.setState(ArmState.CLIMBING);
+            climber.setIsClimbing(true);
         });
         listenerLeft.addButtonDownListener("IncrementBallCount", () -> {
             Log.info("Button9", "pressed");
@@ -394,6 +395,7 @@ public class MainCompbot extends NarwhalRobot {
             hopper.setAction(ActionState.STANDBY);
             shooter.setSetpoint(0);
             climber.setPower(0);
+            climber.setIsClimbing(false);
         });
         /*listenerLeft.addListener("BalancePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
