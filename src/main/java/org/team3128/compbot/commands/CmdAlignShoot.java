@@ -94,6 +94,7 @@ public class CmdAlignShoot extends Command {
         limelight.setLEDMode(LEDMode.ON);
         cmdRunning.isRunning = false;
         arm.setState(stateTracker.getState().targetArmState);
+        shooter.setState(stateTracker.getState().targetShooterState);
         hopper.setAction(Hopper.ActionState.SHOOTING);
         Log.info("CmdAlignShoot", "initialized limelight, aren't I cool!");
     }
