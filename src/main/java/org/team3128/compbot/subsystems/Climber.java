@@ -29,16 +29,16 @@ public class Climber extends Threaded {
 
     private void configMotors() {
         ENGAGE_MOTOR = new LazyTalonSRX(Constants.ClimberConstants.ENGAGE_MOTOR_ID);
-        MOVE_MOTOR = new LazyTalonSRX(Constants.ClimberConstants.MOVE_MOTOR_ID);
+        //MOVE_MOTOR = new LazyTalonSRX(Constants.ClimberConstants.MOVE_MOTOR_ID);
     }
 
-    public void balance(double power){
+    /*public void balance(double power){
         if (isClimbing) {
             MOVE_MOTOR.set(ControlMode.PercentOutput, power);
         } else {
             MOVE_MOTOR.set(ControlMode.PercentOutput, 0.0);
         }
-    }
+    }*/
 
     public void climb(double power){
         if (isClimbing) {
