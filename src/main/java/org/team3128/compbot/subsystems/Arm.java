@@ -20,9 +20,10 @@ public class Arm extends Threaded {
         STARTING(49), // within frame perimeter
         STARTING_DOWN(30), // arm is pushed to release the intake
         LOADING_STATION(46),
-        FAR_RANGE(60), // far range shooting
+        LONG_RANGE(60), // far range shooting
+        MID_RANGE(45),
         SHORT_RANGE(20), // short range shooting
-        CLIMBING(90), // climbing
+        CLIMBING(70), // climbing
         DEBUG(5);
 
         public double armAngle;

@@ -38,6 +38,7 @@ import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.RobotTracker;
 import org.team3128.compbot.subsystems.Arm.ArmState;
 import org.team3128.compbot.subsystems.Hopper.ActionState;
+import org.team3128.compbot.subsystems.StateTracker.RobotState;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -75,6 +76,7 @@ public class MainCompbot extends NarwhalRobot {
     static Arm arm = Arm.getInstance();
     static Shooter shooter = Shooter.getInstance();
     static Climber climber = Climber.getInstance();
+    static StateTracker stateTracker;
 
  
     RobotTracker robotTracker = RobotTracker.getInstance();
@@ -151,6 +153,9 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void constructHardware() {
+        StateTracker.initialize();
+        stateTracker = StateTracker.getInstance();
+
         scheduler.schedule(drive, executor);
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
@@ -220,10 +225,17 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(new Button(2), "zeroCallBount");
         listenerRight.nameControl(new Button(3), "loadingStation");
         listenerRight.nameControl(new Button(4), "RezeroArm");
-        listenerRight.nameControl(new Button(5), "runShooterFF");
+        listenerRight.nameControl(new Button(5), "ZeroShooter");
+        listenerRight.nameControl(new Button(6), "ZeroShooter");
+        // shooter calibration:
+        //listenerRight.nameControl(new Button(5), "runShooterFF");
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
-        listenerRight.nameControl(new Button(7), "EjectBalls");
+        listenerRight.nameControl(new Button(7), "setRangeLong");
+        listenerRight.nameControl(new Button(8), "EjectBalls");
+        listenerRight.nameControl(new Button(9), "setRangeMid");
+        listenerRight.nameControl(new Button(11), "setRangeShort");
+        listenerRight.nameControl(new Button(12), "queueShooter");
         
 
         //listenerRight.nameControl(new Button(10), "ShooterFF");
@@ -231,9 +243,11 @@ public class MainCompbot extends NarwhalRobot {
 
         listenerLeft.nameControl(ControllerExtreme3D.TRIGGER, "Climb");
         //listenerLeft.nameControl(new POV(0), "BalancePOV");
-        listenerLeft.nameControl(new Button(3), "SetArm");
+        listenerLeft.nameControl(new Button(3), "EjectClimber");
+        listenerLeft.nameControl(new Button(4), "EjectClimber");
         listenerLeft.nameControl(new Button(9), "IncrementBallCount");
         listenerLeft.nameControl(new Button(10), "DecrementBallCount");
+        listenerLeft.nameControl(new Button(11), "EmergencyReset");
         listenerLeft.nameControl(new Button(12), "EmergencyReset");
 
 
@@ -275,9 +289,10 @@ public class MainCompbot extends NarwhalRobot {
             arm.setState(ArmState.STOWED);
         });
         listenerRight.addButtonDownListener("EjectBalls", () -> {
-            Log.info("Button7", "pressed");
-            ejectBallsCommand = new CmdArmFF(arm);
-            ejectBallsCommand.start();
+            Log.info("Button8", "pressed");
+            Log.info("MainCompBot", "Eject not implemented yet");
+            // ejectBallsCommand = new CmdEjectBalls(hopper);
+            // ejectBallsCommand.start();
         });
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
@@ -295,16 +310,22 @@ public class MainCompbot extends NarwhalRobot {
             shooterFFCommand.cancel();
             shooterFFCommand = null;
         });
-        
-        // listenerRight.addButtonDownListener("runShooterFF", () -> {
-        // Log.info("Button5", "pressed"); Log.info("Arm", "Start Voltage: " +
-        // String.valueOf(RobotController.getBatteryVoltage())); // shooterFFCommand =
-        // new CmdShooterFF(shooter); // shooterFFCommand.start(); });
-        
-        // listenerRight.addButtonDownListener("endVoltage", () -> { Log.info("Shooter",
-        // String.valueOf(RobotController.getBatteryVoltage()));
-        
-        // });
+        listenerRight.addButtonDownListener("setRangeLong", () -> {
+            stateTracker.setState(RobotState.LONG_RANGE);
+        });
+        listenerRight.addButtonDownListener("setRangeMid", () -> {
+            stateTracker.setState(RobotState.MID_RANGE);
+        });
+        listenerRight.addButtonDownListener("setRangeShort", () -> {
+            stateTracker.setState(RobotState.SHORT_RANGE);
+        });
+        listenerRight.addButtonDownListener("queueShooter", () -> {
+            shooter.queue();
+        });
+        listenerRight.addButtonDownListener("ZeroShooter", () -> {
+            shooter.setSetpoint(0);
+        });
+
          
 
         listenerRight.addListener("IntakePOV", (POVValue pov) -> {
@@ -348,16 +369,15 @@ public class MainCompbot extends NarwhalRobot {
 
         listenerLeft.addButtonDownListener("Climb", () -> {
             Log.info("Trigger", "pressed");
-            climber.climb(Constants.ClimberConstants.CLIMB_POWER);
+            climber.setPower(Constants.ClimberConstants.CLIMB_POWER);
         });
         listenerLeft.addButtonUpListener("Climb", () -> {
             Log.info("Trigger", "released");
-            climber.climb(0.0);
+            climber.setPower(0.0);
         });
-        listenerLeft.addButtonDownListener("SetArm", () -> {
-            Log.info("Button3", "pressed");
+        listenerLeft.addButtonDownListener("EjectClimber", () -> {
+            Log.info("Button3/4", "pressed");
             arm.setState(ArmState.CLIMBING);
-            climber.setIsClimbing(true);
         });
         listenerLeft.addButtonDownListener("IncrementBallCount", () -> {
             Log.info("Button9", "pressed");
@@ -368,11 +388,12 @@ public class MainCompbot extends NarwhalRobot {
             hopper.setBallCount(hopper.ballCount - 1);
         });
         listenerLeft.addButtonDownListener("EmergencyReset", () -> {
+            Log.info("MainCompBot", "EMERGENCY RESET PRESSED");
             hopper.setBallCount(0);
             arm.setState(ArmState.STOWED);
             hopper.setAction(ActionState.STANDBY);
-            climber.setIsClimbing(false);
             shooter.setSetpoint(0);
+            climber.setPower(0);
         });
         /*listenerLeft.addListener("BalancePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {

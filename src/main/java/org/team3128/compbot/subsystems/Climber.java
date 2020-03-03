@@ -10,14 +10,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import org.team3128.common.generics.Threaded;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.hardware.motor.LazyTalonSRX;
+import org.team3128.common.hardware.motor.LazyVictorSPX;
 import org.team3128.common.utility.enums.Direction;
 
 
 public class Climber extends Threaded {
 
     public static final Climber instance = new Climber();
-    public LazyTalonSRX ENGAGE_MOTOR_LEFT, MOVE_MOTOR_RIGHT;
-    public boolean isClimbing = false;
+    public LazyVictorSPX LEFT_MOTOR, RIGHT_MOTOR;
 
     public static Climber getInstance() {
         return instance;
@@ -28,31 +28,13 @@ public class Climber extends Threaded {
     }
 
     private void configMotors() {
-        ENGAGE_MOTOR_LEFT = new LazyTalonSRX(Constants.ClimberConstants.ENGAGE_MOTOR_LEFT_ID);
-        ENGAGE_MOTOR_RIGHT = new LazyTalonSRX(Constants.ClimberConstants.ENGAGE_MOTOR_RIGHT_ID);
-        //MOVE_MOTOR = new LazyTalonSRX(Constants.ClimberConstants.MOVE_MOTOR_ID);
+        LEFT_MOTOR = new LazyVictorSPX(Constants.ClimberConstants.LEFT_MOTOR_ID);
+        RIGHT_MOTOR = new LazyVictorSPX(Constants.ClimberConstants.RIGHT_MOTOR_ID);
     }
 
-    /*public void balance(double power){
-        if (isClimbing) {
-            MOVE_MOTOR.set(ControlMode.PercentOutput, power);
-        } else {
-            MOVE_MOTOR.set(ControlMode.PercentOutput, 0.0);
-        }
-    }*/
-
-    public void climb(double power){
-        if (isClimbing) {
-            ENGAGE_MOTOR_LEFT.set(ControlMode.PercentOutput, power);
-            ENGAGE_MOTOR_RIGHT.set(ControlMode.PercentOutput, -power);
-        } else {
-            ENGAGE_MOTOR_LEFT.set(ControlMode.PercentOutput, 0.0);
-            ENGAGE_MOTOR_RIGHT.set(ControlMode.PercentOutput, 0.0);
-        }
-    }
-
-    public void setIsClimbing(boolean value){
-        isClimbing = value;
+    public void setPower(double power){
+        LEFT_MOTOR.set(ControlMode.PercentOutput, power);
+        RIGHT_MOTOR.set(ControlMode.PercentOutput, -power);
     }
 
     @Override
@@ -61,17 +43,3 @@ public class Climber extends Threaded {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//no
