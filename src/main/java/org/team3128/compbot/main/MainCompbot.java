@@ -374,7 +374,7 @@ public class MainCompbot extends NarwhalRobot {
             climber.setIsClimbing(false);
             shooter.setSetpoint(0);
         });
-        /*listenerRight.addListener("IntakePOV", (POVValue pov) -> {
+        /*listenerLeft.addListener("BalancePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
                 
                 case 1: 

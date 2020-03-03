@@ -16,7 +16,7 @@ import org.team3128.common.utility.enums.Direction;
 public class Climber extends Threaded {
 
     public static final Climber instance = new Climber();
-    public LazyTalonSRX ENGAGE_MOTOR, MOVE_MOTOR;
+    public LazyTalonSRX ENGAGE_MOTOR_LEFT, MOVE_MOTOR_RIGHT;
     public boolean isClimbing = false;
 
     public static Climber getInstance() {
@@ -28,7 +28,8 @@ public class Climber extends Threaded {
     }
 
     private void configMotors() {
-        ENGAGE_MOTOR = new LazyTalonSRX(Constants.ClimberConstants.ENGAGE_MOTOR_ID);
+        ENGAGE_MOTOR_LEFT = new LazyTalonSRX(Constants.ClimberConstants.ENGAGE_MOTOR_LEFT_ID);
+        ENGAGE_MOTOR_RIGHT = new LazyTalonSRX(Constants.ClimberConstants.ENGAGE_MOTOR_RIGHT_ID);
         //MOVE_MOTOR = new LazyTalonSRX(Constants.ClimberConstants.MOVE_MOTOR_ID);
     }
 
@@ -42,9 +43,11 @@ public class Climber extends Threaded {
 
     public void climb(double power){
         if (isClimbing) {
-            ENGAGE_MOTOR.set(ControlMode.PercentOutput, power);
+            ENGAGE_MOTOR_LEFT.set(ControlMode.PercentOutput, power);
+            ENGAGE_MOTOR_RIGHT.set(ControlMode.PercentOutput, -power);
         } else {
-            ENGAGE_MOTOR.set(ControlMode.PercentOutput, 0.0);
+            ENGAGE_MOTOR_LEFT.set(ControlMode.PercentOutput, 0.0);
+            ENGAGE_MOTOR_RIGHT.set(ControlMode.PercentOutput, 0.0);
         }
     }
 
