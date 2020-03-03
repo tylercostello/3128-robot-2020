@@ -117,7 +117,7 @@ public class Shooter extends Threaded {
 
     public double shooterFeedForward(double desiredSetpoint) {
         //double ff = (0.00211 * desiredSetpoint) - 2; // 0.051
-        double ff = (0.00147 * desiredSetpoint) - 0.29;
+        double ff = (0.00147 * desiredSetpoint) + 0;
         if (setpoint != 0) {
             return ff;
         } else {
@@ -126,7 +126,7 @@ public class Shooter extends Threaded {
     }
 
     public double getRPMFromDistance(double distance) {
-        return 4150;
+        return 4080;
         // TODO: relationship between RPM and distance
     }
 

@@ -16,8 +16,8 @@ import org.team3128.common.hardware.motor.LazyTalonFX;
 public class Arm extends Threaded {
     public static enum ArmState {
         STOWED(0), // arm is all the way down
-        INTAKE(30), // intaking balls
-        STARTING(45), // within frame perimeter
+        INTAKE(0), // intaking balls
+        STARTING(49), // within frame perimeter
         STARTING_DOWN(30), // arm is pushed to release the intake
         LOADING_STATION(46),
         FAR_RANGE(60), // far range shooting
@@ -82,7 +82,7 @@ public class Arm extends Threaded {
     }
 
     public double armFeedForward(double desired) {
-        return 0; // true value = -0.46
+        return -0.3; // true value = -0.46
     }
 
     public double getAngle() {

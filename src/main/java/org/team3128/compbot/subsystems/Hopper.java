@@ -246,11 +246,11 @@ public class Hopper extends Threaded {
             detectCount1 = 0;
             //Log.info("Hopper", "sensor doesn't detect ball");
         }
-        if(detectCount1 >= 3) {
+        if(detectCount1 >= 7) {
             detectCount1 = 0;
             notDetectCount1 = 0;
             detectBool1 = true;
-        } else if (notDetectCount1 >= 5) {
+        } else if (notDetectCount1 >= 7) {
             detectCount1 = 0;
             notDetectCount1 = 0;
             detectBool1 = false;
@@ -267,10 +267,11 @@ public class Hopper extends Threaded {
         isFeeding = false;
         if (state == ActionState.INTAKING) {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
-        } else {
+        } else if (state != ActionState.SHOOTING) {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
         }
         if (state == ActionState.SHOOTING) {
+            INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE / 2.5);
             shootingCornerPosition = CORNER_ENCODER.getPosition();
         }
     }
@@ -350,7 +351,7 @@ public class Hopper extends Threaded {
 
     public void loadShoot() { // loading the balls to be shot when in SHOOTING state
         if (SENSOR_0_STATE && !openTheGates) {
-            setMotorPowers(0, 0, 0);
+            setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
         } else if (SENSOR_0_STATE && openTheGates) {
             //shootingCornerPosition = CORNER_ENCODER.getPosition();
             while (SENSOR_0_STATE) {
@@ -430,7 +431,7 @@ public class Hopper extends Threaded {
                     empty1 = true;
                 }
             }
-            setMotorPowers(0, 0, 0);
+            setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
         } else if(openTheGates && !SENSOR_0_STATE){
             //shootingCornerPosition = CORNER_ENCODER.getPosition();
             loading:
@@ -473,7 +474,7 @@ public class Hopper extends Threaded {
                     empty1 = true;
                 }
             }
-            setMotorPowers(0, 0, 0);
+            setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
         } else {
             setMotorPowers(0, 0, 0);
         }
