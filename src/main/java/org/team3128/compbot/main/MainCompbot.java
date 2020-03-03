@@ -155,7 +155,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        // scheduler.schedule(climber, executor);
+        scheduler.schedule(climber, executor);
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
@@ -224,12 +224,18 @@ public class MainCompbot extends NarwhalRobot {
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
         listenerRight.nameControl(new Button(7), "EjectBalls");
-        listenerRight.nameControl(new Button(9), "EngageClimberServos");
-        listenerRight.nameControl(new Button(11), "DisEngageClimberServos");
-        listenerRight.nameControl(new Button(12), "EjectClimber");
+        
 
         //listenerRight.nameControl(new Button(10), "ShooterFF");
         listenerRight.nameControl(new POV(0), "IntakePOV");
+
+        listenerLeft.nameControl(ControllerExtreme3D.TRIGGER, "Climb");
+        //listenerLeft.nameControl(new POV(0), "BalancePOV");
+        listenerLeft.nameControl(new Button(3), "SetArm");
+        listenerLeft.nameControl(new Button(9), "IncrementBallCount");
+        listenerLeft.nameControl(new Button(10), "DecrementBallCount");
+        listenerLeft.nameControl(new Button(12), "EmergencyReset");
+
 
         
         /*listenerRight.addButtonDownListener("ShooterFF", () -> {
@@ -273,20 +279,6 @@ public class MainCompbot extends NarwhalRobot {
             ejectBallsCommand = new CmdArmFF(arm);
             ejectBallsCommand.start();
         });
-        listenerRight.addButtonDownListener("EngageClimberServos", () -> {
-            Log.info("Button9", "pressed");
-            climber.engageClimber();
-
-        });
-        listenerRight.addButtonDownListener("DisEngageClimberServos", () -> {
-            Log.info("Button11", "pressed");
-            climber.disengageClimber();
-
-        });
-        listenerRight.addButtonDownListener("EjectClimber", () -> {
-            Log.info("Button12", "pressed");
-            arm.setState(ArmState.CLIMBING);
-        });
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
         });
@@ -318,6 +310,7 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addListener("IntakePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
                 case 8:
+                case 7:
                 case 1:
                 // start intake command
                     // povCommand = new CmdBallIntake(gyro, ballLimelight, hopper, arm,
@@ -334,10 +327,6 @@ public class MainCompbot extends NarwhalRobot {
 
                     break;
                     
-                case 7:
-                    // push all balls backwards to clear hopper
-
-                    break;
                 case 3:
                 case 4:
                 case 5:
@@ -357,6 +346,52 @@ public class MainCompbot extends NarwhalRobot {
             }
         });
 
+        listenerLeft.addButtonDownListener("Climb", () -> {
+            Log.info("Trigger", "pressed");
+            climber.climb(Constants.ClimberConstants.CLIMB_POWER);
+        });
+        listenerLeft.addButtonUpListener("Climb", () -> {
+            Log.info("Trigger", "released");
+            climber.climb(0.0);
+        });
+        listenerLeft.addButtonDownListener("SetArm", () -> {
+            Log.info("Button3", "pressed");
+            arm.setState(ArmState.CLIMBING);
+            climber.setIsClimbing(true);
+        });
+        listenerLeft.addButtonDownListener("IncrementBallCount", () -> {
+            Log.info("Button9", "pressed");
+            hopper.setBallCount(hopper.ballCount + 1);
+        });
+        listenerLeft.addButtonDownListener("DecrementBallCount", () -> {
+            Log.info("Button10", "pressed");
+            hopper.setBallCount(hopper.ballCount - 1);
+        });
+        listenerLeft.addButtonDownListener("EmergencyReset", () -> {
+            hopper.setBallCount(0);
+            arm.setState(ArmState.STOWED);
+            hopper.setAction(ActionState.STANDBY);
+            climber.setIsClimbing(false);
+            shooter.setSetpoint(0);
+        });
+        /*listenerLeft.addListener("BalancePOV", (POVValue pov) -> {
+            switch (pov.getDirectionValue()) {
+                
+                case 1: 
+                case 2:
+                case 3:
+                    climber.balance(-Constants.ClimberConstants.MOVE_POWER);
+                    break;
+                case 5:
+                case 6:
+                case 7: 
+                    climber.balance(Constants.ClimberConstants.MOVE_POWER);
+                    break;
+                default:
+                    climber.balance(0.0);
+                    break;
+            }
+        });*/
     }
 
     @Override
@@ -390,6 +425,8 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
+        NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
+        NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
         //Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
 
@@ -426,9 +463,6 @@ public class MainCompbot extends NarwhalRobot {
         SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
         SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
         SmartDashboard.putNumber("Corner Encoder", hopper.CORNER_ENCODER.getPosition());
-
-        NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
-        NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
 
         SmartDashboard.putNumber("voltage", RobotController.getBatteryVoltage());
 
