@@ -154,10 +154,10 @@ public class Constants extends RobotConstants {
         }
         
         public static class ClimberConstants {
-                public static final int ENGAGE_MOTOR_ID = 11;
-                public static final int MOVE_MOTOR_ID = 12;
-                public static final double MOVE_POWER = 0.2;
-                public static final double CLIMB_POWER = 0.5;
+                public static final int ENGAGE_MOTOR_LEFT_ID = 11;
+                public static final int MOVE_MOTOR_RIGHT_ID = 12;
+                //public static final double MOVE_POWER = 0.2;
+                public static final double CLIMB_POWER = 0.05;
         }
 
         public static class ArmConstants {

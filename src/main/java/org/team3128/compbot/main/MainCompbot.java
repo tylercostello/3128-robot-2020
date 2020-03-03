@@ -230,8 +230,8 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.nameControl(new POV(0), "IntakePOV");
 
         listenerLeft.nameControl(ControllerExtreme3D.TRIGGER, "Climb");
-        listenerLeft.nameControl(new POV(0), "BalancePOV");
-        listenerLeft.nameControl(new Button(3), "EjectClimber");
+        //listenerLeft.nameControl(new POV(0), "BalancePOV");
+        listenerLeft.nameControl(new Button(3), "SetArm");
         listenerLeft.nameControl(new Button(9), "IncrementBallCount");
         listenerLeft.nameControl(new Button(10), "DecrementBallCount");
         listenerLeft.nameControl(new Button(12), "EmergencyReset");
@@ -354,7 +354,7 @@ public class MainCompbot extends NarwhalRobot {
             Log.info("Trigger", "released");
             climber.climb(0.0);
         });
-        listenerLeft.addButtonDownListener("EjectClimber", () -> {
+        listenerLeft.addButtonDownListener("SetArm", () -> {
             Log.info("Button3", "pressed");
             arm.setState(ArmState.CLIMBING);
             climber.setIsClimbing(true);
@@ -374,7 +374,7 @@ public class MainCompbot extends NarwhalRobot {
             climber.setIsClimbing(false);
             shooter.setSetpoint(0);
         });
-        listenerRight.addListener("IntakePOV", (POVValue pov) -> {
+        /*listenerLeft.addListener("BalancePOV", (POVValue pov) -> {
             switch (pov.getDirectionValue()) {
                 
                 case 1: 
@@ -391,7 +391,7 @@ public class MainCompbot extends NarwhalRobot {
                     climber.balance(0.0);
                     break;
             }
-        });
+        });*/
     }
 
     @Override
