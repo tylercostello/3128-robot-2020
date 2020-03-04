@@ -62,11 +62,18 @@ public class FalconDrive extends Drive {
 	double prevPositionL = 0;
 	double prevPositionR = 0;
 
+	double startTimeControl;
+	double endTime = 0;
+
 	public LazyTalonFX leftTalon, rightTalon, leftTalonSlave, rightTalonSlave, leftTalonSlave2, rightTalonSlave2;
+
+	public double left_setpoint, right_setpoint;
 
 	private FalconDrive() {
 
 		gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+
+		//left and right are flipped because the driver wanted to flip the direction of driving.
 
 		rightTalon = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_FRONT_ID);
 		rightTalonSlave = new LazyTalonFX(Constants.DriveConstants.LEFT_DRIVE_MIDDLE_ID);
@@ -255,15 +262,9 @@ public class FalconDrive extends Drive {
 			DriverStation.reportError("Velocity set over " + Constants.DriveConstants.DRIVE_HIGH_SPEED + " !", false);
 			return;
 		}
-		// inches per sec to nu/100ms
-		double leftSetpoint = (setVelocity.leftVelocity) * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-		double rightSetpoint = (setVelocity.rightVelocity) * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-		leftTalon.set(ControlMode.Velocity, leftSetpoint);
-		// Log.info("FalconDrive", "setWheelVelocity: " + "leftSetpoint = " +
-		// String.valueOf(leftSetpoint));
-		rightTalon.set(ControlMode.Velocity, rightSetpoint);
-		// Log.info("FalconDrive", "setWheelVelocity: " + "rightSetpoint = " +
-		// String.valueOf(rightSetpoint));
+
+		left_setpoint = setVelocity.leftVelocity;
+		right_setpoint = setVelocity.rightVelocity;
 	}
 
 	/**
@@ -307,18 +308,18 @@ public class FalconDrive extends Drive {
 		spdR = Constants.DriveConstants.DRIVE_HIGH_SPEED * pwrR;
 		String tempStr = "pwrL=" + String.valueOf(pwrL) + ", pwrR=" + String.valueOf(pwrR) + ", spdL="
 				+ String.valueOf(spdL) + ", spdR=" + String.valueOf(spdR);
-		Log.info("FalconDrive", tempStr);
-		setWheelPower(new DriveSignal(pwrL, pwrR));
-		// setWheelVelocity(new DriveSignal(spdL, spdR));
+		// Log.info("FalconDrive", tempStr);
+		//setWheelPower(new DriveSignal(pwrL, pwrR));
+		setWheelVelocity(new DriveSignal(spdL, spdR));
 	}
 
 	@Override
 	public void update() {
-		// System.out.println("L speed " + getLeftSpeed() + " position x " +
-		// RobotTracker.getInstance().getOdometry().translationMat.getX());
-		// System.out.println("R speed " + getRightSpeed() + " position y " +
-		// RobotTracker.getInstance().getOdometry().translationMat.getY());
-		// System.out.println(driveState);
+		startTimeControl = Timer.getFPGATimestamp();
+		if(endTime == 0) {
+			endTime = startTime + 20;
+		}
+		velocityController();
 		DriveState snapDriveState;
 		synchronized (this) {
 			snapDriveState = driveState;
@@ -333,6 +334,56 @@ public class FalconDrive extends Drive {
 				updateTurn();
 				break;
 		}
+	}
+
+	private void velocityController() {
+		//(setVelocity.leftVelocity) * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms
+
+		double ks_sign = 1;
+
+		if ((left_setpoint - getLeftSpeed()) < 0) {
+			ks_sign = -1;
+		}
+
+		double left_setpoint_adjusted = left_setpoint * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
+		double left_current_speed_adjusted = getLeftSpeed() * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
+		double right_setpoint_adjusted = right_setpoint * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
+		double right_current_speed_adjusted = getRightSpeed() * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
+
+		double desired_left_acceleration = (left_setpoint_adjusted - left_current_speed_adjusted)/((endTime - startTimeControl)/10);
+		double feedforward_left = (Constants.DriveConstants.kS*ks_sign) + Constants.DriveConstants.kV*left_current_speed_adjusted + Constants.DriveConstants.kA*desired_left_acceleration;
+		double error = left_setpoint_adjusted - left_current_speed_adjusted;
+		double voltage_applied_left = feedforward_left + (Constants.DriveConstants.kP*error);
+		ks_sign = 1;
+
+		if ((right_setpoint - getRightSpeed()) < 0) {
+			ks_sign = -1;
+		}
+
+		double desired_right_acceleration = (right_setpoint_adjusted - right_current_speed_adjusted)/((endTime - startTimeControl)/10);
+		double feedforward_right = (Constants.DriveConstants.kS*ks_sign) + Constants.DriveConstants.kV*right_current_speed_adjusted + Constants.DriveConstants.kA*desired_right_acceleration;
+		error = right_setpoint_adjusted - right_current_speed_adjusted;
+		double voltage_applied_right = feedforward_right + (Constants.DriveConstants.kP*error);
+
+
+		double leftAvaliableVoltage = leftTalon.getBusVoltage();
+		double rightAvaliableVoltage = rightTalon.getBusVoltage();
+
+		Log.info("FalconDrive", "left_voltage = " + String.valueOf(voltage_applied_left) + ", right_voltage = " + String.valueOf(voltage_applied_right));
+
+		double leftPower = voltage_applied_left / leftAvaliableVoltage;
+		double rightPower = voltage_applied_right / rightAvaliableVoltage;
+
+		if ((Math.abs(leftPower) > 1) || (Math.abs(rightPower) > 1)) {
+			Log.info("Drive", "Tried to set a voltage greater than the avaliable voltage");
+			leftPower = RobotMath.clampPosNeg1(leftPower);
+			rightPower = RobotMath.clampPosNeg1(rightPower);
+		}
+
+		leftTalon.set(ControlMode.PercentOutput, leftPower);
+		rightTalon.set(ControlMode.PercentOutput, rightPower);
+
+		endTime = Timer.getFPGATimestamp();
 	}
 
 	@Override

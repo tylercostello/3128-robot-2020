@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.Hopper;
-import org.team3128.compbot.subsystems.Intake;
 import org.team3128.compbot.subsystems.Hopper.HopperState;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -20,17 +19,14 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class CmdEjectBalls extends Command {
     Hopper hopper;
-    Intake intake;
     int adjustBallCount;
-    boolean[] updatedArray = {false, false, false, false};
     double currentTime;
     double startTime;
     int timeCounter = 0;
     
 
-    public CmdEjectBalls(Hopper hopper, Intake intake) {
+    public CmdEjectBalls(Hopper hopper) {
         this.hopper = hopper;
-        this.intake = intake;
     }
 
     @Override
@@ -38,16 +34,13 @@ public class CmdEjectBalls extends Command {
         //nothing here
         startTime = Timer.getFPGATimestamp();
         hopper.setMotorPowers(-Constants.HopperConstants.GATEKEEPER_POWER, -Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.BASE_POWER);
-        intake.turnOnBackwards();
+        hopper.INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_REVERSE_VALUE);
     }
 
     @Override
     protected void execute() {
-        if (hopper.detectsBall(hopper.SENSOR_1)){
-            adjustBallCount--;
-        }
         timeCounter++;
-        if (timeCounter == 25) {
+        if (timeCounter == 5) {
             currentTime = Timer.getFPGATimestamp();
             timeCounter = 0;
         }
@@ -55,11 +48,12 @@ public class CmdEjectBalls extends Command {
 
     @Override
     protected boolean isFinished() {
-        return (adjustBallCount == 0) || ((currentTime - startTime) >= 10000); //if the adjusted ball count is 0 or 10 seconds has gone by, return true
+        return ((currentTime - startTime) >= 10000); //if the adjusted ball count is 0 or 10 seconds has gone by, return true
     }
 
     @Override
     protected void end() {
+        hopper.setMotorPowers(0, 0, 0);
     }
 
     @Override

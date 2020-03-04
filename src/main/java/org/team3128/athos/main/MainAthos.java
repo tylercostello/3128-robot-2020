@@ -1,7 +1,7 @@
 package org.team3128.athos.main;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
+//import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 import org.team3128.common.generics.RobotConstants;
 
@@ -16,7 +16,6 @@ import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
 import org.team3128.common.vision.CmdHorizontalOffsetFeedbackDrive;
-import org.team3128.athos.autonomous.deprecated.CmdAutoBall;
 import org.team3128.athos.subsystems.Constants;
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
@@ -30,6 +29,7 @@ import org.team3128.common.utility.math.Pose2D;
 import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.athos.subsystems.NEODrive;
 import org.team3128.athos.subsystems.RobotTracker;
+import org.team3128.athos.autonomous.deprecated.CmdAutoBall;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -105,11 +105,11 @@ public class MainAthos extends NarwhalRobot {
     public static CanDevices[] CanChain = new CanDevices[42];
     
     public static void setCanChain(){
-        rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", NEODrive.rightSpark);
-        rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", NEODrive.rightSparkSlave);
-        leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", NEODrive.leftSpark);
-        leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", NEODrive.leftSparkSlave);
-        PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", pdp);
+        // rightDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 1, "Right Drive Leader", NEODrive.rightSpark);
+        // rightDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 2, "Right Drive Follower", NEODrive.rightSparkSlave);
+        // leftDriveLeader = new CanDevices(CanDevices.DeviceType.SPARK, 3, "Left Drive Leader", NEODrive.leftSpark);
+        // leftDriveFollower = new CanDevices(CanDevices.DeviceType.SPARK, 4, "Left Drive Follower", NEODrive.leftSparkSlave);
+        // PDP = new CanDevices(CanDevices.DeviceType.PDP, 0, "Power Distribution Panel", pdp);
 
         CanChain[0] = rightDriveLeader;
         CanChain[1] = rightDriveFollower;

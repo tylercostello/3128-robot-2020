@@ -58,7 +58,6 @@ public class Hopper extends Threaded {
     private static final Hopper instance = new Hopper();
 
     // private boolean isMoving;
-    private boolean isShooting, isIntaking;
     private boolean empty0 = true;
     private boolean empty1 = true;
     private boolean isFeeding = false;
@@ -69,9 +68,18 @@ public class Hopper extends Threaded {
     private boolean openTheGates = false;
     private double startPos = 0;
     public int ballCount;
-
+    private int detectCount, notDetectCount, detectCount1, notDetectCount1;
+    private boolean detectBool = false;
+    private boolean detectBool1 = false;
 
     public int openTheGatesCounter = 0;
+    public int jamCount = 0;
+    public int plateauCount = 0;
+    public double shootingCornerPosition = 0;
+    public boolean shootingReversingIndexer = true;
+
+    public boolean SENSOR_0_STATE = false;
+    public boolean SENSOR_1_STATE = false;
 
     public ActionState actionState;
 
@@ -92,13 +100,19 @@ public class Hopper extends Threaded {
     @Override
     public void update() {
 
+        SENSOR_0_STATE = detectsBall0();
+        SENSOR_1_STATE = detectsBall1();
+
+        //Log.info("Hopper", "detect count = " + detectCount);
+
         SmartDashboard.putBoolean("gatekeep", openTheGates);
-        SmartDashboard.putNumber("openTheGatesCounter", openTheGatesCounter);
-        SmartDashboard.putBoolean("SENSOR_0_DETECT", detectsBall(SENSOR_0));
+        //SmartDashboard.putNumber("openTheGatesCounter", openTheGatesCounter);
+        SmartDashboard.putBoolean("SENSOR_0_DETECT", SENSOR_0_STATE);
+        SmartDashboard.putBoolean("SENSOR_1_DETECT", SENSOR_1_STATE);
 
         switch (actionState) {
             case STANDBY:
-                if (!isFull() && !(detectsBall(SENSOR_0) && (ballCount >= 3))) {
+                if (!isFull() && !(SENSOR_0_STATE && (ballCount >= 3))) {
                     standbyIntake();
                 } else {
                     setMotorPowers(0, 0, 0);
@@ -107,7 +121,7 @@ public class Hopper extends Threaded {
                 break;
 
             case INTAKING:
-                if (!isFull() && !(detectsBall(SENSOR_0) && (ballCount >= 5))) {
+                if (!isFull() && !(SENSOR_0_STATE && (ballCount >= 5))) {
                     standbyIntake();
                 } else {
                     setMotorPowers(0, 0, 0);
@@ -120,35 +134,32 @@ public class Hopper extends Threaded {
                 break;
 
             case ORGANIZING:
-                arm.setState(ArmState.STOWED);
                 organize();
+                arm.setState(ArmState.STOWED);
                 break;
         }
 
         SmartDashboard.putString("Hopper isFeeding", "" + isFeeding);
-        if (detectsBall(SENSOR_1)) {
+        if (SENSOR_1_STATE) {
             empty1 = false;
         } else {
             empty1 = true;
         }
-        if (detectsBall(SENSOR_0)) {
+        if (SENSOR_0_STATE) {
             empty0 = false;
         } else {
             empty0 = true;
         }
-        // Log.info("Hopper", String.valueOf(actionState));
-        // Log.info("Hopper", String.valueOf(detectsBall(SENSOR_1)));
     }
 
     private void configMotors() {
-        INTAKE_MOTOR = new LazyCANSparkMax(Constants.IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless);
+        INTAKE_MOTOR = new LazyCANSparkMax(Constants.IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushed);
         HOPPER_FEEDER_MOTOR = new LazyVictorSPX(Constants.HopperConstants.HOPPER_FEEDER_MOTOR_ID);
         CORNER_MOTOR = new LazyCANSparkMax(Constants.HopperConstants.CORNER_MOTOR_ID, MotorType.kBrushless);
         GATEKEEPER_MOTOR = new LazyCANSparkMax(Constants.HopperConstants.GATEKEEPER_MOTOR_ID, MotorType.kBrushless);
     }
 
     private void configEncoders() {
-        // HOPPER_FEEDER_ENCODER = HOPPER_FEEDER_MOTOR.getEncoder();
         CORNER_ENCODER = CORNER_MOTOR.getEncoder();
     }
 
@@ -163,9 +174,7 @@ public class Hopper extends Threaded {
     }
 
     public boolean isEmpty() {
-        // return (getNumBalls() == 0);
         return ballCount <= 0;
-        // return false;
     }
 
     public boolean isFull() {
@@ -178,21 +187,6 @@ public class Hopper extends Threaded {
             out_array[i] = in_array[i + 1];
         }
         out_array[in_array.length - 1] = false;
-        return out_array;
-    }
-
-    private boolean[] addBall(boolean[] in_array) {
-        boolean[] out_array = new boolean[in_array.length];
-        // for (int i = 0; i < in_array.length; i++) {
-        boolean added = false;
-        for (int i = in_array.length - 1; i >= 0; i--) {
-            if (in_array[i]) {
-                out_array[i] = in_array[i];
-            } else if (!added) {
-                out_array[i] = true;
-                added = true;
-            }
-        }
         return out_array;
     }
 
@@ -218,8 +212,52 @@ public class Hopper extends Threaded {
         gateKeep(false);
     }
 
-    public boolean detectsBall(DigitalInput sensor) {
-        return !sensor.get();
+    public boolean detectsBall0() {
+        if(!SENSOR_0.get()) {
+            detectCount++;
+            notDetectCount = 0;
+            //Log.info("Hopper", "sensor detects ball");
+        } else {
+            notDetectCount++;
+            detectCount = 0;
+            //Log.info("Hopper", "sensor doesn't detect ball");
+        }
+        if(detectCount >= 5) {
+            detectCount = 0;
+            notDetectCount = 0;
+            detectBool = true;
+        } else if (notDetectCount >= 5) {
+            detectCount = 0;
+            notDetectCount = 0;
+            detectBool = false;
+        }
+
+        return detectBool;
+        //return(!sensor.get());
+    }
+
+    public boolean detectsBall1() {
+        if(!SENSOR_1.get()) {
+            detectCount1++;
+            notDetectCount1 = 0;
+            //Log.info("Hopper", "sensor detects ball");
+        } else {
+            notDetectCount1++;
+            detectCount1 = 0;
+            //Log.info("Hopper", "sensor doesn't detect ball");
+        }
+        if(detectCount1 >= 7) {
+            detectCount1 = 0;
+            notDetectCount1 = 0;
+            detectBool1 = true;
+        } else if (notDetectCount1 >= 7) {
+            detectCount1 = 0;
+            notDetectCount1 = 0;
+            detectBool1 = false;
+        }
+
+        return detectBool1;
+        //return(!sensor.get());
     }
 
     public void setAction(ActionState state) {
@@ -229,8 +267,12 @@ public class Hopper extends Threaded {
         isFeeding = false;
         if (state == ActionState.INTAKING) {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE);
-        } else {
+        } else if (state != ActionState.SHOOTING) {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
+        }
+        if (state == ActionState.SHOOTING) {
+            INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE / 2.5);
+            shootingCornerPosition = CORNER_ENCODER.getPosition();
         }
     }
 
@@ -242,9 +284,9 @@ public class Hopper extends Threaded {
                 setMotorPowers(0, 0, 0);
             } else {
                 setMotorPowers(0, 0, 0);
-                Log.info("Hopper", "Handling more than 3 balls");
+                // Log.info("Hopper", "Handling more than 3 balls");
             }
-        } else if (detectsBall(SENSOR_1)) { // if there is a ball in the first sensor position
+        } else if (SENSOR_1_STATE) { // if there is a ball in the first sensor position
             // empty1 = false; //tell code the position isn't empty
             if (!isFeeding) { // if we aren't trying to move the intaken ball into the lowest position
                 setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.INDEXER_POWER); // just
@@ -257,13 +299,13 @@ public class Hopper extends Threaded {
                                                                             // move the intaken ball into the lowest
                                                                             // position
             }
-            Log.info("Hopper", "detects ball");
-        } else if (!detectsBall(SENSOR_1) && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
+            //Log.info("Hopper", "detects ball");
+        } else if (!SENSOR_1_STATE && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
         // empty1 = true; //tell the code the position is empty
             Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
             if (!isReversing) {
                 ballCount++; // iterate ballCount once because a ball has passed through our sensors
-                Log.info("Hopper", "iterating ballCount");
+                Log.info("Hopper", "iterating ballCount 0");
             } else {
                 Log.info("Hopper", "was reversing");
                 isReversing = false;
@@ -273,12 +315,14 @@ public class Hopper extends Threaded {
             setMotorPowers(0, Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER); // only move the corner motor to move the ball
                                                                         // into the lowest position
             // if (!isFull) {
+            Log.info("Hopper", "setting isFeeding to true");
             isFeeding = true; // tell the code we are trying move this ball into the lowest position
             // }
         } else if (!isFeeding) {
             if (actionState == ActionState.INTAKING) {
                 setMotorPowers(0, 0, Constants.HopperConstants.INDEXER_POWER);
             } else {
+                //Log.info("Hopper", "alarm alarm alarm alarm alarm alarm alarm alarm");
                 setMotorPowers(0, 0, 0);
             }
         } 
@@ -288,122 +332,152 @@ public class Hopper extends Threaded {
                                                                                                                // the
                                                                                                                // corner
                                                                                                                // motor
-            Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
-            if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math
-                    .abs(startPos)) { // if the ball gets to the right position
-                isFeeding = false; // we're done
-                Log.info("Hopper", "reached end of offset");
+            //////Log.info("Hopper", "" + CORNER_ENCODER.getPosition());
+            if (ballCount > 0 && ballCount <= 4) {
+                if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[ballCount - 1]) >= Math.abs(startPos)) { // if the ball gets to the right position
+                    isFeeding = false; // we're done
+                    Log.info("Hopper", "reached end of offset");
+                }
+            } else {
+                Log.info("Hopper", "something was super wrong; your ballCount is " + ballCount);
+                if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[0]) >= Math.abs(startPos)) { // if the ball gets to the right position
+                    isFeeding = false; // we're done
+                    Log.info("Hopper", "reached end of offset");
+                }
             }
-            Log.info("Hopper", "is feeding");
+            //////Log.info("Hopper", "is feeding");
         }
     }
 
     public void loadShoot() { // loading the balls to be shot when in SHOOTING state
-        if (detectsBall(SENSOR_0) && !openTheGates) {
-            setMotorPowers(0, 0, 0);
-        } else if (detectsBall(SENSOR_0) && openTheGates) {
-            while (detectsBall(SENSOR_0)) {
-                setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+        if (SENSOR_0_STATE && !openTheGates) {
+            setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
+        } else if (SENSOR_0_STATE && openTheGates) {
+            //shootingCornerPosition = CORNER_ENCODER.getPosition();
+            while (SENSOR_0_STATE) {
+                SENSOR_0_STATE = detectsBall0();
+                SENSOR_1_STATE = detectsBall1();
+                if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[0]) >= Math.abs(shootingCornerPosition)) {
+                    shootingReversingIndexer = false;
+                }
+                if (shootingReversingIndexer) {
+                    setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                        -Constants.HopperConstants.INDEXER_POWER);
+                    Log.info("Hopper", "Hopper is trying to hold 4th and 5th ball from entering the robot!");
+                } else if (!shootingReversingIndexer) {
+                    setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
                         Constants.HopperConstants.INDEXER_POWER);
+                }
+                if (!SENSOR_1_STATE && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
+                    empty1 = true; //tell the code the position is empty
+                    Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
+                    if (!isReversing) {
+                        ballCount++; // iterate ballCount once because a ball has passed through our sensors
+                        Log.info("Hopper", "iterating ballCount 1");
+                        shootingReversingIndexer = true;
+                        shootingCornerPosition = CORNER_ENCODER.getPosition();
+                    } else {
+                        Log.info("Hopper", "was reversing");
+                        isReversing = false;
+                    }
+                }
+                if(SENSOR_1_STATE) {
+                    //////Log.info("Hopper", "setting empty1 to false 1");
+                    empty1 = false;
+                } else {
+                    //////Log.info("Hopper", "setting empty1 to true 1");
+                    empty1 = true;
+                }
             }
             ballCount--;
+            //shootingCornerPosition = CORNER_ENCODER.getPosition();
             reloading:
-            while (!detectsBall(SENSOR_0)) {
+            while (!SENSOR_0_STATE) {
+                SENSOR_0_STATE = detectsBall0();
+                SENSOR_1_STATE = detectsBall1();
+                if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[0]) >= Math.abs(shootingCornerPosition)) {
+                    shootingReversingIndexer = false;
+                }
                 if(actionState == ActionState.SHOOTING) {
-                    setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
+                    if (shootingReversingIndexer) {
+                        setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                            -Constants.HopperConstants.INDEXER_POWER);
+                    } else if (!shootingReversingIndexer) {
+                        setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                            Constants.HopperConstants.INDEXER_POWER);
+                    }
                 } else {
                     setMotorPowers(0, 0, 0);
                     break reloading;
                 }
+                if (!SENSOR_1_STATE && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
+                    empty1 = true; //tell the code the position is empty
+                    Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
+                    if (!isReversing) {
+                        ballCount++; // iterate ballCount once because a ball has passed through our sensors
+                        Log.info("Hopper", "iterating ballCount 2");
+                        shootingReversingIndexer = true;
+                        shootingCornerPosition = CORNER_ENCODER.getPosition();
+                    } else {
+                        Log.info("Hopper", "was reversing");
+                        isReversing = false;
+                    }
+                }
+                if(SENSOR_1_STATE) {
+                    //////Log.info("Hopper", "setting empty1 to false 2");
+                    empty1 = false;
+                } else {
+                    //////Log.info("Hopper", "setting empty1 to true 2");
+                    empty1 = true;
+                }
             }
-            setMotorPowers(0, 0, 0);
-        } else if(openTheGates && !detectsBall(SENSOR_0)){
+            setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
+        } else if(openTheGates && !SENSOR_0_STATE){
+            //shootingCornerPosition = CORNER_ENCODER.getPosition();
             loading:
-            while (!detectsBall(SENSOR_0)) {
+            while (!SENSOR_0_STATE) {
+                SENSOR_0_STATE = detectsBall0();
+                SENSOR_1_STATE = detectsBall1();
+                if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[0]) >= Math.abs(shootingCornerPosition)) {
+                    shootingReversingIndexer = false;
+                }
                 if(actionState == ActionState.SHOOTING) {
-                    setMotorPowers(0, Constants.HopperConstants.BASE_POWER, 0);
+                    if (shootingReversingIndexer) {
+                        setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                            -Constants.HopperConstants.INDEXER_POWER);
+                    } else if (!shootingReversingIndexer) {
+                        setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                            Constants.HopperConstants.INDEXER_POWER);
+                    }
                 } else {
                     setMotorPowers(0, 0, 0);
                     break loading;
                 }
+                if (!SENSOR_1_STATE && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
+                    empty1 = true; //tell the code the position is empty
+                    Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
+                    if (!isReversing) {
+                        ballCount++; // iterate ballCount once because a ball has passed through our sensors
+                        Log.info("Hopper", "iterating ballCount 3");
+                        shootingReversingIndexer = true;
+                        shootingCornerPosition = CORNER_ENCODER.getPosition();
+                    } else {
+                        Log.info("Hopper", "was reversing");
+                        isReversing = false;
+                    }
+                }
+                if(SENSOR_1_STATE) {
+                    //////Log.info("Hopper", "setting empty1 to false 3");
+                    empty1 = false;
+                } else {
+                    //////Log.info("Hopper", "setting empty1 to true 3");
+                    empty1 = true;
+                }
             }
-            setMotorPowers(0, 0, 0);
+            setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
         } else {
             setMotorPowers(0, 0, 0);
         }
-
-        // if (!detectsBall(SENSOR_0)) { // if there is no ball in Sensor 0 location
-        //     if (!empty0 && openTheGates) { // if there was a ball in Sensor 0 in the prior iteration and we have opened
-        //                                    // the gates
-        //         openTheGatesCounter++;
-        //         ballCount--; // decrease ballCount by 1
-        //         updateBallArray(shift(getBallArray())); // fix array
-        //         openTheGates = false; // gatekeeper off
-        //         Log.info("Hopper", "stopping gatekeeper");
-        //     }
-        //     empty0 = true; // set to empty
-        //     setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.INDEXER_POWER); // shift
-        //                                                                                                       // all
-        //                                                                                                       // of the
-        //                                                                                                       // balls
-        //                                                                                                       // forward
-        //                                                                                                       // until
-        //                                                                                                       // there
-        //                                                                                                       // is a
-        //                                                                                                       // ball in
-        //                                                                                                       // Sensor
-        //                                                                                                       // position
-        //                                                                                                       // 0
-        // } else if (!detectsBall(SENSOR_0) && empty0) { // if there is a ball in Sensor position 0 and there wasn't in
-        //                                                // the
-        //                                                // prior
-        //     // iteration
-        //     empty0 = false; // it's no longer empty
-
-        //     startPos = CORNER_ENCODER.getPosition(); // record current motor encoder position
-        //     // setMotorPowers(0, Constants.HopperConstants.BASE_POWER,
-        //     // Constants.HopperConstants.INDEXER_POWER); // continue
-        //     // // moving
-        //     // // all
-        //     // // the
-        //     // // balls
-        //     // // forward
-        //     // // for the
-        //     // // set
-        //     // // offset
-        //     // // distance
-        //     isLoading = true; // tell the code we are moving the balls forward for the set offset distance
-        //     Log.info("Hopper", "starting shooter loading");
-        // } else if (isLoading) { // if we are trying to move the ball forward an offset
-        //     setMotorPowers(0, Constants.HopperConstants.BASE_POWER, Constants.HopperConstants.INDEXER_POWER); // shift
-        //                                                                                                       // everything
-        //                                                                                                       // the
-        //                                                                                                       // offset
-        //     if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.SHOOTER_SPACING) >= Math
-        //             .abs(startPos)) { // if the offset has been reached
-        //         isLoading = false; // stop
-        //         Log.info("Hopper", "ending loading");
-        //     }
-        // } else if (openTheGates) { // if there is a ball in sensor position 0 and we aren't trying to move that
-        //                            // ball forward for the offset distance and we are shooting the ball
-        //     setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
-        //             Constants.HopperConstants.INDEXER_POWER); // move everything
-        //     Log.info("Hopper", "opening the gates");
-        // } else {
-        //     setMotorPowers(0, 0, 0);
-        //     Log.info("Hopper", "waiting to be ready to shoot");
-        // }
-        // if (detectsBall(SENSOR_1)) { // if there is a ball in sensor 1
-        //     empty1 = false; // tell the code
-        // } else if (!empty1) { // if there is no ball in sensor 1 but there was in the prior iteration
-        //     empty1 = true; // tell the code
-        //     if (!isReversing) {
-        //         ballCount++; // iterate ball count (a ball has moved into the hopper)
-        //     } else {
-        //         isReversing = false;
-        //     }
-        //     updateBallArray(addBall(getBallArray())); // fix array
-        // }
     }
 
     public void organize() {
@@ -411,26 +485,30 @@ public class Hopper extends Threaded {
             setMotorPowers(0, 0, 0);
             setAction(ActionState.STANDBY);
             Log.info("Hopper", "ending organize because hopper is empty");
-        } 
-        if (ballCount > 0) {
+            setMotorPowers(0, 0, 0);
+        } else {
             startTime = RobotController.getFPGATime();
-            while(!detectsBall(SENSOR_1) && (RobotController.getFPGATime() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
-                isReversing = true;
+            while(!SENSOR_1_STATE && (RobotController.getFPGATime() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
+                //isReversing = true;
+                SENSOR_1_STATE = detectsBall1();
                 setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, 0);
                 Log.info("Hopper", "Reversing balls");
             }
+            setMotorPowers(0, 0, 0);
+            if(SENSOR_1_STATE) {
+                isReversing = true;
+            }
         }
 
-        setMotorPowers(0, 0, 0);
+        //setMotorPowers(0, 0, 0);
         setAction(ActionState.STANDBY);
-        // else if (empty1) {
-        //     empty1 = false;
-        //     setAction(ActionState.STANDBY);
-        //     Log.info("Hopper", "ending organize");
-        // }
     }
 
     public void setBallCount(int count) {
         this.ballCount = count;
+    }
+
+    public int getBallCount() {
+        return this.ballCount;
     }
 }

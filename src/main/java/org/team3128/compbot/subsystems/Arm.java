@@ -17,11 +17,13 @@ public class Arm extends Threaded {
     public static enum ArmState {
         STOWED(0), // arm is all the way down
         INTAKE(0), // intaking balls
-        STARTING(50), // within frame perimeter
+        STARTING(49), // within frame perimeter
         STARTING_DOWN(30), // arm is pushed to release the intake
-        FAR_RANGE(60), // far range shooting
+        LOADING_STATION(46),
+        LONG_RANGE(60), // far range shooting
+        MID_RANGE(45),
         SHORT_RANGE(20), // short range shooting
-        CLIMBING(90), // climbing
+        CLIMBING(70), // climbing
         DEBUG(5);
 
         public double armAngle;
@@ -34,7 +36,7 @@ public class Arm extends Threaded {
     public static final Arm instance = new Arm();
     public LazyTalonFX ARM_MOTOR_LEADER, ARM_MOTOR_FOLLOWER;
     public DigitalInput LIMIT_SWITCH;
-    double setpoint;
+    public double setpoint;
     double current = 0;
     double error = 0;
     public double output = 0;
@@ -81,13 +83,13 @@ public class Arm extends Threaded {
     }
 
     public double armFeedForward(double desired) {
-        return 0; // true value = -0.46
+        return -0.3; // true value = -0.46
     }
 
     public double getAngle() {
         return (((getEncoderPos() / Constants.MechanismConstants.ENCODER_RESOLUTION_PER_ROTATION)
                 / Constants.ArmConstants.ARM_GEARING) * 360) % 360; // TODO: account for
-        // possible negative
+                                                                    // possible negative
     }
 
     public void zero() {
@@ -103,11 +105,16 @@ public class Arm extends Threaded {
     }
 
     public boolean getLimitStatus() {
-        return LIMIT_SWITCH.get();
+        return !LIMIT_SWITCH.get();
+    }
+
+    public boolean isReady() {
+        return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD); 
     }
 
     @Override
-    public void update() {
+    public void update() { 
+        
         if (setpoint > Constants.ArmConstants.MAX_ARM_ANGLE) {
             setpoint = Constants.ArmConstants.MAX_ARM_ANGLE;
         }
@@ -116,14 +123,16 @@ public class Arm extends Threaded {
             setpoint = 0;
         }
 
-        if (!getLimitStatus()) {
+
+        if (getLimitStatus()) {
             ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
             ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
         }
-
+        
         if (ARM_STATE.armAngle != setpoint) {
             Log.info("ARM", "Setpoint override (setpoint has been set without using ArmState)");
         }
+        
         current = getAngle();
         error = setpoint - current;
         accumulator += error * Constants.MechanismConstants.DT;
@@ -156,13 +165,20 @@ public class Arm extends Threaded {
             plateauCount = 0;
         }
 
-        // ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
+
+        if((setpoint == 0) && !getLimitStatus()) {
+            output = Constants.ArmConstants.ZEROING_POWER;
+            // Log.info("Arm", "Using ZEROING_POWER to finish zeroing the arm.");
+        } else if((setpoint == 0) && getLimitStatus()) {
+            output = 0;
+            // Log.info("Arm", "In zero position, setting output to 0.");
+        }
+
+
+        ARM_MOTOR_LEADER.set(ControlMode.PercentOutput, output);
 
         prevError = error;
-    }
 
-    public boolean isReady() {
-        return (plateauCount > Constants.ArmConstants.PLATEAU_THRESHOLD);
     }
 
 }
