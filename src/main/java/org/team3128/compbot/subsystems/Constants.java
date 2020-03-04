@@ -66,6 +66,12 @@ public class Constants extends RobotConstants {
                 public static double K_AUTO_LEFT_D = 0.000; // 0.0001
                 public static double K_AUTO_LEFT_F = 1 / 140.8705712261 * kDriveInchesPerSecPerNUp100ms; // 1/(consistent max vel of this side of drivetrain in/s) * conversion to NU/s
                 public static final double K_HOLD_P = 4;
+
+                public static final double kS = 0.267;
+                public static final double kV = 0.00983;
+                public static final double kA = 0.00189;
+                public static final double kP = 0.0373;
+
         }
 
         public static class AutonomousDriveConstants {

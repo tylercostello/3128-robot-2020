@@ -22,12 +22,8 @@ public class StateTracker{
         
     }
     
-    private static StateTracker instance = null;
+    private static StateTracker instance = new StateTracker();
     public static RobotState robotState;
-
-    public static void initialize(){
-        instance = new StateTracker();
-    }
 
     public static StateTracker getInstance(){
         if (instance != null) {

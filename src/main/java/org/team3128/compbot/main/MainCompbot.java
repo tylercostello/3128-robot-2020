@@ -70,13 +70,12 @@ public class MainCompbot extends NarwhalRobot {
     public Command ejectBallsCommand;
     private DriveCommandRunning driveCmdRunning;
 
-
+    public StateTracker stateTracker = StateTracker.getInstance();
     static FalconDrive drive = FalconDrive.getInstance();
     static Hopper hopper = Hopper.getInstance();
     static Arm arm = Arm.getInstance();
     static Shooter shooter = Shooter.getInstance();
     static Climber climber = Climber.getInstance();
-    static StateTracker stateTracker;
 
  
     RobotTracker robotTracker = RobotTracker.getInstance();
@@ -153,9 +152,6 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void constructHardware() {
-        StateTracker.initialize();
-        stateTracker = StateTracker.getInstance();
-
         scheduler.schedule(drive, executor);
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
@@ -297,19 +293,19 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
         });
-        listenerRight.addButtonDownListener("runShooterFF", () -> {
-            Log.info("Button5", "pressed");
-            Log.info("Shooter", "Start Voltage: " +
-            String.valueOf(RobotController.getBatteryVoltage()));
-            shooterFFCommand = new CmdShooterFF(shooter);
-            shooterFFCommand.start(); 
-        });
-        listenerRight.addButtonUpListener("runShooterFF", () -> {
-            Log.info("Button5", "released");
-            Log.info("Button5", "stopping cmdShooterFF");
-            shooterFFCommand.cancel();
-            shooterFFCommand = null;
-        });
+        // listenerRight.addButtonDownListener("runShooterFF", () -> {
+        //     Log.info("Button5", "pressed");
+        //     Log.info("Shooter", "Start Voltage: " +
+        //     String.valueOf(RobotController.getBatteryVoltage()));
+        //     shooterFFCommand = new CmdShooterFF(shooter);
+        //     shooterFFCommand.start(); 
+        // });
+        // listenerRight.addButtonUpListener("runShooterFF", () -> {
+        //     Log.info("Button5", "released");
+        //     Log.info("Button5", "stopping cmdShooterFF");
+        //     shooterFFCommand.cancel();
+        //     shooterFFCommand = null;
+        // });
         listenerRight.addButtonDownListener("setRangeLong", () -> {
             stateTracker.setState(RobotState.LONG_RANGE);
         });
