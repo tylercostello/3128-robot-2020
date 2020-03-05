@@ -58,7 +58,7 @@ public class ErrorCatcherUtility {
     public CANEncoder canEncoder;
     public CanDevices[] driveLeaders = new CanDevices[2];
 
-    DriveSignal driveSignal = new DriveSignal(40, 40); //Can be changed
+    DriveSignal driveSignal = new DriveSignal(20, 20); //Can be changed
     DriveSignal backwardsDriveSignal = new DriveSignal(-40, -40);
     DriveSignal zeroDriveSignal = new DriveSignal(0, 0);
     
