@@ -343,19 +343,12 @@ public class FalconDrive extends Drive {
 			ks_sign = 0;
 		}
 
-		// double left_setpoint_adjusted = left_setpoint;
-		// double left_current_speed_adjusted = getLeftSpeed() * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-		// double right_setpoint_adjusted = right_setpoint * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-		// double right_current_speed_adjusted = getRightSpeed() * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-
-		// double desired_left_acceleration = (left_setpoint_adjusted - left_current_speed_adjusted)/((endTime - startTimeControl)/10);
-		// double feedforward_left = (Constants.DriveConstants.kS*ks_sign) + Constants.DriveConstants.kV*left_current_speed_adjusted + Constants.DriveConstants.kA*desired_left_acceleration;
-		// double error = left_setpoint_adjusted - left_current_speed_adjusted;
-
 		double feedforward_left = (Constants.DriveConstants.kS * ks_sign) + (left_setpoint * Constants.DriveConstants.kV); //TODO: add acceleration to this
 		double voltage_applied_left = feedforward_left;// + (Constants.DriveConstants.kP*error);
 
 		ks_sign = 1;
+
+		//the next few conditional statements ensure that the y intercept is pushed to the right direction (in case out path includes going backwards)
 
 		if (right_setpoint < 0) {
 			ks_sign = -1;
@@ -365,9 +358,9 @@ public class FalconDrive extends Drive {
 			ks_sign = 0;
 		}
 
-		// double desired_right_acceleration = (right_setpoint_adjusted - right_current_speed_adjusted)/((endTime - startTimeControl)/10);
-		// double feedforward_right = (Constants.DriveConstants.kS*ks_sign) + Constants.DriveConstants.kV*right_current_speed_adjusted + Constants.DriveConstants.kA*desired_right_acceleration;
-		// error = right_setpoint_adjusted - right_current_speed_adjusted;
+
+		// applied_voltage = kS + (desired velocity * kV) [we currently ignore acceleration and emit PID which might be a bad assumption]
+
 		double feedforward_right = (Constants.DriveConstants.kS * ks_sign) + (right_setpoint * Constants.DriveConstants.kV); //TODO: add acceleration to this
 		double voltage_applied_right = feedforward_right; //+ (Constants.DriveConstants.kP*error);
 
