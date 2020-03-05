@@ -240,11 +240,14 @@ public class CmdAlignShoot extends Command {
             // break;
         }
 
-        if ((currentError < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
+        if ((Math.abs(currentError) < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
             Log.info("CmdAlignShoot", "Trying to shoot ball");
             hopper.shoot();
         } else {
             hopper.unShoot();
+            Log.info("CmdAlignShoot", "no longer ready to shoot ball");
+            Log.info("CmdAlignShoot", "" + shooter.isReady());
+            Log.info("CmdAlignShoot", "" + Math.abs(currentError));
         }
     }
 
