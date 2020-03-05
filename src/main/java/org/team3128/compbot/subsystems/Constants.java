@@ -67,15 +67,15 @@ public class Constants extends RobotConstants {
                 public static double K_AUTO_LEFT_F = 1 / 140.8705712261 * kDriveInchesPerSecPerNUp100ms; // 1/(consistent max vel of this side of drivetrain in/s) * conversion to NU/s
                 public static final double K_HOLD_P = 4;
 
-                public static final double kS = 0.267;
-                public static final double kV = 0.00983;
-                public static final double kA = 0.00189;
-                public static final double kP = 0.0373;
+                public static final double kS = 0.178;
+                public static final double kV = 0.0516;
+                public static final double kA = 0.00679;
+                public static final double kP = 1.33;
 
         }
 
         public static class AutonomousDriveConstants {
-                public static final double TRACK_RADIUS = 24;
+                public static final double TRACK_RADIUS = 23.89231390411386;
                 public static final double MIN_TURNING_RADIUS = 40;
                 public static final double MIN_PATH_SPEED = 20;
                 public static final double MAX_PATH_SPEED = 120;
@@ -92,7 +92,7 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
                 public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be allowed to shoot
-                public static final double TX_OFFSET = -1; // to offset alignment in either direction
+                public static final double TX_OFFSET = 2; // to offset alignment in either direction
                 public static final PIDConstants VISION_PID = new PIDConstants(0, 0.0123, 0.02, 0.00006);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
@@ -160,9 +160,9 @@ public class Constants extends RobotConstants {
         }
         
         public static class ClimberConstants {
-                public static final int LEFT_MOTOR_ID = 11;
-                public static final int RIGHT_MOTOR_ID = 12;
-                public static final double CLIMB_POWER = 0.3;
+                public static final int LEFT_MOTOR_ID = 12;
+                public static final int RIGHT_MOTOR_ID = 11;
+                public static final double CLIMB_POWER = 0.5;
         }
 
         public static class ArmConstants {
