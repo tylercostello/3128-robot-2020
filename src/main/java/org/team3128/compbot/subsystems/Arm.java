@@ -23,7 +23,7 @@ public class Arm extends Threaded {
         LONG_RANGE(52), // far range shooting
         MID_RANGE(47),
         SHORT_RANGE(25), // short range shooting
-        CLIMBING(65), // climbing
+        CLIMBING(69), // climbing
         DEBUG(5);
 
         public double armAngle;

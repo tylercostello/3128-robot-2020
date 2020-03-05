@@ -35,7 +35,6 @@ import org.team3128.common.drive.Drive;
 /**
  * Utility used to catch breaks in the CAN chain
  * 
- * 
  * @author Tyler Costello, Daniel Wang, Jude T. Lifset
  * 
  */
@@ -87,7 +86,6 @@ public class ErrorCatcherUtility {
             if(device.name == "Right Drive Leader")  
                 driveLeaders[1] = device;
             
-
             if(device.type == CanDevices.DeviceType.TALON){
                 errorCode = device.talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
             }
@@ -99,7 +97,7 @@ public class ErrorCatcherUtility {
             else if (device.type==CanDevices.DeviceType.SPARK){
 
                 sparkTemp=device.spark.getMotorTemperature();
-                Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
+                //Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
 
                 if (sparkTemp < 5 || sparkTemp>100){
                     errorCode = ErrorCode.CAN_MSG_NOT_FOUND;
@@ -120,7 +118,7 @@ public class ErrorCatcherUtility {
             else if (device.type==CanDevices.DeviceType.PDP){
 
                 pdpTemp=device.pdp.getTemperature();
-                Log.info("ErrorCatcher", "PDP temp "+pdpTemp);
+                //Log.info("ErrorCatcher", "PDP temp "+pdpTemp);
 
                 if (pdpTemp < 5){
                     errorCode = ErrorCode.CAN_MSG_NOT_FOUND;
@@ -204,19 +202,10 @@ public class ErrorCatcherUtility {
         leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
         rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
         while (leftEncoderVelocity < 500 && rightEncoderVelocity < 500 && (endTime-time) <= 1){
-          
-           leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
-           rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
-           if (leftEncoderVelocity < rightEncoderVelocity){
-            if (maxAchieved <= leftEncoderVelocity){
-                maxAchieved=leftEncoderVelocity;
-            }
-           }
-           else {
-            if (maxAchieved <= rightEncoderVelocity){
-                maxAchieved=rightEncoderVelocity;
-            }
-           }
+            leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
+            rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
+           
+            maxAchieved = Math.max(maxAchieved, Math.min(leftEncoderVelocity, rightEncoderVelocity));
             endTime = Timer.getFPGATimestamp();
         }
 
@@ -239,19 +228,13 @@ public class ErrorCatcherUtility {
         rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
         Log.info("ErrorCatcher", "Left Encoder velocity: " + leftEncoderVelocity);
         Log.info("ErrorCatcher", "Right Encoder velocity: " + rightEncoderVelocity);
+
         while (leftEncoderVelocity > -500 && rightEncoderVelocity > -500 && (endTime-time) <= 1){
             leftEncoderVelocity = getEncoderVelocity(driveLeaders[0]);
             rightEncoderVelocity = getEncoderVelocity(driveLeaders[1]);
-            if (leftEncoderVelocity > rightEncoderVelocity){
-                if (maxAchieved >= leftEncoderVelocity){
-                    maxAchieved=leftEncoderVelocity;
-                }
-               }
-            else {
-                if (maxAchieved >= rightEncoderVelocity){
-                    maxAchieved=rightEncoderVelocity;
-                }
-            }
+
+            //Set maxAchieved to the minimum of the slowest motor and the previous minimum
+            maxAchieved = Math.min(maxAchieved, Math.max(leftEncoderVelocity, rightEncoderVelocity)); 
 
             endTime = Timer.getFPGATimestamp();
 
