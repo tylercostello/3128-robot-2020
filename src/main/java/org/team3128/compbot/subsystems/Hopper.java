@@ -76,6 +76,7 @@ public class Hopper extends Threaded {
     public int openTheGatesCounter = 0;
     public int jamCount = 0;
     public int plateauCount = 0;
+    public double shootingCornerReversingPos = 0;
     public double shootingCornerPosition = 0;
     public boolean shootingReversingIndexer = true;
 
@@ -363,6 +364,43 @@ public class Hopper extends Threaded {
             setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
         } else if (SENSOR_0_STATE && openTheGates) {
             //shootingCornerPosition = CORNER_ENCODER.getPosition();
+            shootingCornerReversingPos = CORNER_ENCODER.getPosition();
+            ejectBallInBottom = false;
+            while (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.SHOOTER_REVERSING_OFFSET) >= Math.abs(shootingCornerReversingPos)) {
+                SENSOR_0_STATE = detectsBall0();
+                SENSOR_1_STATE = detectsBall1();
+
+                setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER);
+
+                if (SENSOR_1_STATE) {
+                    isReversing = true;
+                    if (empty1) { //if there wasn't a ball in the first position in the last iteration, but there is one now
+                        ejectBallInBottom = true; //then tell the hopper that there is a new ball in the bottom that is about to be ejected
+                    }
+                } else {
+                    isReversing = false;
+                    ejectBallInBottom = false;
+                }
+        
+                if (!SENSOR_1_STATE && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
+                    empty1 = true; //tell the code the position is empty
+                    Log.info("Hopper", "(hopper shooting reverse) detected ball and was full previously, should de-iterate count");
+                    if (ejectBallInBottom) {
+                        ballCount--; // iterate ballCount once because a ball has passed through our sensors
+                        Log.info("Hopper", "de-iterating ballCount in hopper shooting reverse");
+                    } else {
+                        Log.info("Hopper", "ejected ball that was halfway in the hopper and wasn't accounted for in ballCount");
+                    }
+                }
+
+                if(SENSOR_1_STATE) {
+                    //////Log.info("Hopper", "setting empty1 to false 1");
+                    empty1 = false;
+                } else {
+                    //////Log.info("Hopper", "setting empty1 to true 1");
+                    empty1 = true;
+                }                
+            }
             while (SENSOR_0_STATE) {
                 SENSOR_0_STATE = detectsBall0();
                 SENSOR_1_STATE = detectsBall1();
