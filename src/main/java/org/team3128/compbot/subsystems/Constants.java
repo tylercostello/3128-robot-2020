@@ -70,7 +70,7 @@ public class Constants extends RobotConstants {
                 public static final double kS = 0.178;
                 public static final double kV = 0.0516;
                 public static final double kA = 0.00679;
-                public static final double kP = 1.33;
+                public static final double kP = 0.0015;
 
         }
 
@@ -92,11 +92,12 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
                 public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be allowed to shoot
-                public static final double TX_OFFSET = 2; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.0123, 0.02, 0.00006);
+                public static final double TX_OFFSET = 0; // to offset alignment in either direction
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.0135, 0.02, 0.00006);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
+
 
         public static class TestSuiteConstants {
 
@@ -131,7 +132,7 @@ public class Constants extends RobotConstants {
         public static class HopperConstants {
 
                 public static final int HOPPER_FEEDER_MOTOR_ID = 6;
-                public static final int CORNER_MOTOR_ID = 2;
+                public static final int CORNER_MOTOR_ID = 10;
                 public static final int GATEKEEPER_MOTOR_ID = 9;
 
                 public static final int SENSOR_0_ID = 8;
@@ -145,7 +146,7 @@ public class Constants extends RobotConstants {
                 public static final double FEEDER_REVERSE = 0.25;
                 public static final double GATEKEEPER_POWER = -0.75;
                 public static final double INDEXER_POWER = -0.40;
-                public static final double[] BALL_SPACING = {-30/*25*/, -39/*-27.5*/, -8, -25};//{ -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
+                public static final double[] BALL_SPACING = {-30/*25*/, -39/*-27.5*/, -5, -25};//{ -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
                 public static final double REVERSE_TIMEOUT = 1500; //timeout for how long to run the corner motors back (in case the sensor gets triggered)
                 public static final int JAM_COUNT_THRESHOLD = 100; //how long the motor has to be stopped in order for it to be considered a jam: 100 loop counts * 1/200hz = 0.5 seconds
                 public static final int JAM_REVERSE_COUNT_THRESHOLD = 100; //how long to reverse the intake after a jam is detected: 100 loop counts * 1/200hz = 0.5 seconds
@@ -166,14 +167,14 @@ public class Constants extends RobotConstants {
         }
 
         public static class ArmConstants {
-                public static final int ARM_MOTOR_LEADER_ID = 5;
+                public static final int ARM_MOTOR_LEADER_ID = 13;
                 public static final int ARM_MOTOR_FOLLOWER_ID = 4;
                 public static final int ARM_LIMIT_SWITCH_ID = 0;
 
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
                 public static final NeutralMode ARM_NEUTRAL_MODE_DEBUG = NeutralMode.Coast;
                 public static final double MAX_ARM_ANGLE = 80;
-                public static final double ANGLE_THRESHOLD = 5;
+                public static final double ANGLE_THRESHOLD = 7;
                 public static final double PLATEAU_THRESHOLD = 50;
 
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)
@@ -188,6 +189,9 @@ public class Constants extends RobotConstants {
 
                 public static final double ARM_SATURATION_LIMIT = 2 / ARM_PID.kI; // set limit on integral accumulation
                 public static final double ZEROING_POWER = -0.35;
+
+                public static final double STARTING_ANGLE = 48.87; //the angle that the arm is at when it is within frame perimeter
+                public static final int STARTING_POSITION = (int) ((STARTING_ANGLE / 360) * MechanismConstants.ENCODER_RESOLUTION_PER_ROTATION * ARM_GEARING);
         }
 
 }

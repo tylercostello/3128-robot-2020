@@ -29,6 +29,8 @@ import org.team3128.common.utility.RobotMath;
 
 import edu.wpi.first.wpilibj.Timer;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import org.team3128.common.utility.Log;
 import org.team3128.common.drive.Drive;
 
@@ -44,7 +46,8 @@ public class FalconDrive extends Drive {
 		return instance;
 	}
 
-	private ADXRS450_Gyro gyroSensor;
+	// private ADXRS450_Gyro gyroSensor;
+	private AHRS ahrs;
 	// private LazyTalonSRX leftTalon, rightTalon, leftSlaveTalon, leftSlave2Talon,
 	// rightSlaveTalon, rightSlave2Talon;
 	private RamseteController autonomousDriver;
@@ -71,7 +74,8 @@ public class FalconDrive extends Drive {
 
 	private FalconDrive() {
 
-		gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+		// gyroSensor = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+		ahrs = new AHRS(SPI.Port.kMXP);
 
 		//left and right are flipped because the driver wanted to flip the direction of driving.
 
@@ -149,7 +153,7 @@ public class FalconDrive extends Drive {
 
 	@Override
 	public void calibrateGyro() {
-		gyroSensor.calibrate();
+		// gyroSensor.calibrate();
 	}
 
 	@Override
@@ -180,7 +184,7 @@ public class FalconDrive extends Drive {
 
 	@Override
 	public double getAngle() {
-		return -gyroSensor.getAngle();
+		return ahrs.getAngle();
 	}
 
 	@Override
@@ -191,7 +195,7 @@ public class FalconDrive extends Drive {
 	@Override
 	public Rotation2D getGyroAngle() {
 		// -180 through 180
-		return Rotation2D.fromDegrees(gyroSensor.getAngle());
+		return Rotation2D.fromDegrees(getAngle());
 	}
 
 	@Override
@@ -342,9 +346,9 @@ public class FalconDrive extends Drive {
 		if (left_setpoint == 0) {
 			ks_sign = 0;
 		}
-
+		double error = left_setpoint - getLeftSpeed();
 		double feedforward_left = (Constants.DriveConstants.kS * ks_sign) + (left_setpoint * Constants.DriveConstants.kV); //TODO: add acceleration to this
-		double voltage_applied_left = feedforward_left;// + (Constants.DriveConstants.kP*error);
+		double voltage_applied_left = feedforward_left + (Constants.DriveConstants.kP*error);
 
 		ks_sign = 1;
 
@@ -360,9 +364,9 @@ public class FalconDrive extends Drive {
 
 
 		// applied_voltage = kS + (desired velocity * kV) [we currently ignore acceleration and emit PID which might be a bad assumption]
-
+		error = right_setpoint - getRightSpeed();
 		double feedforward_right = (Constants.DriveConstants.kS * ks_sign) + (right_setpoint * Constants.DriveConstants.kV); //TODO: add acceleration to this
-		double voltage_applied_right = feedforward_right; //+ (Constants.DriveConstants.kP*error);
+		double voltage_applied_right = feedforward_right + (Constants.DriveConstants.kP*error);
 
 
 		double leftAvaliableVoltage = leftTalon.getBusVoltage();
@@ -461,7 +465,7 @@ public class FalconDrive extends Drive {
 
 	@Override
 	public void resetGyro() {
-		gyroSensor.reset();
+		ahrs.reset();
 	}
 
 	@Override

@@ -206,11 +206,13 @@ public class MainCompbot extends NarwhalRobot {
 
             }
         });
+
+        drive.resetGyro();
     }
 
     @Override
     protected void constructAutoPrograms() {
-        NarwhalDashboard.addAuto("Simple Auto", new AutoSimple(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning, 10000));
+        //NarwhalDashboard.addAuto("Simple Auto", new AutoSimple(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning, 10000));
     }
 
     @Override
@@ -552,6 +554,10 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void autonomousInit() {
+        scheduler.resume();
+        drive.resetGyro();
+        Command auto = new AutoSimple(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning, 10000);
+        auto.start();
     }
 
     @Override
