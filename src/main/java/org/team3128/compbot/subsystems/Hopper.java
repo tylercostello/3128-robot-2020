@@ -633,9 +633,9 @@ public class Hopper extends Threaded {
     }
 
     public void eject() {
-        if (!isEmpty()) {
-            setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER);
-        }
+        
+        setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER);
+        
         if (SENSOR_1_STATE) {
             isReversing = true;
             if (empty1) { //if there wasn't a ball in the first position in the last iteration, but there is one now
