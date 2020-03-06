@@ -99,6 +99,7 @@ public class ErrorCatcherUtility {
             else if (device.type==CanDevices.DeviceType.SPARK){
 
                 sparkTemp=device.spark.getMotorTemperature();
+                Log.info("ErrorCatcher", "Spark" +device.id+" "+sparkTemp+" degrees");
                 Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
 
                 if (sparkTemp < 5 || sparkTemp>100){
