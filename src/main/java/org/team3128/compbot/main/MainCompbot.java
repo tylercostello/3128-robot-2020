@@ -446,6 +446,7 @@ public class MainCompbot extends NarwhalRobot {
     protected void updateDashboard() {
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
+        NarwhalDashboard.put("ball_count", hopper.getBallCount());
 
         //Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
 
