@@ -35,7 +35,7 @@ public class Climber extends Threaded {
 
     public void setPower(double power){
         if (isClimbing) {
-            LEFT_MOTOR.set(ControlMode.PercentOutput, power);
+            LEFT_MOTOR.set(ControlMode.PercentOutput, -power);
             RIGHT_MOTOR.set(ControlMode.PercentOutput, -power);
         } else {
             LEFT_MOTOR.set(ControlMode.PercentOutput, 0);

@@ -309,16 +309,12 @@ public class FalconDrive extends Drive {
 		String tempStr = "pwrL=" + String.valueOf(pwrL) + ", pwrR=" + String.valueOf(pwrR) + ", spdL="
 				+ String.valueOf(spdL) + ", spdR=" + String.valueOf(spdR);
 		// Log.info("FalconDrive", tempStr);
-		//setWheelPower(new DriveSignal(pwrL, pwrR));
+		// setWheelPower(new DriveSignal(pwrL, pwrR));
 		setWheelVelocity(new DriveSignal(spdL, spdR));
 	}
 
 	@Override
 	public void update() {
-		startTimeControl = Timer.getFPGATimestamp();
-		if(endTime == 0) {
-			endTime = startTime + 20;
-		}
 		velocityController();
 		DriveState snapDriveState;
 		synchronized (this) {
@@ -337,39 +333,42 @@ public class FalconDrive extends Drive {
 	}
 
 	private void velocityController() {
-		//(setVelocity.leftVelocity) * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms
-
 		double ks_sign = 1;
 
-		if ((left_setpoint - getLeftSpeed()) < 0) {
+		if (left_setpoint < 0) {
 			ks_sign = -1;
 		}
 
-		double left_setpoint_adjusted = left_setpoint * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-		double left_current_speed_adjusted = getLeftSpeed() * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-		double right_setpoint_adjusted = right_setpoint * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
-		double right_current_speed_adjusted = getRightSpeed() * Constants.DriveConstants.ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION * 1 / Constants.DriveConstants.kDriveInchesPerSecPerNUp100ms;
+		if (left_setpoint == 0) {
+			ks_sign = 0;
+		}
 
-		double desired_left_acceleration = (left_setpoint_adjusted - left_current_speed_adjusted)/((endTime - startTimeControl)/10);
-		double feedforward_left = (Constants.DriveConstants.kS*ks_sign) + Constants.DriveConstants.kV*left_current_speed_adjusted + Constants.DriveConstants.kA*desired_left_acceleration;
-		double error = left_setpoint_adjusted - left_current_speed_adjusted;
-		double voltage_applied_left = feedforward_left + (Constants.DriveConstants.kP*error);
+		double feedforward_left = (Constants.DriveConstants.kS * ks_sign) + (left_setpoint * Constants.DriveConstants.kV); //TODO: add acceleration to this
+		double voltage_applied_left = feedforward_left;// + (Constants.DriveConstants.kP*error);
+
 		ks_sign = 1;
 
-		if ((right_setpoint - getRightSpeed()) < 0) {
+		//the next few conditional statements ensure that the y intercept is pushed to the right direction (in case out path includes going backwards)
+
+		if (right_setpoint < 0) {
 			ks_sign = -1;
 		}
 
-		double desired_right_acceleration = (right_setpoint_adjusted - right_current_speed_adjusted)/((endTime - startTimeControl)/10);
-		double feedforward_right = (Constants.DriveConstants.kS*ks_sign) + Constants.DriveConstants.kV*right_current_speed_adjusted + Constants.DriveConstants.kA*desired_right_acceleration;
-		error = right_setpoint_adjusted - right_current_speed_adjusted;
-		double voltage_applied_right = feedforward_right + (Constants.DriveConstants.kP*error);
+		if (right_setpoint == 0) {
+			ks_sign = 0;
+		}
+
+
+		// applied_voltage = kS + (desired velocity * kV) [we currently ignore acceleration and emit PID which might be a bad assumption]
+
+		double feedforward_right = (Constants.DriveConstants.kS * ks_sign) + (right_setpoint * Constants.DriveConstants.kV); //TODO: add acceleration to this
+		double voltage_applied_right = feedforward_right; //+ (Constants.DriveConstants.kP*error);
 
 
 		double leftAvaliableVoltage = leftTalon.getBusVoltage();
 		double rightAvaliableVoltage = rightTalon.getBusVoltage();
 
-		Log.info("FalconDrive", "left_voltage = " + String.valueOf(voltage_applied_left) + ", right_voltage = " + String.valueOf(voltage_applied_right));
+		//Log.info("FalconDrive", "left_voltage = " + String.valueOf(voltage_applied_left) + ", right_voltage = " + String.valueOf(voltage_applied_right));
 
 		double leftPower = voltage_applied_left / leftAvaliableVoltage;
 		double rightPower = voltage_applied_right / rightAvaliableVoltage;
