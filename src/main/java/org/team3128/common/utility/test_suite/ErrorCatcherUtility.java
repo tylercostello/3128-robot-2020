@@ -88,10 +88,12 @@ public class ErrorCatcherUtility {
             
             if(device.type == CanDevices.DeviceType.TALON){
                 errorCode = device.talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+                Log.info("ErrorCatcher", "Talon" +device.id);
             }
 
             else if (device.type==CanDevices.DeviceType.VICTOR){
                 errorCode = device.victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+                Log.info("ErrorCatcher", "Victor" +device.id);
             }
 
             else if (device.type==CanDevices.DeviceType.SPARK){
@@ -113,6 +115,7 @@ public class ErrorCatcherUtility {
             }
 
             else if (device.type==CanDevices.DeviceType.FALCON){
+                Log.info("ErrorCatcher", "Falcon" +device.id);
                 errorCode = device.falcon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
             }
 
@@ -142,7 +145,7 @@ public class ErrorCatcherUtility {
                         NarwhalDashboard.put("ErrorCatcherCAN", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
                     }
 
-                    break;
+                    //break;
                 }
 
                 if (errorCode == ErrorCode.SensorNotPresent){
