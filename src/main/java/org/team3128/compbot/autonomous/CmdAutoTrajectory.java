@@ -55,7 +55,7 @@ public class CmdAutoTrajectory extends Command {
     }
 
     @Override public void end() {
-        drive.setWheelPower(new DriveSignal(0, 0));
+        drive.setWheelVelocity(new DriveSignal(0, 0));
     }
 
     @Override public void interrupted() {
