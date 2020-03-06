@@ -201,7 +201,10 @@ public class CmdAlignShoot extends Command {
 
                     SmartDashboard.putNumber("Shooter Power", leftPower);
 
-                    drive.setWheelPower(new DriveSignal(leftPower, rightPower));
+                    double leftSpeed = leftPower * Constants.DriveConstants.DRIVE_HIGH_SPEED;
+                    double rightSpeed = rightPower * Constants.DriveConstants.DRIVE_HIGH_SPEED;
+                    
+                    drive.setWheelVelocity(new DriveSignal(leftSpeed, rightSpeed));
 
                     previousTime = currentTime;
                     previousError = currentError;
