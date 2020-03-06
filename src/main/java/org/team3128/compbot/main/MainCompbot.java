@@ -286,9 +286,14 @@ public class MainCompbot extends NarwhalRobot {
         });
         listenerRight.addButtonDownListener("EjectBalls", () -> {
             Log.info("Button8", "pressed");
-            Log.info("MainCompBot", "Eject not implemented yet");
+            //Log.info("MainCompBot", "Eject not implemented yet");
             // ejectBallsCommand = new CmdEjectBalls(hopper);
             // ejectBallsCommand.start();
+            hopper.setAction(ActionState.EJECTING);
+        });
+        listenerRight.addButtonUpListener("EjectBalls", () -> {
+            Log.info("Button8", "released");
+            hopper.setAction(ActionState.STANDBY);
         });
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
