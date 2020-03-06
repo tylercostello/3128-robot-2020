@@ -32,6 +32,7 @@ import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.compbot.commands.*;
+import org.team3128.compbot.autonomous.AutoSimple;
 import org.team3128.compbot.calibration.*;
 import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.subsystems.Constants;
@@ -209,6 +210,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void constructAutoPrograms() {
+        NarwhalDashboard.addAuto("Simple Auto", new AutoSimple(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning, 10000));
     }
 
     @Override
