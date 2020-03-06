@@ -75,6 +75,8 @@ public class ErrorCatcherUtility {
 
         //Iterates over each CAN device in the chain, in order, and checks if it is good
         errorCode=ErrorCode.OK;
+        //for(int i=0;i<CanChain.length;i++){
+        //for(int i=CanChain.length-1; i>=0;i--){
         for(CanDevices device : CanChain){
             
             if (device == null){
@@ -88,15 +90,18 @@ public class ErrorCatcherUtility {
             
             if(device.type == CanDevices.DeviceType.TALON){
                 errorCode = device.talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+               // Log.info("ErrorCatcher", "Talon" +device.id);
             }
 
             else if (device.type==CanDevices.DeviceType.VICTOR){
                 errorCode = device.victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
+               // Log.info("ErrorCatcher", "Victor" +device.id);
             }
 
             else if (device.type==CanDevices.DeviceType.SPARK){
 
                 sparkTemp=device.spark.getMotorTemperature();
+                Log.info("ErrorCatcher", "Spark" +device.id+" "+sparkTemp+" degrees");
                 //Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
 
                 if (sparkTemp < 5 || sparkTemp>100){
@@ -112,6 +117,7 @@ public class ErrorCatcherUtility {
             }
 
             else if (device.type==CanDevices.DeviceType.FALCON){
+               // Log.info("ErrorCatcher", "Falcon" +device.id);
                 errorCode = device.falcon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
             }
 
