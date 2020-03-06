@@ -152,6 +152,8 @@ public class Constants extends RobotConstants {
         }
 
         public static class IntakeConstants {
+                //To debug errorcatcher
+                //public static final int INTAKE_MOTOR_ID = 15;
                 public static final int INTAKE_MOTOR_ID = 5;
 
                 public static final double INTAKE_MOTOR_ON_VALUE = -0.65;
