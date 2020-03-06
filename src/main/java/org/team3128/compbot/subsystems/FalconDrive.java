@@ -368,7 +368,7 @@ public class FalconDrive extends Drive {
 		double leftAvaliableVoltage = leftTalon.getBusVoltage();
 		double rightAvaliableVoltage = rightTalon.getBusVoltage();
 
-		Log.info("FalconDrive", "left_voltage = " + String.valueOf(voltage_applied_left) + ", right_voltage = " + String.valueOf(voltage_applied_right));
+		//Log.info("FalconDrive", "left_voltage = " + String.valueOf(voltage_applied_left) + ", right_voltage = " + String.valueOf(voltage_applied_right));
 
 		double leftPower = voltage_applied_left / leftAvaliableVoltage;
 		double rightPower = voltage_applied_right / rightAvaliableVoltage;

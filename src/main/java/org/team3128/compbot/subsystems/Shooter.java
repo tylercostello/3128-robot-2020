@@ -137,7 +137,7 @@ public class Shooter extends Threaded {
 
     public double shooterFeedForward(double desiredSetpoint) {
         //double ff = (0.00211 * desiredSetpoint) - 2; // 0.051
-        double ff = (0.00147 * desiredSetpoint) + 0;
+        double ff = (0.00147 * desiredSetpoint)  - 0.2; // 0
         if (setpoint != 0) {
             return ff;
         } else {
