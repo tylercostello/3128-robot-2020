@@ -57,7 +57,7 @@ public class ErrorCatcherUtility {
     public CANEncoder canEncoder;
     public CanDevices[] driveLeaders = new CanDevices[2];
 
-    DriveSignal driveSignal = new DriveSignal(20, 20); //Can be changed
+    DriveSignal driveSignal = new DriveSignal(40, 40); //Can be changed
     DriveSignal backwardsDriveSignal = new DriveSignal(-40, -40);
     DriveSignal zeroDriveSignal = new DriveSignal(0, 0);
     
@@ -88,19 +88,19 @@ public class ErrorCatcherUtility {
             
             if(device.type == CanDevices.DeviceType.TALON){
                 errorCode = device.talon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
-                Log.info("ErrorCatcher", "Talon" +device.id);
+               // Log.info("ErrorCatcher", "Talon" +device.id);
             }
 
             else if (device.type==CanDevices.DeviceType.VICTOR){
                 errorCode = device.victor.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
-                Log.info("ErrorCatcher", "Victor" +device.id);
+               // Log.info("ErrorCatcher", "Victor" +device.id);
             }
 
             else if (device.type==CanDevices.DeviceType.SPARK){
 
                 sparkTemp=device.spark.getMotorTemperature();
                 Log.info("ErrorCatcher", "Spark" +device.id+" "+sparkTemp+" degrees");
-                Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
+                //Log.info("ErrorCatcher", "Spark temp "+sparkTemp);
 
                 if (sparkTemp < 5 || sparkTemp>100){
                     errorCode = ErrorCode.CAN_MSG_NOT_FOUND;
@@ -115,7 +115,7 @@ public class ErrorCatcherUtility {
             }
 
             else if (device.type==CanDevices.DeviceType.FALCON){
-                Log.info("ErrorCatcher", "Falcon" +device.id);
+               // Log.info("ErrorCatcher", "Falcon" +device.id);
                 errorCode = device.falcon.configRemoteFeedbackFilter(device.id, RemoteSensorSource.CANifier_Quadrature,0, 10);
             }
 
@@ -145,7 +145,7 @@ public class ErrorCatcherUtility {
                         NarwhalDashboard.put("ErrorCatcherCAN", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
                     }
 
-                    //break;
+                    break;
                 }
 
                 if (errorCode == ErrorCode.SensorNotPresent){
