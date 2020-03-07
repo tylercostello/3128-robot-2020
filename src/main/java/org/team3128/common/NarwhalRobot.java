@@ -269,11 +269,15 @@ public abstract class NarwhalRobot extends RobotBase {
             HAL.observeUserProgramDisabled();
             disabledPeriodic();
             m_watchdog.addEpoch("disablePeriodic()");
-        } else if (isAutonomous()) {
+        } else if(isAutonomous()) {
+            if (m_lastMode != Mode.kAutonomous) {
+                autonomousInit();
+                Log.info("NarwhalRobot", "Entered Autonomous");
+            }
+            m_lastMode = Mode.kAutonomous;
+        } else if (false) {
             if (m_lastMode != Mode.kAutonomous) {
                 Log.info("NarwhalRobot", "Entering autonomous period.");
-
-                Scheduler.getInstance().removeAll();
 
                 setupAutoChooser();
 

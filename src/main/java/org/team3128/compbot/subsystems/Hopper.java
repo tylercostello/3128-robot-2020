@@ -88,6 +88,8 @@ public class Hopper extends Threaded {
     private DigitalInput[] sensorPositions = { SENSOR_0, SENSOR_1 }; // top to bottom //0 = 1.5, 1 = 3, 2 = 4
                                                                      // mathhh
 
+    public int hopper_update_count = 0;
+
     public static Hopper getInstance() {
         return instance;
     }
@@ -101,16 +103,10 @@ public class Hopper extends Threaded {
 
     @Override
     public void update() {
+        hopper_update_count++;
 
         SENSOR_0_STATE = detectsBall0();
         SENSOR_1_STATE = detectsBall1();
-
-        //Log.info("Hopper", "detect count = " + detectCount);
-
-        SmartDashboard.putBoolean("gatekeep", openTheGates);
-        //SmartDashboard.putNumber("openTheGatesCounter", openTheGatesCounter);
-        SmartDashboard.putBoolean("SENSOR_0_DETECT", SENSOR_0_STATE);
-        SmartDashboard.putBoolean("SENSOR_1_DETECT", SENSOR_1_STATE);
 
         switch (actionState) {
             case STANDBY:
@@ -324,7 +320,6 @@ public class Hopper extends Threaded {
             if (actionState == ActionState.INTAKING) {
                 setMotorPowers(0, 0, Constants.HopperConstants.INDEXER_POWER);
             } else {
-                //Log.info("Hopper", "alarm alarm alarm alarm alarm alarm alarm alarm");
                 setMotorPowers(0, 0, 0);
             }
         } 

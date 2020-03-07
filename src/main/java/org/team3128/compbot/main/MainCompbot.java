@@ -78,7 +78,7 @@ public class MainCompbot extends NarwhalRobot {
     static Hopper hopper = Hopper.getInstance();
     static Arm arm = Arm.getInstance();
     static Shooter shooter = Shooter.getInstance();
-    static Climber climber = Climber.getInstance();
+    static Climber climber = new Climber();
 
  
     RobotTracker robotTracker = RobotTracker.getInstance();
@@ -159,7 +159,6 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        scheduler.schedule(climber, executor);
         scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
@@ -294,8 +293,9 @@ public class MainCompbot extends NarwhalRobot {
         listenerRight.addButtonDownListener("EjectBalls", () -> {
             Log.info("Button8", "pressed");
             Log.info("MainCompBot", "Eject not implemented yet");
-            // ejectBallsCommand = new CmdEjectBalls(hopper);
-            // ejectBallsCommand.start();
+            drive.resetGyro();
+            Command auto = new AutoSimple(drive, shooter, arm, hopper, ahrs, shooterLimelight, driveCmdRunning, 10000, scheduler);
+            auto.start();
         });
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
@@ -422,7 +422,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopPeriodic() {
-
+        scheduler.resume();
     }
 
     double maxLeftSpeed = 0;
@@ -451,6 +451,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
+        SmartDashboard.putString("hopper update count", String.valueOf(hopper.hopper_update_count));
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
         NarwhalDashboard.put("ball_count", hopper.getBallCount());
@@ -462,12 +463,12 @@ public class MainCompbot extends NarwhalRobot {
             arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
         }
 
-        // currentLeftSpeed = drive.getLeftSpeed();
+        currentLeftSpeed = drive.getLeftSpeed();
         // currentLeftDistance = drive.getLeftDistance();
-        // currentRightSpeed = drive.getRightSpeed();
+        currentRightSpeed = drive.getRightSpeed();
         // currentRightDistance = drive.getRightDistance();
 
-        // currentSpeed = drive.getSpeed();
+        currentSpeed = drive.getSpeed();
         // currentDistance = drive.getDistance();
 
         // currentArmLimitSwitch = String.valueOf(arm.getLimitStatus());
@@ -483,7 +484,7 @@ public class MainCompbot extends NarwhalRobot {
         // currentShooterSetpoint = shooter.setpoint;
 
         // SmartDashboard.putString("DriveCmdRunning", "" + driveCmdRunning.isRunning);
-        // SmartDashboard.putString("ActionState", "" + hopper.actionState);
+        SmartDashboard.putString("ActionState", "" + hopper.actionState);
 
         // SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
         // SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
@@ -507,8 +508,8 @@ public class MainCompbot extends NarwhalRobot {
 
         // SmartDashboard.putNumber("Distance", currentDistance);
 
-        // SmartDashboard.putNumber("Left Velocity", currentLeftSpeed);
-        // SmartDashboard.putNumber("Right Velocity", currentRightSpeed);
+        SmartDashboard.putNumber("Left Velocity", currentLeftSpeed);
+        SmartDashboard.putNumber("Right Velocity", currentRightSpeed);
 
         // SmartDashboard.putNumber("Velocity", drive.getSpeed());
 
@@ -544,20 +545,21 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopInit() {
+        scheduler.resume();
         shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         hopper.setAction(ActionState.STANDBY);
         Log.info("MainCompbot", "TeleopInit has started. Setting arm state to ArmState.STARTING");
-        scheduler.resume();
         driveCmdRunning.isRunning = true;
     }
 
     @Override
     protected void autonomousInit() {
         scheduler.resume();
+        hopper.setAction(ActionState.STANDBY);
         drive.resetGyro();
-        Command auto = new AutoSimple(drive, shooter, arm, hopper, ahrs, shooterLimelight, driveCmdRunning, 10000);
+        Command auto = new AutoSimple(drive, shooter, arm, hopper, ahrs, shooterLimelight, driveCmdRunning, 10000, scheduler);
         auto.start();
     }
 
@@ -566,7 +568,6 @@ public class MainCompbot extends NarwhalRobot {
         shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
-        scheduler.pause();
     }
 
     public static void main(String... args) {

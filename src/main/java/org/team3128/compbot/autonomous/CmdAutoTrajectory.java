@@ -35,22 +35,15 @@ public class CmdAutoTrajectory extends Command {
     }
 
     @Override protected void initialize() { 
-        Log.info("1", "1");
         trajectory = TrajectoryGenerator.generateTrajectory(waypoints, new ArrayList<TrajectoryConstraint>(), 0, 0,
                 speed * Constants.MechanismConstants.inchesToMeters, acceleration, false);
-        Log.info("2", "2");
         drive.setAutoTrajectory(trajectory, false);
-        Log.info("3", "3");
         drive.startTrajectory();
-        Log.info("4", "4");
         timeExpected = trajectory.getTotalTimeSeconds();
-        Log.info("5", "5");
         timeInitial = Timer.getFPGATimestamp();
-        Log.info("6", "6");
     }
 
     @Override protected synchronized boolean isFinished() {
-        Log.info("7", "7");
         timeCurrent = Timer.getFPGATimestamp();
         if ((timeCurrent - timeInitial) >= Math.min(timeExpected, timeoutMs)) {
            return true;
