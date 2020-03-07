@@ -207,7 +207,7 @@ public class CmdAlignShoot extends Command {
                     double leftSpeed = leftPower * Constants.DriveConstants.DRIVE_HIGH_SPEED;
                     double rightSpeed = rightPower * Constants.DriveConstants.DRIVE_HIGH_SPEED;
                     
-                    drive.setWheelVelocity(new DriveSignal(leftSpeed, rightSpeed));
+                    drive.setWheelPower(new DriveSignal(leftPower, rightPower));
 
                     previousTime = currentTime;
                     previousError = currentError;
@@ -247,13 +247,13 @@ public class CmdAlignShoot extends Command {
         }
 
         if ((Math.abs(currentError) < Constants.VisionConstants.TX_THRESHOLD) && shooter.isReady()) {
-            Log.info("CmdAlignShoot", "Trying to shoot ball");
+            // Log.info("CmdAlignShoot", "Trying to shoot ball");
             hopper.shoot();
         } else {
             hopper.unShoot();
-            Log.info("CmdAlignShoot", "no longer ready to shoot ball");
-            Log.info("CmdAlignShoot", "" + shooter.isReady());
-            Log.info("CmdAlignShoot", "" + Math.abs(currentError));
+            // Log.info("CmdAlignShoot", "no longer ready to shoot ball");
+            // Log.info("CmdAlignShoot", "" + shooter.isReady());
+            // Log.info("CmdAlignShoot", "" + Math.abs(currentError));
         }
     }
 

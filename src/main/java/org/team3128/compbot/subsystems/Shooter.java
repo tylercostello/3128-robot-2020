@@ -87,7 +87,6 @@ public class Shooter extends Threaded {
 
     @Override
     public void update() {
-        SmartDashboard.putNumber("plataue count", plateauCount);
         current = getRPM();
         // Log.info("Shooter", "Shooter RPM is " + String.valueOf(current));
         error = setpoint - current;
