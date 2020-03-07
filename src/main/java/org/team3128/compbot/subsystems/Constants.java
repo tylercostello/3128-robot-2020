@@ -137,7 +137,7 @@ public class Constants extends RobotConstants {
 
                 public static final int SENSOR_0_ID = 8;
                 public static final int SENSOR_1_ID = 9;
-                public static final int SENSOR_2_ID = 999;
+                //public static final int SENSOR_2_ID = 999;
 
 
                 public static final double DEBUG_MOTOR_POWER = 0.4;
