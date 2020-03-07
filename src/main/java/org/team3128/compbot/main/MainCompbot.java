@@ -159,7 +159,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        scheduler.schedule(robotTracker, executor);
+        //scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
 
