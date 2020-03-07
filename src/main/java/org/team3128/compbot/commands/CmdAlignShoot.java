@@ -24,6 +24,9 @@ import org.team3128.compbot.subsystems.Arm.ArmState;
 import org.team3128.compbot.subsystems.*;
 import org.team3128.compbot.subsystems.Hopper.ActionState;
 
+import com.kauailabs.navx.frc.AHRS;
+
+
 import org.team3128.compbot.commands.*;
 
 public class CmdAlignShoot extends Command {
@@ -33,7 +36,7 @@ public class CmdAlignShoot extends Command {
     Arm arm;
     boolean gotDistance = false;
 
-    Gyro gyro;
+    AHRS ahrs;
 
     Limelight limelight;
 
@@ -72,13 +75,13 @@ public class CmdAlignShoot extends Command {
 
     private HorizontalOffsetFeedbackDriveState aimState = HorizontalOffsetFeedbackDriveState.SEARCHING;
 
-    public CmdAlignShoot(FalconDrive drive, Shooter shooter, Arm arm, Hopper hopper, Gyro gyro, Limelight limelight,
+    public CmdAlignShoot(FalconDrive drive, Shooter shooter, Arm arm, Hopper hopper, AHRS ahrs, Limelight limelight,
             DriveCommandRunning cmdRunning, double goalHorizontalOffset, int numBallsToShoot) {
         this.drive = drive;
         this.shooter = shooter;
         this.arm = arm;
         this.hopper = hopper;
-        this.gyro = gyro;
+        this.ahrs = ahrs;
         this.limelight = limelight;
         this.visionPID = Constants.VisionConstants.VISION_PID;
 

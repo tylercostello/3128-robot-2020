@@ -13,15 +13,16 @@ import org.team3128.compbot.autonomous.*;
 import org.team3128.compbot.commands.*;
 import org.team3128.compbot.subsystems.Constants.VisionConstants;
 import org.team3128.compbot.subsystems.*;
+import com.kauailabs.navx.frc.AHRS;
 
 public class AutoDevour extends CommandGroup {
 
-    public AutoDevour(FalconDrive drive, Shooter shooter, Arm arm, Hopper hopper, Gyro gyro, Limelight limelight, DriveCommandRunning cmdRunning, double timeoutMs) {       
-        addSequential(new CmdAlignShoot(drive, shooter, arm, hopper, gyro, limelight, cmdRunning, Constants.VisionConstants.TX_OFFSET, 3));
+    public AutoDevour(FalconDrive drive, Shooter shooter, Arm arm, Hopper hopper, AHRS ahrs, Limelight limelight, DriveCommandRunning cmdRunning, double timeoutMs) {       
+        addSequential(new CmdAlignShoot(drive, shooter, arm, hopper, ahrs, limelight, cmdRunning, Constants.VisionConstants.TX_OFFSET, 3));
         for (int i = 0; i < 3; i++) { // picking up three balls
             addSequential(new CmdIntake(hopper, arm));
         }
-        addSequential(new CmdAlignShoot(drive, shooter, arm, hopper, gyro, limelight, cmdRunning, Constants.VisionConstants.TX_OFFSET, 3));
+        addSequential(new CmdAlignShoot(drive, shooter, arm, hopper, ahrs, limelight, cmdRunning, Constants.VisionConstants.TX_OFFSET, 3));
         
         addSequential(new CmdAutoTrajectory(drive, 120, 0.5, 10000, 
             new Pose2D(0, 0, Rotation2D.fromDegrees(0)),

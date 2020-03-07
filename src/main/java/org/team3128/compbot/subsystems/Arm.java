@@ -69,8 +69,9 @@ public class Arm extends Threaded {
         ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
 
-        ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
         ARM_MOTOR_LEADER.setSensorPhase(true);
+        ARM_MOTOR_LEADER.setSelectedSensorPosition(Constants.ArmConstants.STARTING_POSITION);
+
     }
 
     private void setSetpoint(double desiredPos) {
@@ -96,7 +97,7 @@ public class Arm extends Threaded {
         setState(ArmState.STOWED);
     }
 
-    private double getEncoderPos() {
+    public double getEncoderPos() {
         return ARM_MOTOR_LEADER.getSelectedSensorPosition(0);
     }
 
