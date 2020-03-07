@@ -236,7 +236,7 @@ public class FalconDrive extends Drive {
 			Log.info("FalconDrive", "Returned to teleop control");
 			driveState = DriveState.TELEOP;
 		} else {
-			configAuto();
+			//configAuto();
 			updateRamseteController(true);
 			driveState = DriveState.RAMSETECONTROL;
 		}
@@ -443,23 +443,30 @@ public class FalconDrive extends Drive {
 	@Override
 	public void updateRamseteController(boolean isStart) {
 		currentTime = Timer.getFPGATimestamp();
+		Log.info("a", "a");
 		if (isStart) {
 			startTime = currentTime;
 		}
+		Log.info("b", "b");
 		State currentTrajectoryState = trajectory.sample(currentTime - startTime);
+		Log.info("c", "c");
 
 		AutoDriveSignal signal = autonomousDriver.calculate(RobotTracker.getInstance().getOdometry(),
 				currentTrajectoryState);
+		Log.info("d", "d");
 		if ((currentTime - startTime) == totalTime) {
+				Log.info("bleh", "bleh");
 			synchronized (this) {
 				Log.info("FalconDrive", "Finished Trajectory Pursuit with RamseteController successfully.");
 				driveState = DriveState.TELEOP;
 			}
 			configHigh();
 		}
+		Log.info("e", "e");
 		// System.out.println("signal l:" + signal.command.leftVelocity + " signal R " +
 		// signal.command.rightVelocity);
 		setWheelVelocity(signal.command);
+		Log.info("f", "f");
 	}
 
 	@Override
