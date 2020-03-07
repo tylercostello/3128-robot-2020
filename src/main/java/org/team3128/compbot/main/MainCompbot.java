@@ -83,7 +83,7 @@ public class MainCompbot extends NarwhalRobot {
  
     RobotTracker robotTracker = RobotTracker.getInstance();
 
-    ExecutorService executor = Executors.newFixedThreadPool(4);
+    ExecutorService executor = Executors.newFixedThreadPool(6);
     ThreadScheduler scheduler = new ThreadScheduler();
     Thread auto;
 
