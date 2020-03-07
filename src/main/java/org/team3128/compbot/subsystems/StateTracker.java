@@ -8,16 +8,18 @@ import org.team3128.compbot.subsystems.Shooter.ShooterState;
 
 public class StateTracker{
     public enum RobotState {
-        SHORT_RANGE(Arm.ArmState.SHORT_RANGE, Shooter.ShooterState.SHORT_RANGE),
-        MID_RANGE(Arm.ArmState.MID_RANGE, Shooter.ShooterState.MID_RANGE),
-        LONG_RANGE(Arm.ArmState.LONG_RANGE, Shooter.ShooterState.LONG_RANGE);
+        SHORT_RANGE(Arm.ArmState.SHORT_RANGE, Shooter.ShooterState.SHORT_RANGE, "Short"),
+        MID_RANGE(Arm.ArmState.MID_RANGE, Shooter.ShooterState.MID_RANGE, "Mid"),
+        LONG_RANGE(Arm.ArmState.LONG_RANGE, Shooter.ShooterState.LONG_RANGE, "Long");
 
         public ArmState targetArmState;
         public ShooterState targetShooterState;
+        public String shooterStateName;
 
-        private RobotState(final ArmState armState, final ShooterState shooterState) {
+        private RobotState(final ArmState armState, final ShooterState shooterState, String shooterStateName) {
             this.targetArmState = armState;
             this.targetShooterState = shooterState;
+            this.shooterStateName = shooterStateName;
         }
         
     }
