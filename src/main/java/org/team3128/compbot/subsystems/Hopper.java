@@ -27,8 +27,10 @@ import edu.wpi.first.wpilibj.RobotController;
 public class Hopper extends Threaded {
 
     public enum HopperState {
-        POS_0(new boolean[] { false, false, false, false }), POS_1(new boolean[] { false, false, false, true }),
-        POS_2(new boolean[] { false, false, true, true }), POS_3(new boolean[] { false, true, true, true }),
+        POS_0(new boolean[] { false, false, false, false }), 
+        POS_1(new boolean[] { false, false, false, true }),
+        POS_2(new boolean[] { false, false, true, true }), 
+        POS_3(new boolean[] { false, true, true, true }),
         POS_4(new boolean[] { true, true, true, true });
         // POS_5(new boolean[] { true, true, true, true }),
         // POS_6(new boolean[] { false, true, true, true });

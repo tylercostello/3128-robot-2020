@@ -76,7 +76,8 @@ public class ErrorCatcherUtility {
         //Iterates over each CAN device in the chain, in order, and checks if it is good
         errorCode=ErrorCode.OK;
         //for(int i=0;i<CanChain.length;i++){
-        //for(int i=CanChain.length-1; i>=0;i--){
+        //for(int i=12; i>=0;i--){
+            //device=CanChain[i];
         for(CanDevices device : CanChain){
             
             if (device == null){
@@ -147,7 +148,7 @@ public class ErrorCatcherUtility {
                         NarwhalDashboard.put("ErrorCatcherCAN", lastDevice.name + " " + lastDevice.id + " to " +device.name+ " " + device.id +" CAN wire is disconnected");
                     }
 
-                    break;
+                    //break;
                 }
 
                 if (errorCode == ErrorCode.SensorNotPresent){
