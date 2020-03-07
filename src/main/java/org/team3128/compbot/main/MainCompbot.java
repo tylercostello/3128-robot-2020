@@ -209,7 +209,21 @@ public class MainCompbot extends NarwhalRobot {
 
         //     }
         // });
-
+        NarwhalDashboard.addButton("SetStateLong", (boolean down) -> {
+                 if (down) {               
+                    stateTracker.setState(RobotState.LONG_RANGE);
+                 }
+             });
+        NarwhalDashboard.addButton("SetStateMid", (boolean down) -> {
+            if (down) {               
+               stateTracker.setState(RobotState.MID_RANGE);
+            }
+        });
+        NarwhalDashboard.addButton("SetStateShort", (boolean down) -> {
+            if (down) {               
+               stateTracker.setState(RobotState.SHORT_RANGE);
+            }
+        });
         drive.resetGyro();
     }
 
@@ -459,6 +473,7 @@ public class MainCompbot extends NarwhalRobot {
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
         NarwhalDashboard.put("ball_count", hopper.getBallCount());
+        NarwhalDashboard.put("shooting_state", StateTracker.robotState.shooterStateName);
 
         //Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
 
