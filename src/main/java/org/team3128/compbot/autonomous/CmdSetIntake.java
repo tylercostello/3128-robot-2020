@@ -17,6 +17,7 @@ public class CmdSetIntake extends Command {
     
     @Override
     protected void initialize() {
+        hopper.setBallCount(3);
         hopper.INTAKE_MOTOR.set(power);
     }
     

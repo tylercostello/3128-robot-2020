@@ -19,7 +19,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -47,7 +46,7 @@ public class FalconDrive extends Drive {
 	}
 
 	// private ADXRS450_Gyro gyroSensor;
-	private AHRS ahrs;
+	public AHRS ahrs;
 	// private LazyTalonSRX leftTalon, rightTalon, leftSlaveTalon, leftSlave2Talon,
 	// rightSlaveTalon, rightSlave2Talon;
 	private RamseteController autonomousDriver;

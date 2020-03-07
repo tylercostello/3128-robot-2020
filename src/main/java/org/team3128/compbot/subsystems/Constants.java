@@ -70,7 +70,7 @@ public class Constants extends RobotConstants {
                 public static final double kS = 0.178;
                 public static final double kV = 0.0516;
                 public static final double kA = 0.00679;
-                public static final double kP = 0.0015;
+                public static final double kP = 0.0013;
 
         }
 

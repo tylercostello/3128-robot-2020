@@ -5,6 +5,9 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 import org.team3128.common.generics.RobotConstants;
 
+import com.kauailabs.navx.frc.AHRS;
+
+
 import org.team3128.common.NarwhalRobot;
 import org.team3128.common.control.trajectory.Trajectory;
 import org.team3128.common.control.trajectory.TrajectoryGenerator;
@@ -12,7 +15,6 @@ import org.team3128.common.control.trajectory.constraint.TrajectoryConstraint;
 import org.team3128.common.drive.DriveCommandRunning;
 import org.team3128.common.hardware.limelight.LEDMode;
 import org.team3128.common.hardware.limelight.Limelight;
-import org.team3128.common.hardware.gyroscope.Gyro;
 import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
@@ -87,7 +89,7 @@ public class MainCompbot extends NarwhalRobot {
 
     public Joystick joystickRight, joystickLeft;
     public ListenerManager listenerLeft, listenerRight;
-    public Gyro gyro;
+    public AHRS ahrs;
     public static PowerDistributionPanel pdp;
 
     public NetworkTable table;
@@ -162,6 +164,8 @@ public class MainCompbot extends NarwhalRobot {
 
         driveCmdRunning = new DriveCommandRunning();
 
+        ahrs = drive.ahrs;
+
         // // Instatiator if we're using the NavX
         // gyro = new NavX();
 
@@ -191,21 +195,20 @@ public class MainCompbot extends NarwhalRobot {
         limelights[1] = ballLimelight;
 
         pdp = new PowerDistributionPanel(0);
-        setCanChain();
-        errorCatcher = new ErrorCatcherUtility(CanChain, limelights, drive);
+        // setCanChain();
+        // errorCatcher = new ErrorCatcherUtility(CanChain, limelights, drive);
 
-        NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
+        // NarwhalDashboard.addButton("ErrorCatcher", (boolean down) -> {
+        //     if (down) {               
+        //        errorCatcher.testEverything();
+        //     }
+        // });
+        // NarwhalDashboard.addButton("VelocityTester", (boolean down) -> {
+        //     if (down) {               
+        //       // errorCatcher.velocityTester();
 
-            if (down) {               
-               errorCatcher.testEverything();
-            }
-        });
-        NarwhalDashboard.addButton("VelocityTester", (boolean down) -> {
-            if (down) {               
-              // errorCatcher.velocityTester();
-
-            }
-        });
+        //     }
+        // });
 
         drive.resetGyro();
     }
@@ -269,7 +272,7 @@ public class MainCompbot extends NarwhalRobot {
         }, "MoveTurn", "MoveForwards", "Throttle");
 
         listenerRight.addButtonDownListener("AlignShoot", () -> {
-            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning,
+            triggerCommand = new CmdAlignShoot(drive, shooter, arm, hopper, ahrs, shooterLimelight, driveCmdRunning,
                     Constants.VisionConstants.TX_OFFSET, 5);
             triggerCommand.start();
             Log.info("MainCompbot.java", "[Vision Alignment] Started");
@@ -454,91 +457,89 @@ public class MainCompbot extends NarwhalRobot {
 
         //Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
 
-        SmartDashboard.putString("ARM STATE", String.valueOf(arm.ARM_STATE));
-        SmartDashboard.putNumber("ARM SETPOINT", arm.setpoint);
         if (arm.getLimitStatus()) {
             arm.ARM_MOTOR_LEADER.setSelectedSensorPosition(0);
             arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
         }
 
-        currentLeftSpeed = drive.getLeftSpeed();
-        currentLeftDistance = drive.getLeftDistance();
-        currentRightSpeed = drive.getRightSpeed();
-        currentRightDistance = drive.getRightDistance();
+        // currentLeftSpeed = drive.getLeftSpeed();
+        // currentLeftDistance = drive.getLeftDistance();
+        // currentRightSpeed = drive.getRightSpeed();
+        // currentRightDistance = drive.getRightDistance();
 
-        currentSpeed = drive.getSpeed();
-        currentDistance = drive.getDistance();
+        // currentSpeed = drive.getSpeed();
+        // currentDistance = drive.getDistance();
 
-        currentArmLimitSwitch = String.valueOf(arm.getLimitStatus());
-        currentArmAngle = arm.getAngle();
-        currentArmPos = arm.ARM_MOTOR_LEADER.getSelectedSensorPosition(0);
+        // currentArmLimitSwitch = String.valueOf(arm.getLimitStatus());
+        // currentArmAngle = arm.getAngle();
+        // currentArmPos = arm.ARM_MOTOR_LEADER.getSelectedSensorPosition(0);
 
-        currentArmVoltage = arm.ARM_MOTOR_LEADER.getMotorOutputVoltage();
-        currentArmPower = arm.output;
-        currentArmCurrent = arm.ARM_MOTOR_LEADER.getStatorCurrent();
+        // currentArmVoltage = arm.ARM_MOTOR_LEADER.getMotorOutputVoltage();
+        // currentArmPower = arm.output;
+        // currentArmCurrent = arm.ARM_MOTOR_LEADER.getStatorCurrent();
 
-        currentShooterSpeed = shooter.getRPM();
-        currentShooterPower = shooter.output;
-        currentShooterSetpoint = shooter.setpoint;
+        // currentShooterSpeed = shooter.getRPM();
+        // currentShooterPower = shooter.output;
+        // currentShooterSetpoint = shooter.setpoint;
 
-        SmartDashboard.putString("DriveCmdRunning", "" + driveCmdRunning.isRunning);
-        SmartDashboard.putString("ActionState", "" + hopper.actionState);
+        // SmartDashboard.putString("DriveCmdRunning", "" + driveCmdRunning.isRunning);
+        // SmartDashboard.putString("ActionState", "" + hopper.actionState);
 
-        SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
-        SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
-        SmartDashboard.putNumber("Corner Encoder", hopper.CORNER_ENCODER.getPosition());
+        // SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
+        // SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
+        // SmartDashboard.putNumber("Corner Encoder", hopper.CORNER_ENCODER.getPosition());
 
-        SmartDashboard.putNumber("voltage", RobotController.getBatteryVoltage());
+        // SmartDashboard.putNumber("voltage", RobotController.getBatteryVoltage());
 
-        SmartDashboard.putString("Arm Limit Switch", currentArmLimitSwitch);
-        SmartDashboard.putNumber("Arm Angle", currentArmAngle);
-        SmartDashboard.putNumber("Arm Position", currentArmPos);
-        SmartDashboard.putNumber("Arm Voltage", currentArmVoltage);
-        SmartDashboard.putNumber("Arm Current", currentArmCurrent);
-        SmartDashboard.putNumber("Arm Power", currentArmPower);
+        // SmartDashboard.putString("Arm Limit Switch", currentArmLimitSwitch);
+        // SmartDashboard.putNumber("Arm Angle", currentArmAngle);
+        // SmartDashboard.putNumber("Arm Position", currentArmPos);
+        // SmartDashboard.putNumber("Arm Voltage", currentArmVoltage);
+        // SmartDashboard.putNumber("Arm Current", currentArmCurrent);
+        // SmartDashboard.putNumber("Arm Power", currentArmPower);
 
-        SmartDashboard.putNumber("Shooter Speed", currentShooterSpeed);
-        SmartDashboard.putNumber("Shooter Power", currentShooterPower);
+        // SmartDashboard.putNumber("Shooter Speed", currentShooterSpeed);
+        // SmartDashboard.putNumber("Shooter Power", currentShooterPower);
 
-        SmartDashboard.putNumber("Gyro Angle", drive.getAngle());
-        SmartDashboard.putNumber("Left Distance", currentLeftDistance);
-        SmartDashboard.putNumber("Right Distance", currentRightDistance);
+        // SmartDashboard.putNumber("Gyro Angle", drive.getAngle());
+        // SmartDashboard.putNumber("Left Distance", currentLeftDistance);
+        // SmartDashboard.putNumber("Right Distance", currentRightDistance);
 
-        SmartDashboard.putNumber("Distance", currentDistance);
+        // SmartDashboard.putNumber("Distance", currentDistance);
 
-        SmartDashboard.putNumber("Left Velocity", currentLeftSpeed);
-        SmartDashboard.putNumber("Right Velocity", currentRightSpeed);
+        // SmartDashboard.putNumber("Left Velocity", currentLeftSpeed);
+        // SmartDashboard.putNumber("Right Velocity", currentRightSpeed);
 
-        SmartDashboard.putNumber("Velocity", drive.getSpeed());
+        // SmartDashboard.putNumber("Velocity", drive.getSpeed());
 
-        SmartDashboard.putNumber("RobotTracker - x:", robotTracker.getOdometry().getTranslation().getX());
-        SmartDashboard.putNumber("RobotTracker - y:", robotTracker.getOdometry().getTranslation().getY());
-        SmartDashboard.putNumber("RobotTracker - theta:", robotTracker.getOdometry().getRotation().getDegrees());
+        // SmartDashboard.putNumber("RobotTracker - x:", robotTracker.getOdometry().getTranslation().getX());
+        // SmartDashboard.putNumber("RobotTracker - y:", robotTracker.getOdometry().getTranslation().getY());
+        // SmartDashboard.putNumber("RobotTracker - theta:", robotTracker.getOdometry().getRotation().getDegrees());
 
-        maxLeftSpeed = Math.max(maxLeftSpeed, currentLeftSpeed);
-        maxRightSpeed = Math.max(maxRightSpeed, currentRightSpeed);
-        maxSpeed = Math.max(maxSpeed, currentSpeed);
-        minLeftSpeed = Math.min(minLeftSpeed, currentLeftSpeed);
-        minRightSpeed = Math.min(minRightSpeed, currentLeftSpeed);
-        minSpeed = Math.min(minSpeed, currentSpeed);
+        // maxLeftSpeed = Math.max(maxLeftSpeed, currentLeftSpeed);
+        // maxRightSpeed = Math.max(maxRightSpeed, currentRightSpeed);
+        // maxSpeed = Math.max(maxSpeed, currentSpeed);
+        // minLeftSpeed = Math.min(minLeftSpeed, currentLeftSpeed);
+        // minRightSpeed = Math.min(minRightSpeed, currentLeftSpeed);
+        // minSpeed = Math.min(minSpeed, currentSpeed);
 
-        SmartDashboard.putNumber("Max Left Speed", maxLeftSpeed);
-        SmartDashboard.putNumber("Min Left Speed", minLeftSpeed);
-        SmartDashboard.putNumber("Max Right Speed", maxRightSpeed);
-        SmartDashboard.putNumber("Min Right Speed", minRightSpeed);
+        // SmartDashboard.putNumber("Max Left Speed", maxLeftSpeed);
+        // SmartDashboard.putNumber("Min Left Speed", minLeftSpeed);
+        // SmartDashboard.putNumber("Max Right Speed", maxRightSpeed);
+        // SmartDashboard.putNumber("Min Right Speed", minRightSpeed);
 
-        SmartDashboard.putNumber("Max Speed", maxSpeed);
-        SmartDashboard.putNumber("Min Speed", minSpeed);
+        // SmartDashboard.putNumber("Max Speed", maxSpeed);
+        // SmartDashboard.putNumber("Min Speed", minSpeed);
         
-        SmartDashboard.putNumber("Shooter Setpoint", currentShooterSetpoint);
-        SmartDashboard.putNumber("BALL COUNT", hopper.ballCount);
+        // SmartDashboard.putNumber("Shooter Setpoint", currentShooterSetpoint);
+        // SmartDashboard.putNumber("BALL COUNT", hopper.ballCount);
 
-        trackerCSV += "\n" + String.valueOf(Timer.getFPGATimestamp() - startTime) + ","
-                + String.valueOf(robotTracker.getOdometry().translationMat.getX()) + ","
-                + String.valueOf(robotTracker.getOdometry().translationMat.getY()) + ","
-                + String.valueOf(robotTracker.getOdometry().rotationMat.getDegrees()) + ","
-                + String.valueOf(robotTracker.trajOdometry.translationMat.getX()) + ","
-                + String.valueOf(robotTracker.trajOdometry.translationMat.getY());
+        // trackerCSV += "\n" + String.valueOf(Timer.getFPGATimestamp() - startTime) + ","
+        //         + String.valueOf(robotTracker.getOdometry().translationMat.getX()) + ","
+        //         + String.valueOf(robotTracker.getOdometry().translationMat.getY()) + ","
+        //         + String.valueOf(robotTracker.getOdometry().rotationMat.getDegrees()) + ","
+        //         + String.valueOf(robotTracker.trajOdometry.translationMat.getX()) + ","
+        //         + String.valueOf(robotTracker.trajOdometry.translationMat.getY());
     }
 
     @Override
@@ -556,7 +557,7 @@ public class MainCompbot extends NarwhalRobot {
     protected void autonomousInit() {
         scheduler.resume();
         drive.resetGyro();
-        Command auto = new AutoSimple(drive, shooter, arm, hopper, gyro, shooterLimelight, driveCmdRunning, 10000);
+        Command auto = new AutoSimple(drive, shooter, arm, hopper, ahrs, shooterLimelight, driveCmdRunning, 10000);
         auto.start();
     }
 
