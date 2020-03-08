@@ -27,7 +27,6 @@ public class CmdSetArm extends Command {
     
     @Override
     protected boolean isFinished() {
-        Log.info("CmdSetArm", String.valueOf(arm.isReady()));
         if (arm.isReady() || ((Timer.getFPGATimestamp() - startTime) >= timeoutMs)){
             return true;
         } else {

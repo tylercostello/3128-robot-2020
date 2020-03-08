@@ -87,6 +87,7 @@ public class Hopper extends Threaded {
     public boolean SENSOR_1_STATE = false;
 
     public ActionState actionState;
+    public boolean hasGotTime = false;
 
     private DigitalInput[] sensorPositions = { SENSOR_0, SENSOR_1 }; // top to bottom //0 = 1.5, 1 = 3, 2 = 4
                                                                      // mathhh
@@ -520,6 +521,12 @@ public class Hopper extends Threaded {
                     //////Log.info("Hopper", "setting empty1 to true 1");
                     empty1 = true;
                 }
+                try {
+                    Thread.sleep(1);
+                } catch(InterruptedException ex) {
+                    Log.fatalException("NarwhalRobot", "Exception constructing hardware", ex);
+                    ex.printStackTrace();
+                }
             }
             ballCount--;
             //shootingCornerPosition = CORNER_ENCODER.getPosition();
@@ -562,7 +569,12 @@ public class Hopper extends Threaded {
                     //////Log.info("Hopper", "setting empty1 to true 2");
                     empty1 = true;
                 }
-            }
+                try {
+                    Thread.sleep(1);
+                } catch(InterruptedException ex) {
+                    Log.fatalException("NarwhalRobot", "Exception constructing hardware", ex);
+                    ex.printStackTrace();
+                }            }
             setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
         } else if(openTheGates && !SENSOR_0_STATE){
             //shootingCornerPosition = CORNER_ENCODER.getPosition();
@@ -605,6 +617,12 @@ public class Hopper extends Threaded {
                     //////Log.info("Hopper", "setting empty1 to true 3");
                     empty1 = true;
                 }
+                try {
+                    Thread.sleep(1);
+                } catch(InterruptedException ex) {
+                    Log.fatalException("NarwhalRobot", "Exception constructing hardware", ex);
+                    ex.printStackTrace();
+                }
             }
             setMotorPowers(0, 0, -Constants.HopperConstants.INDEXER_POWER / 1.5); // 0
         } else {
@@ -619,21 +637,48 @@ public class Hopper extends Threaded {
             Log.info("Hopper", "ending organize because hopper is empty");
             setMotorPowers(0, 0, 0);
         } else {
-            startTime = Timer.getFPGATime();
-            while(!SENSOR_1_STATE && (Timer.getFPGATime() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
+            if (!hasGotTime) {
+                startTime = Timer.getFPGATimestamp();
+                hasGotTime = true;
+            }
+            // while(!SENSOR_1_STATE && (Timer.getFPGATimestamp() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
+            //     //isReversing = true;
+            //     SENSOR_1_STATE = detectsBall1();
+            //     setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, 0);
+            //     Log.info("Hopper", "Reversing balls");
+            //     try {
+            //         Thread.sleep(1);
+            //     } catch(InterruptedException ex) {
+            //         Log.fatalException("NarwhalRobot", "Exception constructing hardware", ex);
+            //         ex.printStackTrace();
+            //     }
+            // }
+
+            if (!SENSOR_1_STATE && (Timer.getFPGATimestamp() - startTime <= Constants.HopperConstants.REVERSE_TIMEOUT)) {
                 //isReversing = true;
                 SENSOR_1_STATE = detectsBall1();
                 setMotorPowers(0, -Constants.HopperConstants.BASE_POWER, 0);
                 Log.info("Hopper", "Reversing balls");
+            } else {
+                hasGotTime = false;
+                setAction(ActionState.STANDBY);
+                if(SENSOR_1_STATE) {
+                    isReversing = true;
+                } else {
+                    isReversing = false;
+                }
             }
-            setMotorPowers(0, 0, 0);
-            if(SENSOR_1_STATE) {
-                isReversing = true;
-            }
+
+            //setMotorPowers(0, 0, 0);
+            // if(SENSOR_1_STATE) {
+            //     isReversing = true;
+            // } else {
+            //     isReversing = false;
+            // }
         }
 
         //setMotorPowers(0, 0, 0);
-        setAction(ActionState.STANDBY);
+        //setAction(ActionState.STANDBY);
     }
 
     public void eject() {
