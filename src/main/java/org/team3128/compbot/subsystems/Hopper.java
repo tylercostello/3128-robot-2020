@@ -169,6 +169,7 @@ public class Hopper extends Threaded {
 
     private void configEncoders() {
         CORNER_ENCODER = CORNER_MOTOR.getEncoder();
+        CORNER_MOTOR.setInverted(true);
     }
 
     private void configSensors() {

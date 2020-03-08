@@ -22,7 +22,7 @@ public class Arm extends Threaded {
         LOADING_STATION(46),
         LONG_RANGE(52), // far range shooting
         MID_RANGE(50.5),
-        SHORT_RANGE(25), // short range shooting
+        SHORT_RANGE(50.5), // short range shooting
         CLIMBING(72), // climbing
         DEBUG(5);
 
