@@ -18,7 +18,7 @@ public class Shooter extends Threaded {
         OFF(0),
         LONG_RANGE(4800), // long range shooting
         MID_RANGE(4080), // mid range shooting
-        SHORT_RANGE(3800); // short range shooting
+        SHORT_RANGE(3700); // short range shooting
 
         public double shooterRPM;
 

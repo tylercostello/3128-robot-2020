@@ -81,7 +81,7 @@ public class MainCompbot extends NarwhalRobot {
     static Climber climber = new Climber();
 
  
-    RobotTracker robotTracker = RobotTracker.getInstance();
+    // RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(6);
     ThreadScheduler scheduler = new ThreadScheduler();
@@ -248,8 +248,9 @@ public class MainCompbot extends NarwhalRobot {
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
         listenerRight.nameControl(new Button(7), "setRangeLong");
-        listenerRight.nameControl(new Button(8), "EjectBalls");
+        listenerRight.nameControl(new Button(8), "RunBalls");
         listenerRight.nameControl(new Button(9), "setRangeMid");
+        listenerRight.nameControl(new Button(10), "EjectBalls");
         listenerRight.nameControl(new Button(11), "setRangeShort");
         listenerRight.nameControl(new Button(12), "queueShooter");
         
@@ -305,13 +306,21 @@ public class MainCompbot extends NarwhalRobot {
             arm.setState(ArmState.STOWED);
         });
         listenerRight.addButtonDownListener("EjectBalls", () -> {
-            Log.info("Button8", "pressed");
+            Log.info("Button10", "pressed");
             //Log.info("MainCompBot", "Eject not implemented yet");
             // ejectBallsCommand = new CmdEjectBalls(hopper);
             // ejectBallsCommand.start();
             hopper.setAction(ActionState.EJECTING);
         });
         listenerRight.addButtonUpListener("EjectBalls", () -> {
+            Log.info("Button10", "released");
+            hopper.setAction(ActionState.STANDBY);
+        });
+        listenerRight.addButtonDownListener("RunBalls", () -> {
+            Log.info("Button8", "pressed");
+            hopper.setAction(ActionState.RUNNING);
+        });
+        listenerRight.addButtonUpListener("RunBalls", () -> {
             Log.info("Button8", "released");
             hopper.setAction(ActionState.STANDBY);
         });

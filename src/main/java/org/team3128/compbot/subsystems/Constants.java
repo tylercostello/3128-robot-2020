@@ -146,8 +146,8 @@ public class Constants extends RobotConstants {
                 public static final double FEEDER_REVERSE = 0.25;
                 public static final double GATEKEEPER_POWER = -0.75;
                 public static final double INDEXER_POWER = -0.40;
-                public static final double[] BALL_SPACING = {-66/*25*/, -66/*-27.5*/, -6, 0};//{ -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
-                public static final double REVERSE_TIMEOUT = 1500; //timeout for how long to run the corner motors back (in case the sensor gets triggered)
+                public static final double[] BALL_SPACING = {-70/*25*/, -20/*-27.5*/, -1, 0};//{ -25, -20, -20, -20 }; //offsets for the spacing out the balls in the hopper
+                public static final double REVERSE_TIMEOUT = 1.5; //timeout for how long to run the corner motors back (in case the sensor gets triggered)
                 public static final int JAM_COUNT_THRESHOLD = 100; //how long the motor has to be stopped in order for it to be considered a jam: 100 loop counts * 1/200hz = 0.5 seconds
                 public static final int JAM_REVERSE_COUNT_THRESHOLD = 100; //how long to reverse the intake after a jam is detected: 100 loop counts * 1/200hz = 0.5 seconds
         }
