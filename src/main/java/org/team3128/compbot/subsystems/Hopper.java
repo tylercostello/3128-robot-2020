@@ -281,6 +281,9 @@ public class Hopper extends Threaded {
         if (state == ActionState.SHOOTING) {
             INTAKE_MOTOR.set(Constants.IntakeConstants.INTAKE_MOTOR_ON_VALUE / 2.5);
             shootingCornerPosition = CORNER_ENCODER.getPosition();
+            while1 = true;
+            while2 = false;
+            while3 = false;
         }
         if (state == ActionState.EJECTING) {
             INTAKE_MOTOR.set(-Constants.IntakeConstants.INTAKE_MOTOR_OFF_VALUE);
