@@ -375,15 +375,15 @@ public class Hopper extends Threaded {
                 if (Math.abs(CORNER_ENCODER.getPosition() - Constants.HopperConstants.BALL_SPACING[0]) >= Math.abs(shootingCornerPosition)) {
                     shootingReversingIndexer = false;
                 }
-                // if (shootingReversingIndexer) {
-                //     setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
-                //         -Constants.HopperConstants.INDEXER_POWER);
-                //     Log.info("Hopper", "Hopper is trying to hold 4th and 5th ball from entering the robot!");
-                // } else if (!shootingReversingIndexer) {
-                //     setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
-                //         Constants.HopperConstants.INDEXER_POWER);
-                // }
-                setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER);
+                if (shootingReversingIndexer) {
+                    setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                        -Constants.HopperConstants.INDEXER_POWER);
+                    Log.info("Hopper", "Hopper is trying to hold 4th and 5th ball from entering the robot!");
+                } else if (!shootingReversingIndexer) {
+                    setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                        Constants.HopperConstants.INDEXER_POWER);
+                }
+                // setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER, -Constants.HopperConstants.INDEXER_POWER);
                 if (!SENSOR_1_STATE && !empty1) { // if there isn't a ball in the first position, but there was one in the last iteration
                     empty1 = true; //tell the code the position is empty
                     Log.info("Hopper", "detected ball and was full previously, should iterate count if not reversing");
