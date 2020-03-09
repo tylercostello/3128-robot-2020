@@ -1,7 +1,6 @@
 package org.team3128.compbot.subsystems;
 
 import org.team3128.common.utility.units.Length;
-import org.team3128.compbot.subsystems.Hopper.HopperState;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.test_suite.*;
 
