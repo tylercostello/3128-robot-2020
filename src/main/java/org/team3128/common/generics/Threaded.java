@@ -16,6 +16,10 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  * Effectively runs at 200hz
  */
+
+ /**
+  * WHEN USING A WHILE LOOP IN A THREAD, make sure to put a 'Thread.sleep(1)' at the end of every iteration of the while loop to relinquish computer resources and let the other threads continue without hogging system resources.
+  */
 public abstract class Threaded implements Runnable {
 
 	private boolean isUpdated = true;
