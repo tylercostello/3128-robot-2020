@@ -309,16 +309,16 @@ public class FalconDrive extends Drive {
 
 		spdL = Constants.DriveConstants.DRIVE_HIGH_SPEED * pwrL;
 		spdR = Constants.DriveConstants.DRIVE_HIGH_SPEED * pwrR;
-		String tempStr = "pwrL=" + String.valueOf(pwrL) + ", pwrR=" + String.valueOf(pwrR) + ", spdL="
-				+ String.valueOf(spdL) + ", spdR=" + String.valueOf(spdR);
+		// String tempStr = "pwrL=" + String.valueOf(pwrL) + ", pwrR=" + String.valueOf(pwrR) + ", spdL="
+		// 		+ String.valueOf(spdL) + ", spdR=" + String.valueOf(spdR);
 		// Log.info("FalconDrive", tempStr);
-		// setWheelPower(new DriveSignal(pwrL, pwrR));
-		setWheelVelocity(new DriveSignal(spdL, spdR));
+		setWheelPower(new DriveSignal(pwrL, pwrR));
+		// setWheelVelocity(new DriveSignal(spdL, spdR));
 	}
 
 	@Override
 	public void update() {
-		velocityController();
+		// velocityController();
 		DriveState snapDriveState;
 		synchronized (this) {
 			snapDriveState = driveState;
@@ -443,30 +443,23 @@ public class FalconDrive extends Drive {
 	@Override
 	public void updateRamseteController(boolean isStart) {
 		currentTime = Timer.getFPGATimestamp();
-		Log.info("a", "a");
 		if (isStart) {
 			startTime = currentTime;
 		}
-		Log.info("b", "b");
 		State currentTrajectoryState = trajectory.sample(currentTime - startTime);
-		Log.info("c", "c");
 
 		AutoDriveSignal signal = autonomousDriver.calculate(RobotTracker.getInstance().getOdometry(),
 				currentTrajectoryState);
-		Log.info("d", "d");
 		if ((currentTime - startTime) == totalTime) {
-				Log.info("bleh", "bleh");
 			synchronized (this) {
 				Log.info("FalconDrive", "Finished Trajectory Pursuit with RamseteController successfully.");
 				driveState = DriveState.TELEOP;
 			}
 			configHigh();
 		}
-		Log.info("e", "e");
 		// System.out.println("signal l:" + signal.command.leftVelocity + " signal R " +
 		// signal.command.rightVelocity);
 		setWheelVelocity(signal.command);
-		Log.info("f", "f");
 	}
 
 	@Override

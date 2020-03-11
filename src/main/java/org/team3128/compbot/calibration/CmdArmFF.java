@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import org.team3128.compbot.subsystems.Constants;
 import org.team3128.compbot.subsystems.Arm;
-import org.team3128.compbot.subsystems.Hopper.HopperState;
 
 import edu.wpi.first.wpilibj.command.Command;
 

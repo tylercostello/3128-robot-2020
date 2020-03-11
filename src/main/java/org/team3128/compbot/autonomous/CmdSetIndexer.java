@@ -5,19 +5,21 @@ import edu.wpi.first.wpilibj.command.Command;
 import org.team3128.compbot.subsystems.Arm.ArmState;
 import org.team3128.compbot.subsystems.Hopper;
 import org.team3128.common.utility.Log;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
-public class CmdSetIntake extends Command {
+
+public class CmdSetIndexer extends Command {
     
     Hopper hopper;  
     double power;
-    public CmdSetIntake(Hopper hopper, double power) {
+    public CmdSetIndexer(Hopper hopper, double power) {
         this.hopper = hopper;
         this.power = power;
     }
     
     @Override
     protected void initialize() {
-        hopper.INTAKE_MOTOR.set(power);
+        hopper.HOPPER_FEEDER_MOTOR.set(ControlMode.PercentOutput, power);
     }
     
     @Override

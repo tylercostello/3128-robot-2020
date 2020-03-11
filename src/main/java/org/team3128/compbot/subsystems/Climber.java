@@ -14,17 +14,11 @@ import org.team3128.common.hardware.motor.LazyVictorSPX;
 import org.team3128.common.utility.enums.Direction;
 
 
-public class Climber extends Threaded {
-
-    public static final Climber instance = new Climber();
+public class Climber {
     public LazyVictorSPX LEFT_MOTOR, RIGHT_MOTOR;
     public boolean isClimbing = false;
 
-    public static Climber getInstance() {
-        return instance;
-    }
-
-    private Climber() {
+    public Climber() {
         configMotors();
     }
 
@@ -45,11 +39,6 @@ public class Climber extends Threaded {
 
     public void setIsClimbing(boolean value) {
         isClimbing = value;
-    }
-
-    @Override
-    public void update() {
-        // nothing needed here
     }
 
 }

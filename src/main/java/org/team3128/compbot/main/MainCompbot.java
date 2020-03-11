@@ -78,12 +78,12 @@ public class MainCompbot extends NarwhalRobot {
     static Hopper hopper = Hopper.getInstance();
     static Arm arm = Arm.getInstance();
     static Shooter shooter = Shooter.getInstance();
-    static Climber climber = Climber.getInstance();
+    static Climber climber = new Climber();
 
  
-    RobotTracker robotTracker = RobotTracker.getInstance();
+    // RobotTracker robotTracker = RobotTracker.getInstance();
 
-    ExecutorService executor = Executors.newFixedThreadPool(4);
+    ExecutorService executor = Executors.newFixedThreadPool(6);
     ThreadScheduler scheduler = new ThreadScheduler();
     Thread auto;
 
@@ -159,8 +159,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        scheduler.schedule(climber, executor);
-        scheduler.schedule(robotTracker, executor);
+        //scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
 
@@ -209,7 +208,21 @@ public class MainCompbot extends NarwhalRobot {
 
         //     }
         // });
-
+        NarwhalDashboard.addButton("SetStateLong", (boolean down) -> {
+                 if (down) {               
+                    stateTracker.setState(RobotState.LONG_RANGE);
+                 }
+             });
+        NarwhalDashboard.addButton("SetStateMid", (boolean down) -> {
+            if (down) {               
+               stateTracker.setState(RobotState.MID_RANGE);
+            }
+        });
+        NarwhalDashboard.addButton("SetStateShort", (boolean down) -> {
+            if (down) {               
+               stateTracker.setState(RobotState.SHORT_RANGE);
+            }
+        });
         drive.resetGyro();
     }
 
@@ -235,8 +248,9 @@ public class MainCompbot extends NarwhalRobot {
         // listenerRight.nameControl(new Button(6), "runArmFF");
         // listenerRight.nameControl(new Button(7), "endVoltage");
         listenerRight.nameControl(new Button(7), "setRangeLong");
-        listenerRight.nameControl(new Button(8), "EjectBalls");
+        listenerRight.nameControl(new Button(8), "RunBalls");
         listenerRight.nameControl(new Button(9), "setRangeMid");
+        listenerRight.nameControl(new Button(10), "EjectBalls");
         listenerRight.nameControl(new Button(11), "setRangeShort");
         listenerRight.nameControl(new Button(12), "queueShooter");
         
@@ -292,10 +306,23 @@ public class MainCompbot extends NarwhalRobot {
             arm.setState(ArmState.STOWED);
         });
         listenerRight.addButtonDownListener("EjectBalls", () -> {
-            Log.info("Button8", "pressed");
-            Log.info("MainCompBot", "Eject not implemented yet");
+            Log.info("Button10", "pressed");
+            //Log.info("MainCompBot", "Eject not implemented yet");
             // ejectBallsCommand = new CmdEjectBalls(hopper);
             // ejectBallsCommand.start();
+            hopper.setAction(ActionState.EJECTING);
+        });
+        listenerRight.addButtonUpListener("EjectBalls", () -> {
+            Log.info("Button10", "released");
+            hopper.setAction(ActionState.STANDBY);
+        });
+        listenerRight.addButtonDownListener("RunBalls", () -> {
+            Log.info("Button8", "pressed");
+            hopper.setAction(ActionState.RUNNING);
+        });
+        listenerRight.addButtonUpListener("RunBalls", () -> {
+            Log.info("Button8", "released");
+            hopper.setAction(ActionState.STANDBY);
         });
         listenerRight.addButtonDownListener("zeroCallBount", () -> {
             hopper.setBallCount(0);
@@ -422,7 +449,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopPeriodic() {
-
+        scheduler.resume();
     }
 
     double maxLeftSpeed = 0;
@@ -451,9 +478,11 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
+        SmartDashboard.putString("hopper update count", String.valueOf(hopper.hopper_update_count));
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
         NarwhalDashboard.put("ball_count", hopper.getBallCount());
+        NarwhalDashboard.put("shooting_state", StateTracker.robotState.shooterStateName);
 
         //Log.info("HOPPER", "" + hopper.SENSOR_1_STATE);
 
@@ -462,12 +491,12 @@ public class MainCompbot extends NarwhalRobot {
             arm.ARM_MOTOR_FOLLOWER.setSelectedSensorPosition(0);
         }
 
-        // currentLeftSpeed = drive.getLeftSpeed();
+        currentLeftSpeed = drive.getLeftSpeed();
         // currentLeftDistance = drive.getLeftDistance();
-        // currentRightSpeed = drive.getRightSpeed();
+        currentRightSpeed = drive.getRightSpeed();
         // currentRightDistance = drive.getRightDistance();
 
-        // currentSpeed = drive.getSpeed();
+        currentSpeed = drive.getSpeed();
         // currentDistance = drive.getDistance();
 
         // currentArmLimitSwitch = String.valueOf(arm.getLimitStatus());
@@ -483,7 +512,7 @@ public class MainCompbot extends NarwhalRobot {
         // currentShooterSetpoint = shooter.setpoint;
 
         // SmartDashboard.putString("DriveCmdRunning", "" + driveCmdRunning.isRunning);
-        // SmartDashboard.putString("ActionState", "" + hopper.actionState);
+        SmartDashboard.putString("ActionState", "" + hopper.actionState);
 
         // SmartDashboard.putString("Gatekeeper Sensor", String.valueOf(hopper.SENSOR_0.get()));
         // SmartDashboard.putString("Hopper Feeder Sensor", String.valueOf(hopper.SENSOR_1.get()));
@@ -507,8 +536,8 @@ public class MainCompbot extends NarwhalRobot {
 
         // SmartDashboard.putNumber("Distance", currentDistance);
 
-        // SmartDashboard.putNumber("Left Velocity", currentLeftSpeed);
-        // SmartDashboard.putNumber("Right Velocity", currentRightSpeed);
+        SmartDashboard.putNumber("Left Velocity", currentLeftSpeed);
+        SmartDashboard.putNumber("Right Velocity", currentRightSpeed);
 
         // SmartDashboard.putNumber("Velocity", drive.getSpeed());
 
@@ -544,29 +573,29 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void teleopInit() {
+        scheduler.resume();
         shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         hopper.setAction(ActionState.STANDBY);
         Log.info("MainCompbot", "TeleopInit has started. Setting arm state to ArmState.STARTING");
-        scheduler.resume();
         driveCmdRunning.isRunning = true;
     }
 
     @Override
     protected void autonomousInit() {
         scheduler.resume();
+        hopper.setAction(ActionState.STANDBY);
         drive.resetGyro();
-        Command auto = new AutoSimple(drive, shooter, arm, hopper, ahrs, shooterLimelight, driveCmdRunning, 10000);
+        Command auto = new AutoSimple(drive, shooter, arm, hopper, ahrs, shooterLimelight, driveCmdRunning, 10000, scheduler);
         auto.start();
     }
 
     @Override
     protected void disabledInit() {
         shooterLimelight.setLEDMode(LEDMode.OFF);
-        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
+        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG); //TODO: revert to non-debug for comp
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
-        scheduler.pause();
     }
 
     public static void main(String... args) {

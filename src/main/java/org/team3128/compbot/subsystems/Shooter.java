@@ -17,8 +17,8 @@ public class Shooter extends Threaded {
     public static enum ShooterState {
         OFF(0),
         LONG_RANGE(4800), // long range shooting
-        MID_RANGE(4080), // mid range shooting
-        SHORT_RANGE(3600); // short range shooting
+        MID_RANGE(4050), // mid range shooting
+        SHORT_RANGE(3500); // short range shooting 3700
 
         public double shooterRPM;
 
@@ -87,7 +87,6 @@ public class Shooter extends Threaded {
 
     @Override
     public void update() {
-        SmartDashboard.putNumber("plataue count", plateauCount);
         current = getRPM();
         // Log.info("Shooter", "Shooter RPM is " + String.valueOf(current));
         error = setpoint - current;
