@@ -25,7 +25,7 @@ public abstract class Threaded implements Runnable {
 	private boolean isUpdated = true;
 	private boolean isPaused = false;
 	private double lastRuntime = 0;
-	private long period = Duration.ofMillis(50).toNanos(); // period of 5 ms = 0.005 s -> frequency of 1 / 0.005 = 200hz
+	private long period = Duration.ofMillis(20).toNanos(); // period of 5 ms = 0.005 s -> frequency of 1 / 0.005 = 200hz
 
 	@Override
 	public void run() {

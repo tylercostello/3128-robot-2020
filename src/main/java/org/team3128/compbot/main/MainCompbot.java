@@ -594,8 +594,8 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void disabledInit() {
         shooterLimelight.setLEDMode(LEDMode.OFF);
-        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
-        arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
+        arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG); //TODO: revert to non-debug for comp
+        arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
     }
 
     public static void main(String... args) {

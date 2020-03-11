@@ -21,8 +21,8 @@ public class Arm extends Threaded {
         STARTING_DOWN(30), // arm is pushed to release the intake
         LOADING_STATION(46),
         LONG_RANGE(52), // far range shooting
-        MID_RANGE(50.5),
-        SHORT_RANGE(50.5), // short range shooting
+        MID_RANGE(50),
+        SHORT_RANGE(40.5), // short range shooting
         CLIMBING(75), // climbing
         DEBUG(5);
 

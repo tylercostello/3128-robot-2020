@@ -381,10 +381,10 @@ public class Hopper extends Threaded {
                 }
                 if(actionState == ActionState.SHOOTING) {
                     if (shootingReversingIndexer) {
-                        setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                        setMotorPowers(0, Constants.HopperConstants.BASE_POWER,
                             -Constants.HopperConstants.INDEXER_POWER);
                     } else if (!shootingReversingIndexer) {
-                        setMotorPowers(Constants.HopperConstants.GATEKEEPER_POWER, Constants.HopperConstants.BASE_POWER,
+                        setMotorPowers(0, Constants.HopperConstants.BASE_POWER,
                             Constants.HopperConstants.INDEXER_POWER);
                     }
                 } else {
