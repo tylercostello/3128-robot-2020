@@ -37,7 +37,7 @@ public class StateTracker{
     }
 
     private StateTracker(){
-        robotState = RobotState.SHORT_RANGE;
+        robotState = RobotState.MID_RANGE;
     }
 
     public void setState(final RobotState desiredState) {

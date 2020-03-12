@@ -478,7 +478,7 @@ public class MainCompbot extends NarwhalRobot {
 
     @Override
     protected void updateDashboard() {
-        SmartDashboard.putString("hopper update count", String.valueOf(hopper.hopper_update_count));
+        SmartDashboard.putString("Arm Angle", String.valueOf(arm.getAngle()));
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
         NarwhalDashboard.put("ball_count", hopper.getBallCount());

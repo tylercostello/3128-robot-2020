@@ -92,7 +92,7 @@ public class Constants extends RobotConstants {
                 public static final int SAMPLE_RATE = 3;
                 public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be allowed to shoot
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
-                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.0134, 0.02, 0.00006);
+                public static final PIDConstants VISION_PID = new PIDConstants(0, 0.014, 0.02, 0.00006);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
         }
@@ -173,7 +173,7 @@ public class Constants extends RobotConstants {
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
                 public static final NeutralMode ARM_NEUTRAL_MODE_DEBUG = NeutralMode.Coast;
                 public static final double MAX_ARM_ANGLE = 80;
-                public static final double ANGLE_THRESHOLD = 7;
+                public static final double ANGLE_THRESHOLD = 4;
                 public static final double PLATEAU_THRESHOLD = 50;
 
                 public static final double ARM_GEARING = 60 / 12 * 80 / 18 * 64 / 8; // for every (ARM_GEARING)

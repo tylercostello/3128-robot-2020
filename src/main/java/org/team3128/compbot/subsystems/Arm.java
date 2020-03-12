@@ -18,11 +18,11 @@ public class Arm extends Threaded {
         STOWED(0), // arm is all the way down
         INTAKE(0), // intaking balls
         STARTING(49), // within frame perimeter
-        STARTING_DOWN(30), // arm is pushed to release the intake
+        STARTING_DOWN(40), // arm is pushed to release the intake
         LOADING_STATION(46),
         LONG_RANGE(52), // far range shooting
-        MID_RANGE(50),
-        SHORT_RANGE(40.5), // short range shooting
+        MID_RANGE(48.3),
+        SHORT_RANGE(5.5), // short range shooting
         CLIMBING(75), // climbing
         DEBUG(5);
 
@@ -150,12 +150,12 @@ public class Arm extends Threaded {
 
         output = voltage_output / voltage;
         if (output > 1) {
-            Log.info("ARM",
-                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this");
+            // Log.info("ARM",
+            //         "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this");
             output = 1;
         } else if (output < -1) {
-            Log.info("ARM",
-                    "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
+            // Log.info("ARM",
+            //         "WARNING: Tried to set power above available voltage! Saturation limit SHOULD take care of this ");
             output = -1;
         }
 
