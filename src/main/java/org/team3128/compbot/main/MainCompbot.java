@@ -86,8 +86,11 @@ public class MainCompbot extends NarwhalRobot {
     ArrayList<Double> thetaList = new ArrayList<Double>();
     ArrayList<Double> vlList = new ArrayList<Double>();
     ArrayList<Double> vrList = new ArrayList<Double>();
-    static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 100, 100, 10,
-    0.01, 0.25, 0.25, 0.25);
+
+    //Navx should be pretty accurate because it is running its own kalman filter
+    //I have no idea what the encoder variances should be
+    static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 100, 100, 0.9652,
+    0.01, 0.01, 0.25, 0.25);
     private double[] inputArray = new double[4];
     private double[] outputArray;
     private double currentTime, previousTime, printerTime;
@@ -464,6 +467,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.resume();
         currentTime=RobotController.getFPGATime();
         
+        //I'm not sure how to check if new readings are available so right now we are running predict and update every time
         inputArray[0] = ahrs.getAngle();
         inputArray[1] = drive.getLeftSpeed();
         inputArray[2] = drive.getRightSpeed();
