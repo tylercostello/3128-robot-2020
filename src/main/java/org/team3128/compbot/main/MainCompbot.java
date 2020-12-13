@@ -65,6 +65,8 @@ import java.util.concurrent.*;
 
 import org.team3128.common.generics.ThreadScheduler;
 
+import org.team3128.common.utility.ExtendedKalmanFilter.EKF;
+
 public class MainCompbot extends NarwhalRobot {
 
     public Command triggerCommand;
@@ -79,8 +81,18 @@ public class MainCompbot extends NarwhalRobot {
     static Arm arm = Arm.getInstance();
     static Shooter shooter = Shooter.getInstance();
     static Climber climber = new Climber();
+    ArrayList<Double> xList = new ArrayList<Double>();
+    ArrayList<Double> yList = new ArrayList<Double>();
+    ArrayList<Double> thetaList = new ArrayList<Double>();
+    ArrayList<Double> vlList = new ArrayList<Double>();
+    ArrayList<Double> vrList = new ArrayList<Double>();
+    static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 100, 100, 10,
+    0.01, 0.25, 0.25, 0.25);
+    private double[] inputArray = new double[4];
+    private double[] outputArray;
+    private double currentTime, previousTime, printerTime;
 
- 
+
     // RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(6);
@@ -450,6 +462,30 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void teleopPeriodic() {
         scheduler.resume();
+        currentTime=RobotController.getFPGATime();
+        
+        inputArray[0] = ahrs.getAngle();
+        inputArray[1] = drive.getLeftSpeed();
+        inputArray[2] = drive.getRightSpeed();
+        inputArray[3] = currentTime-previousTime;
+       // where EKF is ran
+         outputArray = ekf.runFilter(inputArray);
+
+        xList.add(outputArray[0]);
+        yList.add(outputArray[1]);
+        thetaList.add(outputArray[2]);
+        vlList.add(outputArray[3]);
+        vrList.add(outputArray[4]);
+        previousTime=currentTime;
+        if(printerTime-currentTime>1){
+            printerTime=currentTime;
+            Log.info("EKF", "x: " + xList.get(xList.size()-1));
+            Log.info("EKF", "y: " + yList.get(yList.size()-1));
+            Log.info("EKF", "theta: " + thetaList.get(thetaList.size()-1));
+            Log.info("EKF", "vl: " + vlList.get(vlList.size()-1));
+            Log.info("EKF", "vr: " + vrList.get(vrList.size()-1));
+        }
+
     }
 
     double maxLeftSpeed = 0;
@@ -574,12 +610,19 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void teleopInit() {
         scheduler.resume();
+        printerTime=RobotController.getFPGATime();
+        previousTime=RobotController.getFPGATime();
         shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         hopper.setAction(ActionState.STANDBY);
         Log.info("MainCompbot", "TeleopInit has started. Setting arm state to ArmState.STARTING");
         driveCmdRunning.isRunning = true;
+        xList.add((double) 0);
+        yList.add((double) 0);
+        thetaList.add(Math.PI/2);
+        vlList.add((double) 0);
+        vrList.add((double) 0);
     }
 
     @Override
