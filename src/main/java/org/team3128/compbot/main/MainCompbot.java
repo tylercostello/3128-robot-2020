@@ -66,6 +66,7 @@ import java.util.concurrent.*;
 import org.team3128.common.generics.ThreadScheduler;
 
 import org.team3128.common.utility.ExtendedKalmanFilter.EKF;
+import java.io.FileWriter;
 
 public class MainCompbot extends NarwhalRobot {
 
@@ -86,7 +87,6 @@ public class MainCompbot extends NarwhalRobot {
     ArrayList<Double> thetaList = new ArrayList<Double>();
     ArrayList<Double> vlList = new ArrayList<Double>();
     ArrayList<Double> vrList = new ArrayList<Double>();
-
     //Navx should be pretty accurate because it is running its own kalman filter
     //I have no idea what the encoder variances should be
     static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 10, 10, 0.5842,//0.9652,
@@ -433,6 +433,10 @@ public class MainCompbot extends NarwhalRobot {
             Log.info("Button10", "pressed");
             hopper.setBallCount(hopper.ballCount - 1);
         });
+        listenerLeft.addButtonDownListener("SaveCSV", () -> {
+            Log.info("Button11", "pressed");
+            
+        });
         listenerLeft.addButtonDownListener("EmergencyReset", () -> {
             Log.info("MainCompBot", "EMERGENCY RESET PRESSED");
             hopper.setBallCount(0);
@@ -465,6 +469,7 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void teleopPeriodic() {
         scheduler.resume();
+        
         currentTime=RobotController.getFPGATime()/1000000.0;
         //currentTime = currentTime*1e-06;
         //I'm not sure how to check if new readings are available so right now we are running predict and update every time
@@ -508,6 +513,17 @@ public class MainCompbot extends NarwhalRobot {
             } else {
                 Log.info("EKF", "vr: " + vrList.get(vrList.size()-1));
             }
+
+            try{
+                
+                writer.append(xList.get(xList.size()-1)+","+yList.get(yList.size()-1)+","+thetaList.get(thetaList.size()-1)+","+vlList.get(vlList.size()-1)+","+vrList.get(vrList.size()-1)+"\n");
+            }
+            catch(Exception e){
+                System.out.println(e);
+            } 
+
+
+
             /*Log.info("EKF", "y: " + yList.get(yList.size()-1));
             Log.info("EKF", "theta: " + thetaList.get(thetaList.size()-1));
             Log.info("EKF", "vl: " + vlList.get(vlList.size()-1));
@@ -539,6 +555,7 @@ public class MainCompbot extends NarwhalRobot {
     double currentShooterSpeed;
     double currentShooterPower;
     double currentShooterSetpoint;
+    FileWriter writer;
 
     @Override
     protected void updateDashboard() {
@@ -651,6 +668,16 @@ public class MainCompbot extends NarwhalRobot {
         thetaList.add(Math.PI/2);
         vlList.add((double) 0);
         vrList.add((double) 0);
+        try{
+            writer = new FileWriter("test.csv");
+            writer.append("x,y,theta,vl,vr\n");
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }   
+        
+
+        
     }
 
     @Override
@@ -667,6 +694,12 @@ public class MainCompbot extends NarwhalRobot {
         shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG); //TODO: revert to non-debug for comp
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE_DEBUG);
+        try{
+            writer.close(); 
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }   
     }
 
     public static void main(String... args) {
