@@ -469,8 +469,8 @@ public class MainCompbot extends NarwhalRobot {
         //currentTime = currentTime*1e-06;
         //I'm not sure how to check if new readings are available so right now we are running predict and update every time
         inputArray[0] = ahrs.getAngle() * Math.PI / 180.0;
-        inputArray[1] = drive.getLeftSpeed() * 0.0254 * 10;
-        inputArray[2] = drive.getRightSpeed() * 0.0254 * 10;
+        inputArray[1] = drive.getLeftSpeed() * 0.0254;
+        inputArray[2] = drive.getRightSpeed() * 0.0254;
         inputArray[3] = currentTime-previousTime;
        // where EKF is run
          outputArray = ekf.runFilter(inputArray);
