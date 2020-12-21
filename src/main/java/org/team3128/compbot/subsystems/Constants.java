@@ -50,7 +50,7 @@ public class Constants extends RobotConstants {
 
                 public static final int DRIVE_HIGH_SPEED = 140; // Empirical Max Linear Speed: TBD in/s
 
-                public static final double WHEEL_DIAMETER = 3.55; // effective wheel diameter (measure first then tune this number until distances are accurate)
+                public static final double WHEEL_DIAMETER = 6.2; // effective wheel diameter (measure first then tune this number until distances are accurate)
 
                 public static final double LEFT_SPEEDSCALAR = 1.0; // purely for TELEOP drive (to make sure that when the drive pushes the joystick forward, both sides of the drivetrain are going ROUGHLY the same speed)
                 public static final double RIGHT_SPEEDSCALAR = 1.0;// purely for TELEOP drive (to make sure that when the drive pushes the joystick forward, both sides of the drivetrain are going ROUGHLY the same speed)

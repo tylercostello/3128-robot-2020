@@ -89,8 +89,8 @@ public class MainCompbot extends NarwhalRobot {
 
     //Navx should be pretty accurate because it is running its own kalman filter
     //I have no idea what the encoder variances should be
-    static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 1, 1, 0.9652,
-    0.01, 0.01, 0.25, 0.25);
+    static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 10, 10, 0.5842,//0.9652,
+    0.01, 0.1, 0.01, 0.01);
     private double[] inputArray = new double[4];
     private double[] outputArray;
     private double currentTime, previousTime, printerTime;
