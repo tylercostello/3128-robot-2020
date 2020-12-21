@@ -93,7 +93,7 @@ public class MainCompbot extends NarwhalRobot {
     0.01, 0.1, 0.01, 0.01);
     private double[] inputArray = new double[4];
     private double[] outputArray;
-    private double currentTime, previousTime, printerTime;
+    private double currentTime, previousTime, printerTime, initTime;
 
 
     // RobotTracker robotTracker = RobotTracker.getInstance();
@@ -124,6 +124,7 @@ public class MainCompbot extends NarwhalRobot {
 
     public int countBalls = 0;
     public int countBalls2 = 0;
+
     public static CanDevices leftDriveLeader;
     public static CanDevices leftDriveFollower;
     public static CanDevices rightDriveLeader;
@@ -433,10 +434,10 @@ public class MainCompbot extends NarwhalRobot {
             Log.info("Button10", "pressed");
             hopper.setBallCount(hopper.ballCount - 1);
         });
-        listenerLeft.addButtonDownListener("SaveCSV", () -> {
+        /*listenerLeft.addButtonDownListener("SaveCSV", () -> {
             Log.info("Button11", "pressed");
             
-        });
+        });*/
         listenerLeft.addButtonDownListener("EmergencyReset", () -> {
             Log.info("MainCompBot", "EMERGENCY RESET PRESSED");
             hopper.setBallCount(0);
@@ -513,14 +514,14 @@ public class MainCompbot extends NarwhalRobot {
             } else {
                 Log.info("EKF", "vr: " + vrList.get(vrList.size()-1));
             }
+        }
 
-            try{
-                
-                writer.append(xList.get(xList.size()-1)+","+yList.get(yList.size()-1)+","+thetaList.get(thetaList.size()-1)+","+vlList.get(vlList.size()-1)+","+vrList.get(vrList.size()-1)+"\n");
-            }
-            catch(Exception e){
-                System.out.println(e);
-            } 
+        try{     
+            writer.append((currentTime-initTime)+","+xList.get(xList.size()-1)+","+yList.get(yList.size()-1)+","+thetaList.get(thetaList.size()-1)+","+vlList.get(vlList.size()-1)+","+vrList.get(vrList.size()-1)+"\n");
+        }
+        catch(Exception e){
+            System.out.println(e);
+        } 
 
 
 
@@ -528,7 +529,6 @@ public class MainCompbot extends NarwhalRobot {
             Log.info("EKF", "theta: " + thetaList.get(thetaList.size()-1));
             Log.info("EKF", "vl: " + vlList.get(vlList.size()-1));
             Log.info("EKF", "vr: " + vrList.get(vrList.size()-1));*/
-        }
 
     }
 
@@ -669,15 +669,13 @@ public class MainCompbot extends NarwhalRobot {
         vlList.add((double) 0);
         vrList.add((double) 0);
         try{
-            writer = new FileWriter("test.csv");
-            writer.append("x,y,theta,vl,vr\n");
+            writer = new FileWriter("/home/lvuser/test.csv");
+            writer.append("t,x,y,theta,vl,vr\n");
         }
         catch(Exception e){
             System.out.println(e);
         }   
-        
-
-        
+        initTime=RobotController.getFPGATime()/1000000.0;
     }
 
     @Override
