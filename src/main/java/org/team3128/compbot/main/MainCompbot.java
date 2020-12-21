@@ -465,12 +465,12 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void teleopPeriodic() {
         scheduler.resume();
-        currentTime=RobotController.getFPGATime();
+        currentTime=RobotController.getFPGATime()/1000000.0;
         //currentTime = currentTime*1e-06;
         //I'm not sure how to check if new readings are available so right now we are running predict and update every time
         inputArray[0] = ahrs.getAngle() * Math.PI / 180.0;
-        inputArray[1] = drive.getLeftSpeed() * 0.0254;
-        inputArray[2] = drive.getRightSpeed() * 0.0254;
+        inputArray[1] = drive.getLeftSpeed() * 0.0254 * 10;
+        inputArray[2] = drive.getRightSpeed() * 0.0254 * 10;
         inputArray[3] = currentTime-previousTime;
        // where EKF is run
          outputArray = ekf.runFilter(inputArray);
@@ -638,8 +638,8 @@ public class MainCompbot extends NarwhalRobot {
     @Override
     protected void teleopInit() {
         scheduler.resume();
-        printerTime=RobotController.getFPGATime();
-        previousTime=RobotController.getFPGATime();
+        printerTime=RobotController.getFPGATime()/1000000.0;
+        previousTime=RobotController.getFPGATime()/1000000.0;
         shooterLimelight.setLEDMode(LEDMode.OFF);
         arm.ARM_MOTOR_LEADER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
         arm.ARM_MOTOR_FOLLOWER.setNeutralMode(Constants.ArmConstants.ARM_NEUTRAL_MODE);
