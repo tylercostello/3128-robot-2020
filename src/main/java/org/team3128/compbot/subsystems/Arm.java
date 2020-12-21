@@ -53,7 +53,7 @@ public class Arm extends Threaded {
     private Arm() {
         configMotors();
         configSensors();
-        setState(ArmState.STARTING);
+        setState(ArmState.STOWED);
     }
 
     private void configSensors() {

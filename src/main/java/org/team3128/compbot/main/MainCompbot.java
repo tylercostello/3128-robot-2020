@@ -89,7 +89,7 @@ public class MainCompbot extends NarwhalRobot {
 
     //Navx should be pretty accurate because it is running its own kalman filter
     //I have no idea what the encoder variances should be
-    static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 100, 100, 0.9652,
+    static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 1, 1, 0.9652,
     0.01, 0.01, 0.25, 0.25);
     private double[] inputArray = new double[4];
     private double[] outputArray;
@@ -466,13 +466,13 @@ public class MainCompbot extends NarwhalRobot {
     protected void teleopPeriodic() {
         scheduler.resume();
         currentTime=RobotController.getFPGATime();
-        
+        //currentTime = currentTime*1e-06;
         //I'm not sure how to check if new readings are available so right now we are running predict and update every time
-        inputArray[0] = ahrs.getAngle();
-        inputArray[1] = drive.getLeftSpeed();
-        inputArray[2] = drive.getRightSpeed();
+        inputArray[0] = ahrs.getAngle() * Math.PI / 180.0;
+        inputArray[1] = drive.getLeftSpeed() * 0.0254;
+        inputArray[2] = drive.getRightSpeed() * 0.0254;
         inputArray[3] = currentTime-previousTime;
-       // where EKF is ran
+       // where EKF is run
          outputArray = ekf.runFilter(inputArray);
 
         xList.add(outputArray[0]);
@@ -481,13 +481,37 @@ public class MainCompbot extends NarwhalRobot {
         vlList.add(outputArray[3]);
         vrList.add(outputArray[4]);
         previousTime=currentTime;
-        if(printerTime-currentTime>1){
+        if(currentTime-printerTime>1){
             printerTime=currentTime;
-            Log.info("EKF", "x: " + xList.get(xList.size()-1));
-            Log.info("EKF", "y: " + yList.get(yList.size()-1));
+            //drive.debug();
+            //Log.info("Raw Sensor Value", "left speed: " + drive.getLeftSpeed() * 0.0254);
+            //Log.info("Raw Sensor Value", "right speed: " + drive.getRightSpeed() * 0.0254);
+            if (RobotMath.isClose(xList.get(xList.size()-1), 0)) {
+                Log.info("EKF", "x: 0");
+            } else {
+                Log.info("EKF", "x: " + xList.get(xList.size()-1));
+            }
+            if (RobotMath.isClose(yList.get(yList.size()-1), 0)) {
+                Log.info("EKF", "y: 0");
+            } else {
+                Log.info("EKF", "y: " + yList.get(yList.size()-1));
+            }if (RobotMath.isClose(thetaList.get(thetaList.size()-1), 0)) {
+                Log.info("EKF", "theta: 0");
+            } else {
+                Log.info("EKF", "theta: " + thetaList.get(thetaList.size()-1));
+            }if (RobotMath.isClose(vlList.get(vlList.size()-1), 0)) {
+                Log.info("EKF", "vl: 0");
+            } else {
+                Log.info("EKF", "vl: " + vlList.get(vlList.size()-1));
+            }if (RobotMath.isClose(vrList.get(vrList.size()-1), 0)) {
+                Log.info("EKF", "vr: 0");
+            } else {
+                Log.info("EKF", "vr: " + vrList.get(vrList.size()-1));
+            }
+            /*Log.info("EKF", "y: " + yList.get(yList.size()-1));
             Log.info("EKF", "theta: " + thetaList.get(thetaList.size()-1));
             Log.info("EKF", "vl: " + vlList.get(vlList.size()-1));
-            Log.info("EKF", "vr: " + vrList.get(vrList.size()-1));
+            Log.info("EKF", "vr: " + vrList.get(vrList.size()-1));*/
         }
 
     }

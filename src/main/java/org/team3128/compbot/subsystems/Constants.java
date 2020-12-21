@@ -29,7 +29,7 @@ public class Constants extends RobotConstants {
                 public static final double kDriveInchesPerSecPerNUp100ms = (1000d / 1)
                                 * (1 / MechanismConstants.ENCODER_RESOLUTION_PER_ROTATION)
                                 * (Constants.DriveConstants.WHEEL_DIAMETER * Math.PI)
-                                * Constants.DriveConstants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION; // a fairly basic relationship between tangential and rotational speed: NU/100ms * 1000ms/1second * 1/(encoder resolution) * CIRCUM * (relation between encoder rotations and wheel rotations) = in/s
+                                * Constants.DriveConstants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION / 100; // a fairly basic relationship between tangential and rotational speed: NU/100ms * 1000ms/1second * 1/(encoder resolution) * CIRCUM * (relation between encoder rotations and wheel rotations) = in/s
                 public static final double kDriveNuToInches = (1
                                 / Constants.MechanismConstants.ENCODER_RESOLUTION_PER_ROTATION)
                                 * Constants.DriveConstants.WHEEL_DIAMETER * Math.PI

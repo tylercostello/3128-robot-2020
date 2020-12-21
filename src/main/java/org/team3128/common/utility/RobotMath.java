@@ -455,4 +455,16 @@ public class RobotMath {
 		return Math.abs(testValue) > (1.0 - percent / 100.0) * Math.abs(targetValue)
 				&& Math.abs(testValue) < (1.0 + percent / 100.0) * Math.abs(targetValue);
 	}
+	/**
+	 * Returns true if two doubles are within 0.001 of each other.
+	 * 
+	 * @param in1	- The first double
+	 * @param in2	- The second double
+ 	*/
+	public static boolean isClose(double in1, double in2) {
+		if (Math.abs(in1 - in2) <= 0.001) {
+			return true;
+		}
+		return false;
+	}
 }

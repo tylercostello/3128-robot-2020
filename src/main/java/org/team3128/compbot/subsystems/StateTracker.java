@@ -10,7 +10,8 @@ public class StateTracker{
     public enum RobotState {
         SHORT_RANGE(Arm.ArmState.SHORT_RANGE, Shooter.ShooterState.SHORT_RANGE, "Short"),
         MID_RANGE(Arm.ArmState.MID_RANGE, Shooter.ShooterState.MID_RANGE, "Mid"),
-        LONG_RANGE(Arm.ArmState.LONG_RANGE, Shooter.ShooterState.LONG_RANGE, "Long");
+        LONG_RANGE(Arm.ArmState.LONG_RANGE, Shooter.ShooterState.LONG_RANGE, "Long"),
+        ZERO(Arm.ArmState.STOWED, Shooter.ShooterState.LONG_RANGE, "Long");
 
         public ArmState targetArmState;
         public ShooterState targetShooterState;
@@ -37,7 +38,7 @@ public class StateTracker{
     }
 
     private StateTracker(){
-        robotState = RobotState.MID_RANGE;
+        robotState = RobotState.ZERO;//RobotState.MID_RANGE;
     }
 
     public void setState(final RobotState desiredState) {
