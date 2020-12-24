@@ -479,7 +479,9 @@ public class MainCompbot extends NarwhalRobot {
         inputArray[2] = drive.getRightSpeed() * 0.0254;
         inputArray[3] = currentTime-previousTime;
        // where EKF is run
-         outputArray = ekf.runFilter(inputArray);
+        outputArray = ekf.runFilter(inputArray);
+
+       // outputArray = ekf.testFunction(inputArray);
 
         xList.add(outputArray[0]);
         yList.add(outputArray[1]);

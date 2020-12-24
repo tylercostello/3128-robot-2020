@@ -59,6 +59,43 @@ public class EKF {
 		return false;
 	}
 
+
+	public double[] testFunction(double[] xInput) {
+		double xNum = x.get(0, 0);
+		double y = x.get(1, 0);
+		double theta = xInput[0];
+		double vl = xInput[1];
+		double vr = xInput[2];
+		dt=xInput[3];
+
+		//special case to check if vl and vr are about the same, because then r would go to infinity
+		if (isClose(vl, vr)) {
+			xNum = xNum + vl * Math.cos(theta) * dt;
+			y = y + vl * Math.sin(theta) * dt;
+			theta = theta;
+		} else {
+			double w = (vr - vl) / b;
+			double r = (b / 2) * (vl + vr) / (vr - vl);
+			xNum = r * Math.sin(theta) * Math.cos(w * dt) + r * Math.cos(theta) * Math.sin(w * dt) + xNum
+					- r * Math.sin(theta);
+			y = r * Math.sin(theta) * Math.sin(w * dt) - r * Math.cos(theta) * Math.cos(w * dt) + y
+					+ r * Math.cos(theta);
+			theta = theta + w * dt;
+		}
+		
+
+		double[] returnArray = new double[5];
+		returnArray[0] = xNum;
+		returnArray[1] = y;
+		returnArray[2] = theta;
+		returnArray[3] = vl;
+		returnArray[4] = vr;
+
+		return returnArray;
+	}
+
+
+
 	// the function for calculating new position
 	private SimpleMatrix aFunction(SimpleMatrix xInput, double b, double dt) {
 		SimpleMatrix xOutput = new SimpleMatrix(5, 1);
