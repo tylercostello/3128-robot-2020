@@ -103,7 +103,7 @@ public class MainCompbot extends NarwhalRobot {
     private double currentTime, previousTime, printerTime, initTime;
 
 
-    // RobotTracker robotTracker = RobotTracker.getInstance();
+    RobotTracker robotTracker = RobotTracker.getInstance();
 
     ExecutorService executor = Executors.newFixedThreadPool(6);
     ThreadScheduler scheduler = new ThreadScheduler();
@@ -182,7 +182,7 @@ public class MainCompbot extends NarwhalRobot {
         scheduler.schedule(hopper, executor);
         scheduler.schedule(shooter, executor);
         scheduler.schedule(arm, executor);
-        //scheduler.schedule(robotTracker, executor);
+        scheduler.schedule(robotTracker, executor);
 
         driveCmdRunning = new DriveCommandRunning();
 
@@ -551,9 +551,16 @@ public class MainCompbot extends NarwhalRobot {
             }
         }
 
+
+
+         // SmartDashboard.putNumber("RobotTracker - x:", robotTracker.getOdometry().getTranslation().getX());
+        // SmartDashboard.putNumber("RobotTracker - y:", robotTracker.getOdometry().getTranslation().getY());
+        // SmartDashboard.putNumber("RobotTracker - theta:", robotTracker.getOdometry().getRotation().getDegrees());
+
         try{     
             writer.append((currentTime-initTime)+","+xList.get(xList.size()-1)+","+yList.get(yList.size()-1)+","+thetaList.get(thetaList.size()-1)+","+vlList.get(vlList.size()-1)+","+vrList.get(vrList.size()-1)+
-            ","+KxList.get(KxList.size()-1)+","+KyList.get(KyList.size()-1)+","+KthetaList.get(KthetaList.size()-1)+","+KvlList.get(KvlList.size()-1)+","+KvrList.get(KvrList.size()-1)+"\n");
+            ","+KxList.get(KxList.size()-1)+","+KyList.get(KyList.size()-1)+","+KthetaList.get(KthetaList.size()-1)+","+KvlList.get(KvlList.size()-1)+","+KvrList.get(KvrList.size()-1)+
+            ","+robotTracker.getOdometry().getTranslation().getX()+","+robotTracker.getOdometry().getTranslation().getY()+","+robotTracker.getOdometry().getRotation().getDegrees()+"\n");
         }
         catch(Exception e){
             System.out.println(e);
@@ -712,7 +719,7 @@ public class MainCompbot extends NarwhalRobot {
         KvrList.add((double) 0);
         try{
             writer = new FileWriter("/home/lvuser/test.csv");
-            writer.append("t,x,y,theta,vl,vr,kx,ky,ktheta,kvl,kvr\n");
+            writer.append("t,x,y,theta,vl,vr,kx,ky,ktheta,kvl,kvr,rx,ry,rtheta\n");
         }
         catch(Exception e){
             System.out.println(e);
