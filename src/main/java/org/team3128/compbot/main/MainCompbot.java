@@ -87,11 +87,18 @@ public class MainCompbot extends NarwhalRobot {
     ArrayList<Double> thetaList = new ArrayList<Double>();
     ArrayList<Double> vlList = new ArrayList<Double>();
     ArrayList<Double> vrList = new ArrayList<Double>();
+
+    ArrayList<Double> KxList = new ArrayList<Double>();
+    ArrayList<Double> KyList = new ArrayList<Double>();
+    ArrayList<Double> KthetaList = new ArrayList<Double>();
+    ArrayList<Double> KvlList = new ArrayList<Double>();
+    ArrayList<Double> KvrList = new ArrayList<Double>();
     //Navx should be pretty accurate because it is running its own kalman filter
     //I have no idea what the encoder variances should be
     static EKF ekf = new EKF(0, 0, Math.PI/2, 0, 0, 10, 10, 0.5842,//0.9652,
     0.01, 1e-3, 0.01, 0.01);
     private double[] inputArray = new double[4];
+    private double[] kinematicArray = new double[6];
     private double[] outputArray;
     private double currentTime, previousTime, printerTime, initTime;
 
@@ -481,13 +488,39 @@ public class MainCompbot extends NarwhalRobot {
        // where EKF is run
         outputArray = ekf.runFilter(inputArray);
 
-       // outputArray = ekf.testFunction(inputArray);
-
         xList.add(outputArray[0]);
         yList.add(outputArray[1]);
         thetaList.add(outputArray[2]);
         vlList.add(outputArray[3]);
         vrList.add(outputArray[4]);
+
+
+
+
+        
+        
+        kinematicArray[0] = KxList.get(KxList.size()-1);
+        kinematicArray[1] = KyList.get(KyList.size()-1);
+        kinematicArray[2] = ahrs.getAngle() * Math.PI / 180.0;
+        kinematicArray[3] = drive.getLeftSpeed() * 0.0254;
+        kinematicArray[4] = drive.getRightSpeed() * 0.0254;
+        kinematicArray[5] = currentTime-previousTime;
+
+        outputArray = ekf.testFunction(kinematicArray);
+
+        KxList.add(outputArray[0]);
+        KyList.add(outputArray[1]);
+        KthetaList.add(outputArray[2]);
+        KvlList.add(outputArray[3]);
+        KvrList.add(outputArray[4]);
+       
+
+
+
+
+
+
+
         previousTime=currentTime;
         if(currentTime-printerTime>1){
             printerTime=currentTime;
@@ -519,7 +552,8 @@ public class MainCompbot extends NarwhalRobot {
         }
 
         try{     
-            writer.append((currentTime-initTime)+","+xList.get(xList.size()-1)+","+yList.get(yList.size()-1)+","+thetaList.get(thetaList.size()-1)+","+vlList.get(vlList.size()-1)+","+vrList.get(vrList.size()-1)+"\n");
+            writer.append((currentTime-initTime)+","+xList.get(xList.size()-1)+","+yList.get(yList.size()-1)+","+thetaList.get(thetaList.size()-1)+","+vlList.get(vlList.size()-1)+","+vrList.get(vrList.size()-1)+
+            ","+KxList.get(KxList.size()-1)+","+KyList.get(KyList.size()-1)+","+KthetaList.get(KthetaList.size()-1)+","+KvlList.get(KvlList.size()-1)+","+KvrList.get(KvrList.size()-1)+"\n");
         }
         catch(Exception e){
             System.out.println(e);
@@ -670,9 +704,15 @@ public class MainCompbot extends NarwhalRobot {
         thetaList.add(Math.PI/2);
         vlList.add((double) 0);
         vrList.add((double) 0);
+
+        KxList.add((double) 0);
+        KyList.add((double) 0);
+        KthetaList.add(Math.PI/2);
+        KvlList.add((double) 0);
+        KvrList.add((double) 0);
         try{
             writer = new FileWriter("/home/lvuser/test.csv");
-            writer.append("t,x,y,theta,vl,vr\n");
+            writer.append("t,x,y,theta,vl,vr,kx,ky,ktheta,kvl,kvr\n");
         }
         catch(Exception e){
             System.out.println(e);

@@ -61,12 +61,12 @@ public class EKF {
 
 
 	public double[] testFunction(double[] xInput) {
-		double xNum = x.get(0, 0);
-		double y = x.get(1, 0);
-		double theta = xInput[0];
-		double vl = xInput[1];
-		double vr = xInput[2];
-		dt=xInput[3];
+		double xNum = xInput[0];
+		double y = xInput[1];
+		double theta = xInput[2];
+		double vl = xInput[3];
+		double vr = xInput[4];
+		double dt=xInput[5];
 
 		//special case to check if vl and vr are about the same, because then r would go to infinity
 		if (isClose(vl, vr)) {
